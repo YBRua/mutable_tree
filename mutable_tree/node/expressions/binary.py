@@ -1,6 +1,7 @@
 from enum import Enum
 from ..node import NodeType
 from .expression import Expression
+from ..utils import is_expression
 
 
 class BinaryOps(Enum):
@@ -37,6 +38,10 @@ class BinaryExpression(Expression):
     def _check_types(self):
         if self.node_type != NodeType.BINARY_EXPR:
             raise TypeError(f'Invalid type: {self.node_type} for BinaryExpression.')
+        if not is_expression(self.left):
+            raise TypeError(f'Invalid type: {self.left.node_type} for BinOp LHS.')
+        if not is_expression(self.right):
+            raise TypeError(f'Invalid type: {self.right.node_type} for BinOp RHS.')
 
     def to_string(self) -> str:
         return f'{self.left.to_string()} {str(self.op)} {self.right.to_string()}'

@@ -27,7 +27,7 @@ class NodeType(Enum):
     ARRAY_ACCESS = 'ArrayAccess'
 
     # statements
-    SWITCH_STMT = 'SwitchStatement'  # NOT IMPLEMENTED
+    SWITCH_STMT = 'SwitchStatement'
 
 
 class Node:
