@@ -1,0 +1,7 @@
+.vscode/
+__pycache__/
+
+# tree-sitter
+tree-sitter/
+parser/
+
