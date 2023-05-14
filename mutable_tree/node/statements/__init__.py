@@ -3,7 +3,7 @@ from .assert_stmt import AssertStatement
 from .block_stmt import BlockStatement
 from .break_stmt import BreakStatement
 from .continue_stmt import ContinueStatement
-from do_stmt import DoStatement
+from .do_stmt import DoStatement
 from .expression_stmt import ExpressionStatement
 from .for_in_stmt import ForInStatement
 from .for_stmt import ForStatement
