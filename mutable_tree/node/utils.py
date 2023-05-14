@@ -1,5 +1,6 @@
 from .node import Node, NodeType
 from .expressions import Expression
+from .statements import Statement
 
 
 def is_expression(node: Node):
@@ -13,3 +14,7 @@ def is_primary_expression(node: Node):
         NodeType.PARENTHESIZED_EXPR, NodeType.NEW_EXPR, NodeType.CALL_EXPR,
         NodeType.FIELD_ACCESS, NodeType.ARRAY_ACCESS
     }
+
+
+def is_statement(node: Node):
+    return isinstance(node, Statement)

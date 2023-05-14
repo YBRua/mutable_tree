@@ -26,6 +26,6 @@ class AssertStatement(Statement):
 
     def to_string(self) -> str:
         if self.message is not None:
-            return f'assert {self.condition.to_string()} : {self.message.to_string()};\n'
+            return f'assert {self.condition.to_string()} : {self.message.to_string()};'
         else:
-            return f'assert {self.condition.to_string()};\n'
+            return f'assert {self.condition.to_string()};'
