@@ -1,4 +1,4 @@
-from .expression import Expression
+from .expression import Expression, is_expression, is_primary_expression
 from .array_access import ArrayAccess
 from .array_expr import ArrayExpression
 from .assignment_expr import AssignmentExpression, get_assignment_op, AssignmentOps
@@ -14,8 +14,6 @@ from .ternary_expr import TernaryExpression
 from .this import ThisExpression
 from .unary_expr import UnaryExpression, get_unary_op, UnaryOps
 from .update_expr import UpdateExpression, get_update_op, UpdateOps
+from .primary_expr import PrimaryExpression
 
 from typing import Union
-
-PrimaryExpression = Union[Literal, Identifier, ThisExpression, NewExpression,
-                          CallExpression, FieldAccess, ArrayAccess]

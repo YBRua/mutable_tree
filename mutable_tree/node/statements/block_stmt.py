@@ -1,6 +1,6 @@
 from ..node import NodeType
 from .statement import Statement
-from ..utils import is_statement
+from .statement import is_statement
 from typing import List
 
 

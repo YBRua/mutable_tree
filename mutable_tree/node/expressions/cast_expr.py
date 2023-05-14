@@ -1,7 +1,7 @@
 from ..node import NodeType
 from .expression import Expression
 from ..types import TypeIdentifier
-from ..utils import is_expression
+from .expression import is_expression
 
 
 class CastExpression(Expression):

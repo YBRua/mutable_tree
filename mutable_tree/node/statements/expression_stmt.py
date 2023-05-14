@@ -1,7 +1,7 @@
 from ..node import NodeType
 from .statement import Statement
 from ..expressions import Expression
-from ..utils import is_expression
+from ..expressions import is_expression
 
 
 class ExpressionStatement(Statement):

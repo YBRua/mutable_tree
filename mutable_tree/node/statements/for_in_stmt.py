@@ -1,8 +1,9 @@
 from ..node import NodeType
 from .statement import Statement
+from .statement import is_statement
 from ..expressions import Expression, Identifier
 from ..types import TypeIdentifier
-from ..utils import is_statement, is_expression
+from ..expressions import is_expression
 
 
 class ForInStatement(Statement):

@@ -2,7 +2,7 @@ from ..node import Node, NodeType
 from .statement import Statement
 from ..expressions import Expression, Identifier
 from ..types import TypeIdentifier
-from ..utils import is_expression
+from ..expressions import is_expression
 from ..utils import throw_invalid_type
 from typing import List, Optional
 

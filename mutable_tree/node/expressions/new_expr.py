@@ -1,7 +1,7 @@
 from ..node import NodeType
 from ..types import TypeIdentifier
 from .expression import Expression
-from ..utils import is_expression
+from .expression import is_expression
 from typing import List
 
 

@@ -1,7 +1,8 @@
 from ..node import NodeType
 from .statement import Statement
+from .statement import is_statement
 from ..expressions import Expression
-from ..utils import is_statement, is_expression
+from ..expressions import is_expression
 from ..utils import throw_invalid_type
 from typing import Optional
 

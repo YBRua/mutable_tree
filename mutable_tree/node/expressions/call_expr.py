@@ -1,13 +1,12 @@
 from ..node import NodeType
 from .expression import Expression
-from ..utils import is_primary_expression, is_expression
+from .expression import is_primary_expression, is_expression
 from typing import List
-from . import PrimaryExpression
 
 
 class CallExpression(Expression):
 
-    def __init__(self, node_type: NodeType, callee: PrimaryExpression,
+    def __init__(self, node_type: NodeType, callee: Expression,
                  args: List[Expression]):
         super().__init__(node_type)
         self.callee = callee

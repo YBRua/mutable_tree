@@ -1,7 +1,7 @@
 from enum import Enum
 from ..node import Node, NodeType
 from .expression import Expression
-from ..utils import is_expression
+from .expression import is_expression
 
 
 class AssignmentOps(Enum):
