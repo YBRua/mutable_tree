@@ -19,6 +19,7 @@ class NodeType(Enum):
     # primary expressions
     LITERAL = 'Literal'
     IDENTIFIER = 'Identifier'
+    ARRAY_EXPRESSION = 'ArrayExpression'
     THIS_EXPR = 'ThisExpression'
     PARENTHESIZED_EXPR = 'ParenthesizedExpression'
     NEW_EXPR = 'NewExpression'
@@ -46,6 +47,10 @@ class NodeType(Enum):
     TRY_STMT = 'TryStatement'
     WHILE_STMT = 'WhileStatement'
     YIELD_STMT = 'YieldStatement'
+
+    # miscs
+    DIMENSION_SPECIFIER = 'DimensionSpecifier'
+    VARIABLE_DECLARATOR = 'VariableDeclarator'
 
 
 class Node:
