@@ -26,6 +26,33 @@ class BinaryOps(Enum):
     LRSHIFT = '>>>'
 
 
+_binary_op_map = {
+    '+': BinaryOps.ADD,
+    '-': BinaryOps.MINUS,
+    '*': BinaryOps.MULTIPLY,
+    '/': BinaryOps.DIVIDE,
+    '>': BinaryOps.GT,
+    '<': BinaryOps.LT,
+    '>=': BinaryOps.GE,
+    '<=': BinaryOps.LE,
+    '==': BinaryOps.EQ,
+    '!=': BinaryOps.NE,
+    '&&': BinaryOps.AND,
+    '||': BinaryOps.OR,
+    '^': BinaryOps.BITWISE_XOR,
+    '&': BinaryOps.BITWISE_AND,
+    '|': BinaryOps.BITWISE_OR,
+    '%': BinaryOps.MOD,
+    '<<': BinaryOps.LSHIFT,
+    '>>': BinaryOps.RSHIFT,
+    '>>>': BinaryOps.LRSHIFT
+}
+
+
+def get_binary_op(op: str) -> BinaryOps:
+    return _binary_op_map[op]
+
+
 class BinaryExpression(Expression):
 
     def __init__(self, node_type: NodeType, left: Expression, right: Expression,

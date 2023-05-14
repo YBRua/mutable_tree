@@ -11,6 +11,18 @@ class UnaryOps(Enum):
     BITWISE_NOT = '~'
 
 
+_unary_op_map = {
+    '+': UnaryOps.PLUS,
+    '-': UnaryOps.NEG,
+    '!': UnaryOps.NOT,
+    '~': UnaryOps.BITWISE_NOT
+}
+
+
+def get_unary_op(op: str) -> UnaryOps:
+    return _unary_op_map[op]
+
+
 class UnaryExpression(Expression):
 
     def __init__(self, node_type: NodeType, operand: Expression, op: UnaryOps):

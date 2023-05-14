@@ -9,6 +9,13 @@ class UpdateOps(Enum):
     DECREMENT = '--'
 
 
+_update_op_map = {'++': UpdateOps.INCREMENT, '--': UpdateOps.DECREMENT}
+
+
+def get_update_op(op: str) -> UpdateOps:
+    return _update_op_map[op]
+
+
 class UpdateExpression(Expression):
 
     def __init__(self, node_type: NodeType, operand: Expression, op: UpdateOps):

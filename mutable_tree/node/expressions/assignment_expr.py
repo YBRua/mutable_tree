@@ -19,6 +19,26 @@ class AssignmentOps(Enum):
     LRSHIFT_EQUAL = '>>>='
 
 
+_assignment_op_map = {
+    '=': AssignmentOps.EQUAL,
+    '+=': AssignmentOps.PLUS_EQUAL,
+    '-=': AssignmentOps.MINUS_EQUAL,
+    '*=': AssignmentOps.MULTIPLY_EQUAL,
+    '/=': AssignmentOps.DIVIDE_EQUAL,
+    '&=': AssignmentOps.AND_EQUAL,
+    '|=': AssignmentOps.OR_EQUAL,
+    '^=': AssignmentOps.XOR_EQUAL,
+    '%=': AssignmentOps.MOD_EQUAL,
+    '<<=': AssignmentOps.LSHIFT_EQUAL,
+    '>>=': AssignmentOps.ARSHIFT_EQUAL,
+    '>>>=': AssignmentOps.LRSHIFT_EQUAL
+}
+
+
+def get_assignment_op(op: str) -> AssignmentOps:
+    return _assignment_op_map[op]
+
+
 class AssignmentExpression(Expression):
 
     def __init__(self, node_type: NodeType, left: Node, right: Expression,
