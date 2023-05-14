@@ -1,8 +1,9 @@
-from ..node import Node, NodeType
+from .expression import Expression
+from ..node import NodeType
 from typing import Union
 
 
-class Literal(Node):
+class Literal(Expression):
 
     def __init__(self, node_type: NodeType, value: Union[str, int, float]):
         super().__init__(node_type)

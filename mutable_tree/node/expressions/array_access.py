@@ -16,7 +16,7 @@ class ArrayAccess(Expression):
             raise TypeError(f'Invalid type: {self.node_type} for ArrayAccess')
         if not is_primary_expression(self.array):
             raise TypeError(f'Invalid type: {self.array.node_type} for array')
-        if not is_expression(self.index.node_type):
+        if not is_expression(self.index):
             raise TypeError(f'Invalid type: {self.index.node_type} for array index')
 
     def to_string(self) -> str:
