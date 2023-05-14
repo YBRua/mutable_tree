@@ -9,6 +9,7 @@ from ...node import (AssertStatement, BlockStatement, BreakStatement, ContinueSt
                      IfStatement, LabeledStatement, LocalVariableDeclaration,
                      ReturnStatement, SwitchStatement, ThrowStatement, TryStatement,
                      WhileStatement, YieldStatement)
+from ...node import get_assignment_op, get_binary_op, get_unary_op, get_update_op
 from ...node import node_factory
 
 
@@ -27,6 +28,7 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         'string_literal': convert_literal,
         'null_literal': convert_literal,
         'array_access': convert_array_access,
+        'assignment_expression': convert_assignment_expr,
     }
 
     return expr_convertors[node.type](node)
@@ -54,6 +56,17 @@ def convert_array_access(node: tree_sitter.Node) -> ArrayAccess:
     array_expr = convert_expression(node.child_by_field_name('array'))
     index_expr = convert_expression(node.child_by_field_name('index'))
     return node_factory.create_array_access(array_expr, index_expr)
+
+
+def convert_array_expr(node: tree_sitter.Node) -> ArrayExpression:
+    raise NotImplementedError('pending on variable initializer')
+
+
+def convert_assignment_expr(node: tree_sitter.Node) -> AssignmentExpression:
+    lhs = convert_expression(node.child_by_field_name('left'))
+    rhs = convert_expression(node.child_by_field_name('right'))
+    op = get_assignment_op(node.child_by_field_name('operator').text.decode())
+    return node_factory.create_assignment_expr(lhs, rhs, op)
 
 
 def convert_expression_stmt(node: tree_sitter.Node) -> ExpressionStatement:

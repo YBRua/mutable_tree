@@ -38,4 +38,4 @@ class UnaryExpression(Expression):
             raise TypeError(f'Invalid type: {self.operand.node_type} for unary operand')
 
     def to_string(self) -> str:
-        return f'{str(self.op)} {self.operand.to_string()}'
+        return f'{self.op.value}{self.operand.to_string()}'

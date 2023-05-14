@@ -5,7 +5,7 @@ from tree_sitter import Language, Parser
 from .utils import LANGUAGES_PATH, collect_tokens
 
 
-class JavaExpressionTest(unittest.TestCase):
+class JavaExprTestBase(unittest.TestCase):
 
     def setUp(self) -> None:
         self.parser = Parser()
@@ -27,6 +27,9 @@ class JavaExpressionTest(unittest.TestCase):
         new_tokens = collect_tokens(new_root)
         self.assertSequenceEqual(tokens, new_tokens)
 
+
+class TestJavaArrayAccess(JavaExprTestBase):
+
     def test_array_access(self):
         self._stmt_round_trip('arr[1];')
         self._stmt_round_trip('arr[a];')
@@ -41,6 +44,14 @@ class JavaExpressionTest(unittest.TestCase):
         self._stmt_round_trip('a1[a2[1][2]];')
         self._stmt_round_trip('a1[a2[1]][a3[i2]];')
         self._stmt_round_trip('a1[a2[i1]][a3[1]];')
+
+
+class TestJavaAssignmentExpr(JavaExprTestBase):
+
+    def test_assignment_expr(self):
+        self._stmt_round_trip('a = 1;')
+        self._stmt_round_trip('a = b;')
+        self._stmt_round_trip('a = b = c;')
 
 
 if __name__ == '__main__':

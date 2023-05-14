@@ -59,4 +59,4 @@ class AssignmentExpression(Expression):
             raise TypeError(f'Invalid type: {self.right.node_type} for Assignment RHS')
 
     def to_string(self) -> str:
-        return f'{self.left.to_string()} {str(self.op)} {self.right.to_string()}'
+        return f'{self.left.to_string()} {self.op.value} {self.right.to_string()}'

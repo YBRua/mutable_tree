@@ -34,6 +34,6 @@ class UpdateExpression(Expression):
 
     def to_string(self) -> str:
         if self.prefix:
-            return f'{str(self.op)}{self.operand.to_string()}'
+            return f'{self.op.value}{self.operand.to_string()}'
         else:
-            return f'{self.operand.to_string()}{str(self.op)}'
+            return f'{self.operand.to_string()}{self.op.value}'
