@@ -14,7 +14,7 @@ class BreakStatement(Statement):
     def _check_types(self):
         if self.node_type != NodeType.BREAK_STMT:
             raise TypeError(f'Invalid type: {self.node_type} for BreakStatement')
-        if self.label.node_type != NodeType.IDENTIFIER:
+        if self.label is not None and self.label.node_type != NodeType.IDENTIFIER:
             raise TypeError(f'Invalid type: {self.label.node_type} for break label')
 
     def to_string(self) -> str:

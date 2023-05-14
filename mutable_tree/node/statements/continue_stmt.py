@@ -14,7 +14,7 @@ class ContinueStatement(Statement):
     def _check_types(self):
         if self.node_type != NodeType.CONTINUE_STMT:
             raise TypeError(f'Invalid type: {self.node_type} for ContinueStatement')
-        if self.label.node_type != NodeType.IDENTIFIER:
+        if self.label is not None and self.label.node_type != NodeType.IDENTIFIER:
             raise TypeError(f'Invalid type: {self.label.node_type} for continue label')
 
     def to_string(self) -> str:
