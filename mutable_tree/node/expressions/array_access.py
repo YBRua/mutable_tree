@@ -14,7 +14,7 @@ class ArrayAccess(Expression):
     def _check_types(self):
         if self.node_type != NodeType.ARRAY_ACCESS:
             raise TypeError(f'Invalid type: {self.node_type} for ArrayAccess')
-        if not is_primary_expression(self.array.node_type):
+        if not is_primary_expression(self.array):
             raise TypeError(f'Invalid type: {self.array.node_type} for array')
         if not is_expression(self.index.node_type):
             raise TypeError(f'Invalid type: {self.index.node_type} for array index')
