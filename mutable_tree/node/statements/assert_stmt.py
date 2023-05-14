@@ -14,6 +14,7 @@ class AssertStatement(Statement):
         super().__init__(node_type)
         self.condition = condition
         self.message = message
+        self._check_types()
 
     def _check_types(self):
         if self.node_type != NodeType.ASSERT_STMT:

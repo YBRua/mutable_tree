@@ -10,7 +10,6 @@ from .instanceof_expr import InstanceofExpression
 from .lambda_expr import LambdaExpression
 from .literal import Literal
 from .new_expr import NewExpression
-from .parenthesized_expr import ParenthesizedExpression
 from .ternary_expr import TernaryExpression
 from .this import ThisExpression
 from .unary_expr import UnaryExpression

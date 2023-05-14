@@ -9,6 +9,7 @@ class BlockStatement(Statement):
     def __init__(self, node_type: NodeType, stmts: List[Statement]):
         super().__init__(node_type)
         self.stmts = stmts
+        self._check_types()
 
     def _check_types(self):
         if self.node_type != NodeType.BLOCK_STMT:

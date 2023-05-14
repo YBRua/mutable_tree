@@ -9,6 +9,7 @@ class ContinueStatement(Statement):
     def __init__(self, node_type: NodeType, label: Optional[Expression] = None):
         super().__init__(node_type)
         self.label = label
+        self._check_types()
 
     def _check_types(self):
         if self.node_type != NodeType.CONTINUE_STMT:
