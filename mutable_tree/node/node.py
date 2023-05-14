@@ -36,7 +36,6 @@ class Node:
 
     def __init__(self, node_type: NodeType):
         self.node_type = node_type
-        self._check_types()
 
     def _check_types(self):
         raise NotImplementedError('Base class Node should never be initialized')

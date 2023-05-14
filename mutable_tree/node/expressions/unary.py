@@ -17,12 +17,13 @@ class UnaryExpression(Expression):
         super().__init__(node_type)
         self.operand = operand
         self.op = op
+        self._check_types()
 
     def _check_types(self):
         if self.node_type != NodeType.UNARY_EXPR:
-            raise TypeError(f'Invalid type: {self.node_type} for UnaryExpression.')
+            raise TypeError(f'Invalid type: {self.node_type} for UnaryExpression')
         if not is_expression(self.operand):
-            raise TypeError(f'Invalid type: {self.operand.node_type} for unary operand.')
+            raise TypeError(f'Invalid type: {self.operand.node_type} for unary operand')
 
     def to_string(self) -> str:
         return f'{str(self.op)} {self.operand.to_string()}'

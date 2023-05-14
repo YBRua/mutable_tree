@@ -11,19 +11,20 @@ class TernaryExpression(Expression):
         self.condition = condition
         self.consequence = consequence
         self.alternative = alternative
+        self._check_types()
 
     def _check_types(self):
         if self.node_type != NodeType.TERNARY_EXPR:
-            raise TypeError(f'Invalid type: {self.node_type} for TernaryExpression.')
+            raise TypeError(f'Invalid type: {self.node_type} for TernaryExpression')
         if not is_expression(self.condition):
             raise TypeError(
-                f'Invalid type: {self.condition.node_type} for ternary condition.')
+                f'Invalid type: {self.condition.node_type} for ternary condition')
         if not is_expression(self.consequence):
             raise TypeError(
-                f'Invalid type: {self.consequence.node_type} for ternary consequence.')
+                f'Invalid type: {self.consequence.node_type} for ternary consequence')
         if not is_expression(self.alternative):
             raise TypeError(
-                f'Invalid type: {self.alternative.node_type} for ternary alternative.')
+                f'Invalid type: {self.alternative.node_type} for ternary alternative')
 
     def to_string(self) -> str:
         return (f'{self.condition.to_string()} ? '
