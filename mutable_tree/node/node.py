@@ -27,7 +27,25 @@ class NodeType(Enum):
     ARRAY_ACCESS = 'ArrayAccess'
 
     # statements
+    ASSERT_STMT = 'AssertStatement'
+    BLOCK_STMT = 'BlockStatement'
+    BREAK_STMT = 'BreakStatement'
+    CONTINUE_STMT = 'ContinueStatement'
+    DECLARATION_STMT = 'DeclarationStatement'
+    DO_STMT = 'DoStatement'
+    EXPRESSION_STMT = 'ExpressionStatement'
+    FOR_STMT = 'ForStatement'
+    FOR_IN_STMT = 'ForInStatement'
+    IF_STMT = 'IfStatement'
+    LABELED_STMT = 'LabeledStatement'
+    LOCAL_VAR_DECL = 'LocalVariableDeclaration'
+    RETURN_STMT = 'ReturnStatement'
     SWITCH_STMT = 'SwitchStatement'
+    SYNC_STMT = 'SynchronizedStatement'
+    THROW_STMT = 'ThrowStatement'
+    TRY_STMT = 'TryStatement'
+    WHILE_STMT = 'WhileStatement'
+    YIELD_STMT = 'YieldStatement'
 
 
 class Node:
