@@ -31,7 +31,7 @@ class NodeType(Enum):
     BLOCK_STMT = 'BlockStatement'
     BREAK_STMT = 'BreakStatement'
     CONTINUE_STMT = 'ContinueStatement'
-    DECLARATION_STMT = 'DeclarationStatement'
+    DECLARATION_STMT = 'DeclarationStatement'  # NOT IMPLEMENTED
     DO_STMT = 'DoStatement'
     EXPRESSION_STMT = 'ExpressionStatement'
     FOR_STMT = 'ForStatement'
