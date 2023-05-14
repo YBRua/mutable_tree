@@ -52,6 +52,8 @@ class NodeType(Enum):
     DIMENSION_SPECIFIER = 'DimensionSpecifier'
     VARIABLE_DECLARATOR = 'VariableDeclarator'
     SWITCH_CASE = 'SwitchCase'
+    CATCH_CLAUSE = 'CatchClause'
+    FINALLY_CLAUSE = 'FinallyClause'
 
 
 class Node:
