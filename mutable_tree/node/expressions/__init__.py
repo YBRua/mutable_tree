@@ -15,5 +15,3 @@ from .this import ThisExpression
 from .unary_expr import UnaryExpression, get_unary_op, UnaryOps
 from .update_expr import UpdateExpression, get_update_op, UpdateOps
 from .primary_expr import PrimaryExpression
-
-from typing import Union
