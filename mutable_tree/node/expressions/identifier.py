@@ -1,7 +1,8 @@
-from ..node import Node, NodeType
+from .expression import Expression
+from ..node import NodeType
 
 
-class Identifier(Node):
+class Identifier(Expression):
 
     def __init__(self, node_type: NodeType, name: str):
         super().__init__(node_type)

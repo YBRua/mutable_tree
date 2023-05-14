@@ -29,6 +29,8 @@ class JavaExpressionTest(unittest.TestCase):
 
     def test_array_access(self):
         self._stmt_round_trip('arr[1];')
+        self._stmt_round_trip('arr[a];')
+        self._stmt_round_trip('array2d[a][23];')
 
 
 if __name__ == '__main__':
