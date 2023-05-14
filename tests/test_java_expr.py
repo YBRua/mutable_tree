@@ -14,14 +14,14 @@ class JavaExpressionTest(unittest.TestCase):
     def _stmt_round_trip(self, code: str):
         tree = self.parser.parse(code.encode())
         root = tree.root_node
-        assert not root.has_error
+        self.assertFalse(root.has_error)
 
         mutable_root = JavaAdaptor.convert_statement(root.children[0])
         new_code = mutable_root.to_string()
 
         new_tree = self.parser.parse(new_code.encode())
         new_root = new_tree.root_node
-        assert not new_root.has_error
+        self.assertFalse(new_root.has_error)
 
         tokens = collect_tokens(root)
         new_tokens = collect_tokens(new_root)
@@ -30,7 +30,17 @@ class JavaExpressionTest(unittest.TestCase):
     def test_array_access(self):
         self._stmt_round_trip('arr[1];')
         self._stmt_round_trip('arr[a];')
+
+    def test_ndarray_access(self):
         self._stmt_round_trip('array2d[a][23];')
+        self._stmt_round_trip('array2d[1][23];')
+        self._stmt_round_trip('array2d[1][a];')
+        self._stmt_round_trip('array2d[a][b][c];')
+
+    def test_nested_array_access(self):
+        self._stmt_round_trip('a1[a2[1][2]];')
+        self._stmt_round_trip('a1[a2[1]][a3[i2]];')
+        self._stmt_round_trip('a1[a2[i1]][a3[1]];')
 
 
 if __name__ == '__main__':
