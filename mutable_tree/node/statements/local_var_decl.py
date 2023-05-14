@@ -68,7 +68,7 @@ class LocalVariableDeclaration(Statement):
         if self.node_type != NodeType.LOCAL_VAR_DECL:
             throw_invalid_type(self.node_type, self)
         for i, decl in enumerate(self.declarators):
-            if not isinstance(decl, VariableDeclarator):
+            if decl.node_type != NodeType.VARIABLE_DECLARATOR:
                 throw_invalid_type(decl.node_type, self, attr=f'declarator#{i}')
 
     def to_string(self) -> str:
