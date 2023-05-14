@@ -6,6 +6,12 @@ from .expressions import (ArrayAccess, ArrayExpression, AssignmentExpression,
                           Identifier, InstanceofExpression, Literal, NewExpression,
                           TernaryExpression, ThisExpression, UnaryExpression,
                           UpdateExpression, PrimaryExpression)
+from .statements import Statement
+from .statements import (AssertStatement, BlockStatement, BreakStatement,
+                         ContinueStatement, DoStatement, ExpressionStatement,
+                         ForInStatement, ForStatement, IfStatement, LabeledStatement,
+                         LocalVariableDeclaration, ReturnStatement, SwitchStatement,
+                         ThrowStatement, TryStatement, WhileStatement, YieldStatement)
 from .types import TypeIdentifier
 
 from typing import Union, List
@@ -74,3 +80,7 @@ def create_ternary_expr(condition: Expression, consequence: Expression,
 
 def create_this_expr() -> ThisExpression:
     return ThisExpression(NodeType.THIS_EXPR)
+
+
+def create_expression_stmt(expr: Expression) -> ExpressionStatement:
+    return ExpressionStatement(NodeType.EXPRESSION_STMT, expr)
