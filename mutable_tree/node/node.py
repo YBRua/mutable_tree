@@ -18,7 +18,7 @@ class NodeType(Enum):
     # primary expressions
     LITERAL = 'Literal'
     IDENTIFIER = 'Identifier'
-    ARRAY_EXPRESSION = 'ArrayExpression'
+    ARRAY_EXPR = 'ArrayExpression'
     THIS_EXPR = 'ThisExpression'
     PARENTHESIZED_EXPR = 'ParenthesizedExpression'
     NEW_EXPR = 'NewExpression'

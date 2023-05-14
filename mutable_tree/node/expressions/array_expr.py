@@ -12,7 +12,7 @@ class ArrayExpression(Expression):
         self._check_types()
 
     def _check_types(self):
-        if self.node_type != NodeType.ARRAY_EXPRESSION:
+        if self.node_type != NodeType.ARRAY_EXPR:
             raise TypeError(f'Invalid type: {self.node_type} for ArrayExpression')
         for i, elem in enumerate(self.elements):
             if not is_expression(elem):

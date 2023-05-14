@@ -1,11 +1,12 @@
 from ..node import NodeType
 from .expression import Expression
 from ..utils import is_primary_expression
+from . import PrimaryExpression
 
 
 class FieldAccess(Expression):
 
-    def __init__(self, node_type: NodeType, object: Expression, field: Expression):
+    def __init__(self, node_type: NodeType, object: PrimaryExpression, field: Expression):
         super().__init__(node_type)
         self.object = object
         self.field = field

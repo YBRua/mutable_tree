@@ -1,11 +1,12 @@
 from ..node import NodeType
 from .expression import Expression
 from ..utils import is_primary_expression, is_expression
+from . import PrimaryExpression
 
 
 class ArrayAccess(Expression):
 
-    def __init__(self, node_type: NodeType, array: Expression, index: Expression):
+    def __init__(self, node_type: NodeType, array: PrimaryExpression, index: Expression):
         super().__init__(node_type)
         self.array = array
         self.index = index
