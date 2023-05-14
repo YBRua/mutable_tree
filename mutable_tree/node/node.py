@@ -51,10 +51,10 @@ class NodeType(Enum):
     # miscs
     DIMENSION_SPECIFIER = 'DimensionSpecifier'
     VARIABLE_DECLARATOR = 'VariableDeclarator'
+    SWITCH_CASE = 'SwitchCase'
 
 
 class Node:
-    children: Optional[List['Node']] = None
     node_type: NodeType
 
     def __init__(self, node_type: NodeType):

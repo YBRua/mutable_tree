@@ -6,11 +6,11 @@ from ..utils import is_expression
 class TernaryExpression(Expression):
 
     def __init__(self, node_type: NodeType, condition: Expression,
-                 consequence: Expression, alternative: Expression):
+                 consequence: Expression, alternate: Expression):
         super().__init__(node_type)
         self.condition = condition
         self.consequence = consequence
-        self.alternative = alternative
+        self.alternative = alternate
         self._check_types()
 
     def _check_types(self):
