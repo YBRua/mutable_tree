@@ -81,3 +81,6 @@ class ForStatement(Statement):
             children.append(self.update)
         children.append(self.body)
         return children
+
+    def get_children_names(self) -> List[str]:
+        return ['init', 'condition', 'update', 'body']

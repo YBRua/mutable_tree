@@ -76,3 +76,6 @@ class Node:
 
     def get_children(self) -> List['Node']:
         raise NotImplementedError()
+
+    def get_children_names(self) -> List[str]:
+        raise NotImplementedError()

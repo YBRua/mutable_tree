@@ -26,4 +26,7 @@ class NewExpression(Expression):
         return f'new {self.type.to_string()}({arg_list})'
 
     def get_children(self) -> List[Node]:
-        return [self.type] + self.args
+        return [self.type, self.args]
+
+    def get_children_names(self) -> List[str]:
+        return ['type', 'args']

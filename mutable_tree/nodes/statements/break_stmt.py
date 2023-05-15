@@ -28,3 +28,6 @@ class BreakStatement(Statement):
             return [self.label]
         else:
             return []
+
+    def get_children_names(self) -> List[str]:
+        return ['label']

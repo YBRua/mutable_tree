@@ -79,3 +79,6 @@ class BinaryExpression(Expression):
 
     def get_children(self) -> List[Node]:
         return [self.left, self.right]
+
+    def get_children_names(self) -> List[str]:
+        return ['left', 'right']

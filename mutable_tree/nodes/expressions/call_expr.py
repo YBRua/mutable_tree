@@ -27,3 +27,6 @@ class CallExpression(Expression):
 
     def get_children(self) -> List[Node]:
         return [self.callee, self.args]
+
+    def get_children_names(self) -> List[str]:
+        return ['callee', 'args']

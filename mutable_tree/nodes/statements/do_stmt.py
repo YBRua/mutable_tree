@@ -27,3 +27,6 @@ class DoStatement(Statement):
 
     def get_children(self) -> List[Node]:
         return [self.body, self.condition]
+
+    def get_children_names(self) -> List[str]:
+        return ['body', 'condition']

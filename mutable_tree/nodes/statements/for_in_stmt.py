@@ -40,3 +40,6 @@ class ForInStatement(Statement):
 
     def get_children(self) -> List[Node]:
         return [self.it_type, self.iter, self.iterable, self.body]
+
+    def get_children_names(self) -> List[str]:
+        return ['it_type', 'iter', 'iterable', 'body']

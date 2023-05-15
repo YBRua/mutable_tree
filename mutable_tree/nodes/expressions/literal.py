@@ -1,6 +1,6 @@
 from .expression import Expression
 from ..node import NodeType
-from typing import Union
+from typing import List, Union
 
 
 class Literal(Expression):
@@ -18,4 +18,7 @@ class Literal(Expression):
         return str(self.value)
 
     def get_children(self):
+        return []
+
+    def get_children_names(self) -> List[str]:
         return []

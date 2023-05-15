@@ -27,3 +27,6 @@ class LabeledStatement(Statement):
 
     def get_children(self) -> List[Node]:
         return [self.label, self.stmt]
+
+    def get_children_names(self) -> List[str]:
+        return ['label', 'stmt']

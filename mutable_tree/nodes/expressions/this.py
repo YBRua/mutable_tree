@@ -17,3 +17,6 @@ class ThisExpression(Node):
 
     def get_children(self) -> List[Node]:
         return []
+
+    def get_children_names(self) -> List[str]:
+        return []

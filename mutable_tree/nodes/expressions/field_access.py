@@ -28,3 +28,6 @@ class FieldAccess(Expression):
 
     def get_children(self) -> List[Node]:
         return [self.object, self.field]
+
+    def get_children_names(self) -> List[str]:
+        return ['object', 'field']

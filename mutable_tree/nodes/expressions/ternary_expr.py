@@ -34,3 +34,6 @@ class TernaryExpression(Expression):
 
     def get_children(self) -> List[Node]:
         return [self.condition, self.consequence, self.alternative]
+
+    def get_children_names(self) -> List[str]:
+        return ['condition', 'consequence', 'alternative']

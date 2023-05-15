@@ -5,8 +5,10 @@ from typing import List, Optional
 
 class TypeIdentifier(Node):
 
-    def __init__(self, node_type: NodeType, type_identifier: str,
-                 dimension: Optional[DimensionSpecifier]):
+    def __init__(self,
+                 node_type: NodeType,
+                 type_identifier: str,
+                 dimension: Optional[DimensionSpecifier] = None):
         super().__init__(node_type)
         self.type_identifier = type_identifier
         self.dimension = dimension
@@ -26,3 +28,6 @@ class TypeIdentifier(Node):
             return [self.dimension]
         else:
             return []
+
+    def get_children_names(self) -> List[str]:
+        return ['dimension']

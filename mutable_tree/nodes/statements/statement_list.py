@@ -22,3 +22,6 @@ class StatementList(Statement):
 
     def get_children(self) -> List[Node]:
         return self.stmts
+
+    def get_children_names(self) -> List[str]:
+        return ['stmts']

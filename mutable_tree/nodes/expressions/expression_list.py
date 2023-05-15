@@ -22,3 +22,6 @@ class ExpressionList(Expression):
 
     def get_children(self) -> List[Node]:
         return self.exprs
+
+    def get_children_names(self) -> List[str]:
+        return list(map(str, range(len(self.exprs))))

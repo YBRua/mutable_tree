@@ -40,6 +40,9 @@ class SwitchCase(Node):
         else:
             return [self.stmts]
 
+    def get_children_names(self) -> List[str]:
+        return ['case', 'stmts']
+
 
 class SwitchCaseList(Node):
 
@@ -55,6 +58,9 @@ class SwitchCaseList(Node):
 
     def get_children(self) -> List[Node]:
         return self.cases
+
+    def get_children_names(self) -> List[str]:
+        return ['cases']
 
 
 class SwitchStatement(Statement):
@@ -80,3 +86,6 @@ class SwitchStatement(Statement):
 
     def get_children(self) -> List[Node]:
         return [self.condition, self.cases]
+
+    def get_children_names(self) -> List[str]:
+        return ['condition', 'cases']

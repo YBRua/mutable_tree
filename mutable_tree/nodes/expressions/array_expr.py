@@ -23,3 +23,6 @@ class ArrayExpression(Expression):
 
     def get_children(self) -> List[Node]:
         return [self.elements]
+
+    def get_children_names(self) -> List[str]:
+        return ['elements']

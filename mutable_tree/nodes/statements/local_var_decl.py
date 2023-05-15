@@ -47,6 +47,9 @@ class VariableDeclarator(Node):
             children.append(self.value)
         return children
 
+    def get_children_names(self) -> List[str]:
+        return ['name', 'dimensions', 'value']
+
 
 class VariableDeclaratorList(Node):
 
@@ -64,6 +67,9 @@ class VariableDeclaratorList(Node):
 
     def get_children(self) -> List[Node]:
         return self.declarators
+
+    def get_children_names(self) -> List[str]:
+        return list(map(str, range(len(self.declarators))))
 
 
 class LocalVariableDeclaration(Statement):
@@ -88,3 +94,6 @@ class LocalVariableDeclaration(Statement):
 
     def get_children(self) -> List[Node]:
         return [self.type, self.declarators]
+
+    def get_children_names(self) -> List[str]:
+        return ['type', 'declarators']

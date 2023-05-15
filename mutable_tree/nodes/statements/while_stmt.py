@@ -31,3 +31,6 @@ class WhileStatement(Statement):
 
     def get_children(self) -> List[Node]:
         return [self.condition, self.body]
+
+    def get_children_names(self) -> List[str]:
+        return ['condition', 'body']

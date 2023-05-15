@@ -28,3 +28,6 @@ class CastExpression(Expression):
 
     def get_children(self) -> List[Node]:
         return [self.type, self.value]
+
+    def get_children_names(self) -> List[str]:
+        return ['type', 'value']

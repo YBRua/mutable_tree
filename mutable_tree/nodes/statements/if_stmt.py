@@ -44,3 +44,6 @@ class IfStatement(Statement):
             return [self.condition, self.consequence]
         else:
             return [self.condition, self.consequence, self.alternate]
+
+    def get_children_names(self) -> List[str]:
+        return ['condition', 'consequence', 'alternate']

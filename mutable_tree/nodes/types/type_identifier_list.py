@@ -20,3 +20,6 @@ class TypeIdentifierList(Node):
 
     def get_children(self) -> List[Node]:
         return self.type_ids
+
+    def get_children_names(self) -> List[str]:
+        return list(map(str, range(len(self.type_ids))))

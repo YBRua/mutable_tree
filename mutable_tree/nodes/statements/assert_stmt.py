@@ -36,3 +36,6 @@ class AssertStatement(Statement):
             return [self.condition, self.message]
         else:
             return [self.condition]
+
+    def get_children_names(self) -> List[str]:
+        return ['condition', 'message']

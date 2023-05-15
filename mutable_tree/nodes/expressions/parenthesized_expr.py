@@ -24,3 +24,6 @@ class ParenthesizedExpression(Expression):
 
     def get_children(self) -> List[Node]:
         return [self.expr]
+
+    def get_children_names(self) -> List[str]:
+        return ['expr']

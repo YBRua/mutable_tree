@@ -29,3 +29,6 @@ class ReturnStatement(Statement):
             return [self.expr]
         else:
             return []
+
+    def get_children_names(self) -> List[str]:
+        return ['expr']

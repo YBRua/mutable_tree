@@ -37,6 +37,9 @@ class CatchClause(Node):
     def get_children(self) -> List[Node]:
         return [self.catch_types, self.exception, self.body]
 
+    def get_children_names(self) -> List[str]:
+        return ['catch_types', 'exception', 'body']
+
 
 class FinallyClause(Node):
 
@@ -54,6 +57,9 @@ class FinallyClause(Node):
     def to_string(self) -> str:
         body_str = self.body.to_string()
         return f'finally {{\n{body_str}\n}}'
+
+    def get_children_names(self) -> List[str]:
+        return ['body']
 
 
 class TryStatement(Statement):
@@ -89,3 +95,6 @@ class TryStatement(Statement):
             return f'try {body_str}\n{handlers_str}\n{finalizer_str}'
         else:
             return f'try {body_str}\n{handlers_str}'
+
+    def get_children_names(self) -> List[str]:
+        return ['body', 'handlers', 'finalizer']

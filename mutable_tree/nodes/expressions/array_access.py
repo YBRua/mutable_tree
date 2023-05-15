@@ -26,3 +26,6 @@ class ArrayAccess(Expression):
 
     def get_children(self) -> List[Node]:
         return [self.array, self.index]
+
+    def get_children_names(self) -> List[str]:
+        return ['array', 'index']
