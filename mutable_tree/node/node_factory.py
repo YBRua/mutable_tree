@@ -8,11 +8,11 @@ from .expressions import (ArrayAccess, ArrayExpression, AssignmentExpression,
                           UpdateExpression, PrimaryExpression)
 from .statements import Statement
 from .statements import (AssertStatement, BlockStatement, BreakStatement,
-                         ContinueStatement, DoStatement, ExpressionStatement,
-                         ForInStatement, ForStatement, IfStatement, LabeledStatement,
-                         LocalVariableDeclaration, VariableDeclarator, ReturnStatement,
-                         SwitchStatement, ThrowStatement, TryStatement, WhileStatement,
-                         YieldStatement)
+                         ContinueStatement, DoStatement, EmptyStatement,
+                         ExpressionStatement, ForInStatement, ForStatement, IfStatement,
+                         LabeledStatement, LocalVariableDeclaration, VariableDeclarator,
+                         ReturnStatement, SwitchStatement, ThrowStatement, TryStatement,
+                         WhileStatement, YieldStatement)
 from .statements.for_stmt import ForInit
 from .types import TypeIdentifier, DimensionSpecifier
 
@@ -27,9 +27,10 @@ def create_array_type(type_identifier: TypeIdentifier,
     return type_identifier
 
 
-def create_type_identifier(name: str,
-                           dimension: Optional[DimensionSpecifier] = None
-                           ) -> TypeIdentifier:
+def create_type_identifier(
+    name: str,
+    dimension: Optional[DimensionSpecifier] = None,
+) -> TypeIdentifier:
     return TypeIdentifier(NodeType.TYPE_IDENTIFIER, name, dimension)
 
 
@@ -106,6 +107,10 @@ def create_this_expr() -> ThisExpression:
 
 
 # STATEMENTS
+
+
+def create_empty_stmt() -> EmptyStatement:
+    return EmptyStatement(NodeType.EMPTY_STMT)
 
 
 def create_expression_stmt(expr: Expression) -> ExpressionStatement:

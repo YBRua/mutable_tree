@@ -34,8 +34,10 @@ class ForStatement(Statement):
         if self.init is not None:
             if self.is_init_decl and self.init.node_type != NodeType.LOCAL_VAR_DECL:
                 throw_invalid_type(self.init.node_type, self, attr='init')
-            if not self.is_init_decl and not is_expression(self.init):
-                throw_invalid_type(self.init.node_type, self, attr='init')
+            if not self.is_init_decl:
+                for i, e in enumerate(self.init):
+                    if not is_expression(e):
+                        throw_invalid_type(self.init.node_type, self, attr=f'init#{i}')
 
         if self.condition is not None:
             if not is_expression(self.condition):
@@ -53,14 +55,14 @@ class ForStatement(Statement):
         if self.init is None:
             init_str = ';'
         elif self.is_init_decl:
-            init_str = self.init.to_string() + ' '
+            init_str = self.init.to_string()
         else:
-            init_str = self.init.to_string() + '; '
+            init_str = ', '.join(init.to_string() for init in self.init) + ';'
 
         if self.condition is None:
             cond_str = ';'
         else:
-            cond_str = self.condition.to_string()
+            cond_str = ' ' + self.condition.to_string() + ';'
 
         if self.update is None:
             update_str = ''
@@ -68,4 +70,4 @@ class ForStatement(Statement):
             update_str = ' ' + ', '.join(u.to_string() for u in self.update)
 
         body_str = self.body.to_string()
-        return f'for ({init_str}{cond_str};{update_str}) {body_str}'
+        return f'for ({init_str}{cond_str}{update_str}) {body_str}'

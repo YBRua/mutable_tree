@@ -4,6 +4,7 @@ from .block_stmt import BlockStatement
 from .break_stmt import BreakStatement
 from .continue_stmt import ContinueStatement
 from .do_stmt import DoStatement
+from .empty_stmt import EmptyStatement
 from .expression_stmt import ExpressionStatement
 from .for_in_stmt import ForInStatement
 from .for_stmt import ForStatement

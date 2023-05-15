@@ -30,8 +30,27 @@ class TestJavaVarDecl(JavaSnippetTestBase):
 
 
 class TestJavaForStmt(JavaSnippetTestBase):
+
     def test_simple_for(self):
         self._stmt_round_trip('for (int i = 0; i < 10; i++) { }')
+        self._stmt_round_trip('for (int i = 0; i < 10; i++);')
+        self._stmt_round_trip('for (i = 0; i <= 5; i++) { }')
+        self._stmt_round_trip('for (i = 0; i <= 5; i++);')
+
+    def test_empty_for(self):
+        self._stmt_round_trip('for (;;) { }')
+        self._stmt_round_trip('for (;;) ;')
+        self._stmt_round_trip('for (i = 1;;) { }')
+        self._stmt_round_trip('for (; i < 10;) { }')
+        self._stmt_round_trip('for (;; i++) { }')
+    
+    def test_multi_init(self):
+        self._stmt_round_trip('for (int i = 0, j = 0; i < 10; i++) { }')
+        self._stmt_round_trip('for (i = 0, j = 0; i < 10; i++);')
+    
+    def test_multi_update(self):
+        self._stmt_round_trip('for (int i = 0; i < 10; i++, j++) { }')
+        self._stmt_round_trip('for (i = 0; i < 10; i++, j++);')
 
 
 if __name__ == '__main__':

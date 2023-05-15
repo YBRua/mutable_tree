@@ -33,6 +33,7 @@ class NodeType(Enum):
     CONTINUE_STMT = 'ContinueStatement'
     DECLARATION_STMT = 'DeclarationStatement'  # NOT IMPLEMENTED
     DO_STMT = 'DoStatement'
+    EMPTY_STMT = 'EmptyStatement'
     EXPRESSION_STMT = 'ExpressionStatement'
     FOR_STMT = 'ForStatement'
     FOR_IN_STMT = 'ForInStatement'

@@ -5,10 +5,11 @@ from ...node import (ArrayAccess, ArrayExpression, AssignmentExpression, BinaryE
                      InstanceofExpression, Literal, NewExpression, TernaryExpression,
                      ThisExpression, UnaryExpression, UpdateExpression, PrimaryExpression)
 from ...node import (AssertStatement, BlockStatement, BreakStatement, ContinueStatement,
-                     DoStatement, ExpressionStatement, ForInStatement, ForStatement,
-                     IfStatement, LabeledStatement, LocalVariableDeclaration,
-                     VariableDeclarator, ReturnStatement, SwitchStatement, ThrowStatement,
-                     TryStatement, WhileStatement, YieldStatement)
+                     DoStatement, EmptyStatement, ExpressionStatement, ForInStatement,
+                     ForStatement, IfStatement, LabeledStatement,
+                     LocalVariableDeclaration, VariableDeclarator, ReturnStatement,
+                     SwitchStatement, ThrowStatement, TryStatement, WhileStatement,
+                     YieldStatement)
 from ...node import TypeIdentifier, DimensionSpecifier
 from ...node import get_assignment_op, get_binary_op, get_unary_op, get_update_op
 from ...node import node_factory
@@ -41,8 +42,10 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
 
 def convert_statement(node: tree_sitter.Node) -> Statement:
     stmt_convertors = {
+        ';': convert_empty_stmt,
         'local_variable_declaration': convert_local_variable_declaration,
         'expression_statement': convert_expression_stmt,
+        'empty_statement': convert_empty_stmt,
         'block': convert_block_stmt,
         'for_statement': convert_for_stmt,
     }
@@ -185,6 +188,10 @@ def convert_local_variable_declaration(
         declarators.append(convert_variable_declarator(decl_node))
 
     return node_factory.create_local_var_decl(ty, declarators)
+
+
+def convert_empty_stmt(node: tree_sitter.Node) -> EmptyStatement:
+    return node_factory.create_empty_stmt()
 
 
 def convert_for_stmt(node: tree_sitter.Node) -> ForStatement:
