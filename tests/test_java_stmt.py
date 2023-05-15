@@ -29,5 +29,10 @@ class TestJavaVarDecl(JavaSnippetTestBase):
         self._stmt_round_trip('MyClass a, b, c[];')
 
 
+class TestJavaForStmt(JavaSnippetTestBase):
+    def test_simple_for(self):
+        self._stmt_round_trip('for (int i = 0; i < 10; i++) { }')
+
+
 if __name__ == '__main__':
     unittest.main()

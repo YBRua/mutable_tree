@@ -112,9 +112,13 @@ def create_expression_stmt(expr: Expression) -> ExpressionStatement:
     return ExpressionStatement(NodeType.EXPRESSION_STMT, expr)
 
 
-def create_for_stmt(init: ForInit, condition: Expression, update: List[Expression],
-                    body: Statement) -> ForStatement:
-    return ForStatement(NodeType.FOR_STMT, init, condition, update, body)
+def create_for_stmt(
+    body: Statement,
+    init: Optional[ForInit] = None,
+    condition: Optional[Expression] = None,
+    update: Optional[List[Expression]] = None,
+) -> ForStatement:
+    return ForStatement(NodeType.FOR_STMT, body, init, condition, update)
 
 
 def create_while_stmt(condition: Expression, body: Statement) -> WhileStatement:

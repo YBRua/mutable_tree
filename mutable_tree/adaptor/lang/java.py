@@ -33,6 +33,7 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         'binary_expression': convert_binary_expr,
         'method_invocation': convert_call_expr,
         'field_access': convert_field_access,
+        'update_expression': convert_update_expr,
     }
 
     return expr_convertors[node.type](node)
@@ -40,8 +41,10 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
 
 def convert_statement(node: tree_sitter.Node) -> Statement:
     stmt_convertors = {
-        'expression_statement': convert_expression_stmt,
         'local_variable_declaration': convert_local_variable_declaration,
+        'expression_statement': convert_expression_stmt,
+        'block': convert_block_stmt,
+        'for_statement': convert_for_stmt,
     }
 
     return stmt_convertors[node.type](node)
@@ -129,6 +132,18 @@ def convert_call_expr(node: tree_sitter.Node) -> CallExpression:
     return node_factory.create_call_expr(callee_expr, args)
 
 
+def convert_update_expr(node: tree_sitter.Node) -> UpdateExpression:
+    if node.children[0].type not in {'++', '--'}:
+        prefix = False
+        op = get_update_op(node.children[1].text.decode())
+        expr = convert_expression(node.children[0])
+    else:
+        prefix = True
+        op = get_update_op(node.children[0].text.decode())
+        expr = convert_expression(node.children[1])
+    return node_factory.create_update_expr(expr, op, prefix)
+
+
 def convert_expression_stmt(node: tree_sitter.Node) -> ExpressionStatement:
     expr = convert_expression(node.children[0])
     return node_factory.create_expression_stmt(expr)
@@ -170,3 +185,33 @@ def convert_local_variable_declaration(
         declarators.append(convert_variable_declarator(decl_node))
 
     return node_factory.create_local_var_decl(ty, declarators)
+
+
+def convert_for_stmt(node: tree_sitter.Node) -> ForStatement:
+    init_nodes = node.children_by_field_name('init')
+    cond_node = node.child_by_field_name('condition')
+    update_node = node.children_by_field_name('update')
+    body_node = node.child_by_field_name('body')
+
+    body = convert_statement(body_node)
+    if len(init_nodes) == 0:
+        init = None
+    else:
+        if init_nodes[0].type == 'local_variable_declaration':
+            assert len(init_nodes) == 1
+            init = convert_local_variable_declaration(init_nodes[0])
+        else:
+            init = [convert_expression(init_node) for init_node in init_nodes]
+    cond = convert_expression(cond_node) if cond_node is not None else None
+    if len(update_node) == 0:
+        update = None
+    else:
+        update = [convert_expression(update) for update in update_node]
+    return node_factory.create_for_stmt(body, init, cond, update)
+
+
+def convert_block_stmt(node: tree_sitter.Node) -> BlockStatement:
+    stmts = []
+    for stmt_node in node.children[1:-1]:
+        stmts.append(convert_statement(stmt_node))
+    return node_factory.create_block_stmt(stmts)

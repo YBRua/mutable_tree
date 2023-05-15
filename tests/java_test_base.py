@@ -20,7 +20,7 @@ class JavaSnippetTestBase(unittest.TestCase):
         mutable_root = JavaAdaptor.convert_statement(root.children[0])
         new_code = mutable_root.to_string()
 
-        print(new_code)
+        # print(new_code)
         new_tree = self.parser.parse(new_code.encode())
         new_root = new_tree.root_node
         self.assertFalse(new_root.has_error)
