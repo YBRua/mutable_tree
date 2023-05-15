@@ -1,7 +1,7 @@
 import unittest
 from tree_sitter import Language, Parser
 from mutable_tree.adaptor import JavaAdaptor
-from mutable_tree.node import Node, NodeType
+from mutable_tree.nodes import Node, NodeType
 from .utils import LANGUAGES_PATH
 from typing import Callable
 

@@ -1,5 +1,5 @@
 from typing import List
-from mutable_tree.node.node import Node
+from mutable_tree.nodes.node import Node
 from ..node import NodeType
 from .expression import Expression
 from ..types import TypeIdentifier

@@ -1,7 +1,7 @@
-from mutable_tree.node import Node, NodeType
-from mutable_tree.node import node_factory
-from mutable_tree.node import ForStatement, WhileStatement, BlockStatement
-from mutable_tree.node import is_expression
+from mutable_tree.nodes import Node, NodeType
+from mutable_tree.nodes import node_factory
+from mutable_tree.nodes import ForStatement, WhileStatement, BlockStatement
+from mutable_tree.nodes import is_expression
 from typing import List
 
 

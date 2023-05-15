@@ -1,18 +1,18 @@
 import tree_sitter
-from ...node import Node, Expression, Statement
-from ...node import (ArrayAccess, ArrayExpression, AssignmentExpression, BinaryExpression,
+from ...nodes import Node, Expression, Statement
+from ...nodes import (ArrayAccess, ArrayExpression, AssignmentExpression, BinaryExpression,
                      CallExpression, CastExpression, FieldAccess, Identifier,
                      InstanceofExpression, Literal, NewExpression, TernaryExpression,
                      ThisExpression, UnaryExpression, UpdateExpression, PrimaryExpression)
-from ...node import (AssertStatement, BlockStatement, BreakStatement, ContinueStatement,
+from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueStatement,
                      DoStatement, EmptyStatement, ExpressionStatement, ForInStatement,
                      ForStatement, IfStatement, LabeledStatement,
                      LocalVariableDeclaration, VariableDeclarator, ReturnStatement,
                      SwitchStatement, ThrowStatement, TryStatement, WhileStatement,
                      YieldStatement)
-from ...node import TypeIdentifier, DimensionSpecifier
-from ...node import get_assignment_op, get_binary_op, get_unary_op, get_update_op
-from ...node import node_factory
+from ...nodes import TypeIdentifier, DimensionSpecifier
+from ...nodes import get_assignment_op, get_binary_op, get_unary_op, get_update_op
+from ...nodes import node_factory
 
 
 def convert_expression(node: tree_sitter.Node) -> Expression:
