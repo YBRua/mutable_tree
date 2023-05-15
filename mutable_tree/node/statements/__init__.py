@@ -9,7 +9,7 @@ from .for_in_stmt import ForInStatement
 from .for_stmt import ForStatement
 from .if_stmt import IfStatement
 from .labeled_stmt import LabeledStatement
-from .local_var_decl import LocalVariableDeclaration
+from .local_var_decl import LocalVariableDeclaration, VariableDeclarator
 from .return_stmt import ReturnStatement
 from .switch_stmt import SwitchStatement
 from .throw_stmt import ThrowStatement

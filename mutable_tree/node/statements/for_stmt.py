@@ -7,12 +7,12 @@ from ..expressions import is_expression
 from ..utils import throw_invalid_type
 from typing import Union, List
 
-Init = Union[LocalVariableDeclaration, List[Expression]]
+ForInit = Union[LocalVariableDeclaration, List[Expression]]
 
 
 class ForStatement(Statement):
 
-    def __init__(self, node_type: NodeType, init: Init, condition: Expression,
+    def __init__(self, node_type: NodeType, init: ForInit, condition: Expression,
                  update: List[Expression], body: Statement):
         super().__init__(node_type)
         self.init = init

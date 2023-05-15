@@ -10,11 +10,34 @@ from .statements import Statement
 from .statements import (AssertStatement, BlockStatement, BreakStatement,
                          ContinueStatement, DoStatement, ExpressionStatement,
                          ForInStatement, ForStatement, IfStatement, LabeledStatement,
-                         LocalVariableDeclaration, ReturnStatement, SwitchStatement,
-                         ThrowStatement, TryStatement, WhileStatement, YieldStatement)
-from .types import TypeIdentifier
+                         LocalVariableDeclaration, VariableDeclarator, ReturnStatement,
+                         SwitchStatement, ThrowStatement, TryStatement, WhileStatement,
+                         YieldStatement)
+from .statements.for_stmt import ForInit
+from .types import TypeIdentifier, DimensionSpecifier
 
-from typing import Union, List
+from typing import Union, List, Optional
+
+# TYPES
+
+
+def create_array_type(type_identifier: TypeIdentifier,
+                      dimension: DimensionSpecifier) -> TypeIdentifier:
+    type_identifier.dimension = dimension
+    return type_identifier
+
+
+def create_type_identifier(name: str,
+                           dimension: Optional[DimensionSpecifier] = None
+                           ) -> TypeIdentifier:
+    return TypeIdentifier(NodeType.TYPE_IDENTIFIER, name, dimension)
+
+
+def create_dimension_specifier(dims: int) -> DimensionSpecifier:
+    return DimensionSpecifier(NodeType.DIMENSION_SPECIFIER, dims)
+
+
+# EXPRESSIONS
 
 
 def create_identifier(name: str) -> Identifier:
@@ -82,5 +105,33 @@ def create_this_expr() -> ThisExpression:
     return ThisExpression(NodeType.THIS_EXPR)
 
 
+# STATEMENTS
+
+
 def create_expression_stmt(expr: Expression) -> ExpressionStatement:
     return ExpressionStatement(NodeType.EXPRESSION_STMT, expr)
+
+
+def create_for_stmt(init: ForInit, condition: Expression, update: List[Expression],
+                    body: Statement) -> ForStatement:
+    return ForStatement(NodeType.FOR_STMT, init, condition, update, body)
+
+
+def create_while_stmt(condition: Expression, body: Statement) -> WhileStatement:
+    return WhileStatement(NodeType.WHILE_STMT, condition, body)
+
+
+def create_block_stmt(statements: List[Statement]) -> BlockStatement:
+    return BlockStatement(NodeType.BLOCK_STMT, statements)
+
+
+def create_variable_declarator(name: Identifier,
+                               dimension: Optional[DimensionSpecifier] = None,
+                               value: Optional[Expression] = None) -> VariableDeclarator:
+    return VariableDeclarator(NodeType.VARIABLE_DECLARATOR, name, dimension, value)
+
+
+def create_local_var_decl(
+        type_name: TypeIdentifier,
+        declarators: List[VariableDeclarator]) -> LocalVariableDeclaration:
+    return LocalVariableDeclaration(NodeType.LOCAL_VAR_DECL, type_name, declarators)

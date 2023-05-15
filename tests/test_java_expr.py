@@ -1,35 +1,8 @@
 import unittest
-from mutable_tree.adaptor import JavaAdaptor
-from tree_sitter import Language, Parser
-
-from .utils import LANGUAGES_PATH, collect_tokens
+from .java_test_base import JavaSnippetTestBase
 
 
-class JavaExprTestBase(unittest.TestCase):
-
-    def setUp(self) -> None:
-        self.parser = Parser()
-        self.parser.set_language(Language(LANGUAGES_PATH, 'java'))
-
-    def _stmt_round_trip(self, code: str):
-        tree = self.parser.parse(code.encode())
-        root = tree.root_node
-        if root.has_error:
-            raise ValueError('original code is invalid')
-
-        mutable_root = JavaAdaptor.convert_statement(root.children[0])
-        new_code = mutable_root.to_string()
-
-        new_tree = self.parser.parse(new_code.encode())
-        new_root = new_tree.root_node
-        self.assertFalse(new_root.has_error)
-
-        tokens = collect_tokens(root)
-        new_tokens = collect_tokens(new_root)
-        self.assertSequenceEqual(tokens, new_tokens)
-
-
-class TestJavaArrayAccess(JavaExprTestBase):
+class TestJavaArrayAccess(JavaSnippetTestBase):
 
     def test_array_access(self):
         self._stmt_round_trip('arr[1];')
@@ -47,7 +20,7 @@ class TestJavaArrayAccess(JavaExprTestBase):
         self._stmt_round_trip('a1[a2[i1]][a3[1]];')
 
 
-class TestJavaAssignmentExpr(JavaExprTestBase):
+class TestJavaAssignmentExpr(JavaSnippetTestBase):
 
     def test_assignment_expr(self):
         self._stmt_round_trip('a = 1;')
@@ -61,7 +34,7 @@ class TestJavaAssignmentExpr(JavaExprTestBase):
             self._stmt_round_trip(f'a {op} b {op} c;')
 
 
-class TestJavaBinaryExpr(JavaExprTestBase):
+class TestJavaBinaryExpr(JavaSnippetTestBase):
 
     def test_binary_expr(self):
         operators = ['+', '-', '*', '/', '%', '&', '|', '^', '<<', '>>', '>>>']
@@ -84,7 +57,7 @@ class TestJavaBinaryExpr(JavaExprTestBase):
             self._stmt_round_trip(f'a = a {op} b;')
 
 
-class TestJavaFieldAccess(JavaExprTestBase):
+class TestJavaFieldAccess(JavaSnippetTestBase):
 
     def test_field_access(self):
         self._stmt_round_trip('foo.bar;')
@@ -101,7 +74,7 @@ class TestJavaFieldAccess(JavaExprTestBase):
         self._stmt_round_trip('foo.bar.baz[idx].thonk[2];')
 
 
-class TestJavaCallExpr(JavaExprTestBase):
+class TestJavaCallExpr(JavaSnippetTestBase):
 
     def test_simple_call(self):
         self._stmt_round_trip('foo();')

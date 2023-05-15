@@ -1,25 +1,10 @@
 from ..node import Node, NodeType
 from .statement import Statement
 from ..expressions import Expression, Identifier
-from ..types import TypeIdentifier
+from ..types import TypeIdentifier, DimensionSpecifier
 from ..expressions import is_expression
 from ..utils import throw_invalid_type
 from typing import List, Optional
-
-
-class DimensionSpecifier(Node):
-
-    def __init__(self, node_type: NodeType, dims: int):
-        super().__init__(node_type)
-        self.dims = dims
-        self._check_types()
-
-    def _check_types(self):
-        if self.node_type != NodeType.DIMENSION_SPECIFIER:
-            throw_invalid_type(self.node_type, self)
-
-    def to_string(self) -> str:
-        return '[]' * self.dims
 
 
 class VariableDeclarator(Node):
@@ -73,4 +58,4 @@ class LocalVariableDeclaration(Statement):
 
     def to_string(self) -> str:
         decl_strs = ', '.join(decl.to_string() for decl in self.declarators)
-        return f'{self.type.to_string()} {decl_strs}'
+        return f'{self.type.to_string()} {decl_strs};'
