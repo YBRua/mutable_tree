@@ -14,7 +14,8 @@ class JavaExprTestBase(unittest.TestCase):
     def _stmt_round_trip(self, code: str):
         tree = self.parser.parse(code.encode())
         root = tree.root_node
-        self.assertFalse(root.has_error)
+        if root.has_error:
+            raise ValueError('original code is invalid')
 
         mutable_root = JavaAdaptor.convert_statement(root.children[0])
         new_code = mutable_root.to_string()
