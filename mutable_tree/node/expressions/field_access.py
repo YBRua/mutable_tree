@@ -14,7 +14,7 @@ class FieldAccess(Expression):
     def _check_types(self):
         if self.node_type != NodeType.FIELD_ACCESS:
             raise TypeError(f'Invalid type: {self.node_type} for FieldAccess')
-        if not is_primary_expression(self.object.node_type):
+        if not is_primary_expression(self.object):
             raise TypeError(
                 f'Invalid type: {self.object.node_type} for field access object')
         f_nt = self.field.node_type
