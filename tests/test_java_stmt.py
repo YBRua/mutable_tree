@@ -43,14 +43,55 @@ class TestJavaForStmt(JavaSnippetTestBase):
         self._stmt_round_trip('for (i = 1;;) { }')
         self._stmt_round_trip('for (; i < 10;) { }')
         self._stmt_round_trip('for (;; i++) { }')
-    
+
     def test_multi_init(self):
         self._stmt_round_trip('for (int i = 0, j = 0; i < 10; i++) { }')
         self._stmt_round_trip('for (i = 0, j = 0; i < 10; i++);')
-    
+
     def test_multi_update(self):
         self._stmt_round_trip('for (int i = 0; i < 10; i++, j++) { }')
         self._stmt_round_trip('for (i = 0; i < 10; i++, j++);')
+
+    def test_block(self):
+        code = 'for (int i = 0; i < 10; ++i) { int j = 2 * i; sum += j; }'
+        self._stmt_round_trip(code)
+
+    def test_nested_for(self):
+        code = 'for (i = 0; i < 10; ++i) { for (int j = 0; j < 10; ++j) { k = i * j; }}'
+        self._stmt_round_trip(code)
+
+        code = 'for (i = 0; i < 10; ++i) for (int j = 0; j < 10; ++j) k = i * j;'
+        self._stmt_round_trip(code)
+    
+    def test_for_while(self):
+        code = 'for (int i = 0; i < 10; ++i) { while (j < 2 * i) { j = 2 * j; } }'
+        self._stmt_round_trip(code)
+
+
+class TestJavaWhileStmt(JavaSnippetTestBase):
+
+    def test_simple_while(self):
+        self._stmt_round_trip('while (i < 10) { }')
+        self._stmt_round_trip('while (i < 10);')
+
+    def test_empty_while(self):
+        self._stmt_round_trip('while (true) { }')
+        self._stmt_round_trip('while (true);')
+
+    def test_block(self):
+        code = 'while (i < 10) { int j = 2 * i; sum += j; i++; }'
+        self._stmt_round_trip(code)
+
+    def test_nested_while(self):
+        code = 'while (i < 10) { while (j < 10) { k = i * j; } }'
+        self._stmt_round_trip(code)
+
+        code = 'while (i < 10) while (j < 10) k = i * j;'
+        self._stmt_round_trip(code)
+
+    def test_while_for(self):
+        code = 'while (true) { for (int i = 0; i < 10; ++i) { j = i * 2; } }'
+        self._stmt_round_trip(code)
 
 
 if __name__ == '__main__':

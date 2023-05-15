@@ -48,6 +48,7 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'empty_statement': convert_empty_stmt,
         'block': convert_block_stmt,
         'for_statement': convert_for_stmt,
+        'while_statement': convert_while_stmt,
     }
 
     return stmt_convertors[node.type](node)
@@ -194,6 +195,13 @@ def convert_empty_stmt(node: tree_sitter.Node) -> EmptyStatement:
     return node_factory.create_empty_stmt()
 
 
+def convert_block_stmt(node: tree_sitter.Node) -> BlockStatement:
+    stmts = []
+    for stmt_node in node.children[1:-1]:
+        stmts.append(convert_statement(stmt_node))
+    return node_factory.create_block_stmt(stmts)
+
+
 def convert_for_stmt(node: tree_sitter.Node) -> ForStatement:
     init_nodes = node.children_by_field_name('init')
     cond_node = node.child_by_field_name('condition')
@@ -217,8 +225,12 @@ def convert_for_stmt(node: tree_sitter.Node) -> ForStatement:
     return node_factory.create_for_stmt(body, init, cond, update)
 
 
-def convert_block_stmt(node: tree_sitter.Node) -> BlockStatement:
-    stmts = []
-    for stmt_node in node.children[1:-1]:
-        stmts.append(convert_statement(stmt_node))
-    return node_factory.create_block_stmt(stmts)
+def convert_while_stmt(node: tree_sitter.Node) -> WhileStatement:
+    cond_node = node.child_by_field_name('condition')
+    assert cond_node.child_count == 3, 'while condition with != 3 children'
+    cond_node = cond_node.children[1]
+    body_node = node.child_by_field_name('body')
+
+    cond = convert_expression(cond_node)
+    body = convert_statement(body_node)
+    return node_factory.create_while_stmt(cond, body)
