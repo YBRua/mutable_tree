@@ -1,16 +1,17 @@
 import tree_sitter
 from ...nodes import Node, Expression, Statement
-from ...nodes import (ArrayAccess, ArrayExpression, AssignmentExpression, BinaryExpression,
-                     CallExpression, CastExpression, FieldAccess, Identifier,
-                     InstanceofExpression, Literal, NewExpression, TernaryExpression,
-                     ThisExpression, UnaryExpression, UpdateExpression, PrimaryExpression)
+from ...nodes import (ArrayAccess, ArrayExpression, AssignmentExpression,
+                      BinaryExpression, CallExpression, CastExpression, FieldAccess,
+                      Identifier, InstanceofExpression, Literal, NewExpression,
+                      TernaryExpression, ThisExpression, UnaryExpression,
+                      UpdateExpression, PrimaryExpression, ExpressionList)
 from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueStatement,
-                     DoStatement, EmptyStatement, ExpressionStatement, ForInStatement,
-                     ForStatement, IfStatement, LabeledStatement,
-                     LocalVariableDeclaration, VariableDeclarator, ReturnStatement,
-                     SwitchStatement, ThrowStatement, TryStatement, WhileStatement,
-                     YieldStatement)
-from ...nodes import TypeIdentifier, DimensionSpecifier
+                      DoStatement, EmptyStatement, ExpressionStatement, ForInStatement,
+                      ForStatement, IfStatement, LabeledStatement,
+                      LocalVariableDeclaration, VariableDeclarator, ReturnStatement,
+                      SwitchStatement, ThrowStatement, TryStatement, WhileStatement,
+                      YieldStatement, StatementList, VariableDeclaratorList)
+from ...nodes import TypeIdentifier, DimensionSpecifier, TypeIdentifierList
 from ...nodes import get_assignment_op, get_binary_op, get_unary_op, get_update_op
 from ...nodes import node_factory
 
@@ -124,6 +125,7 @@ def convert_call_expr(node: tree_sitter.Node) -> CallExpression:
         if arg.text.decode() == ',':
             continue
         args.append(convert_expression(arg))
+    args = node_factory.create_expression_list(args)
 
     name_expr = convert_expression(node.child_by_field_name('name'))
     obj_node = node.child_by_field_name('object')
@@ -187,6 +189,7 @@ def convert_local_variable_declaration(
     declarators = []
     for decl_node in node.children_by_field_name('declarator'):
         declarators.append(convert_variable_declarator(decl_node))
+    declarators = node_factory.create_variable_declarator_list(declarators)
 
     return node_factory.create_local_var_decl(ty, declarators)
 
@@ -199,6 +202,7 @@ def convert_block_stmt(node: tree_sitter.Node) -> BlockStatement:
     stmts = []
     for stmt_node in node.children[1:-1]:
         stmts.append(convert_statement(stmt_node))
+    stmts = node_factory.create_statement_list(stmts)
     return node_factory.create_block_stmt(stmts)
 
 
@@ -217,11 +221,13 @@ def convert_for_stmt(node: tree_sitter.Node) -> ForStatement:
             init = convert_local_variable_declaration(init_nodes[0])
         else:
             init = [convert_expression(init_node) for init_node in init_nodes]
+            init = node_factory.create_expression_list(init)
     cond = convert_expression(cond_node) if cond_node is not None else None
     if len(update_node) == 0:
         update = None
     else:
         update = [convert_expression(update) for update in update_node]
+        update = node_factory.create_expression_list(update)
     return node_factory.create_for_stmt(body, init, cond, update)
 
 

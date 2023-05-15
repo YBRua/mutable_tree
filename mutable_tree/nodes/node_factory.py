@@ -5,18 +5,19 @@ from .expressions import (ArrayAccess, ArrayExpression, AssignmentExpression,
                           BinaryExpression, CallExpression, CastExpression, FieldAccess,
                           Identifier, InstanceofExpression, Literal, NewExpression,
                           TernaryExpression, ThisExpression, UnaryExpression,
-                          UpdateExpression, PrimaryExpression)
+                          UpdateExpression, PrimaryExpression, ExpressionList)
 from .statements import Statement
 from .statements import (AssertStatement, BlockStatement, BreakStatement,
                          ContinueStatement, DoStatement, EmptyStatement,
                          ExpressionStatement, ForInStatement, ForStatement, IfStatement,
                          LabeledStatement, LocalVariableDeclaration, VariableDeclarator,
                          ReturnStatement, SwitchStatement, ThrowStatement, TryStatement,
-                         WhileStatement, YieldStatement)
+                         WhileStatement, YieldStatement, StatementList,
+                         VariableDeclaratorList)
 from .statements.for_stmt import ForInit
 from .types import TypeIdentifier, DimensionSpecifier
 
-from typing import Union, List, Optional
+from typing import Union, Optional, List
 
 # TYPES
 
@@ -72,11 +73,11 @@ def create_array_access(array: PrimaryExpression, index: Expression) -> ArrayAcc
     return ArrayAccess(NodeType.ARRAY_ACCESS, array, index)
 
 
-def create_array_expr(elements: List[Expression]) -> ArrayExpression:
+def create_array_expr(elements: ExpressionList) -> ArrayExpression:
     return ArrayExpression(NodeType.ARRAY_EXPR, elements)
 
 
-def create_call_expr(callee: PrimaryExpression, args: List[Expression]) -> CallExpression:
+def create_call_expr(callee: PrimaryExpression, args: ExpressionList) -> CallExpression:
     return CallExpression(NodeType.CALL_EXPR, callee, args)
 
 
@@ -93,7 +94,7 @@ def create_instanceof_expr(expr: Expression,
     return InstanceofExpression(NodeType.INSTANCEOF_EXPR, expr, type_name)
 
 
-def create_new_expr(type_name: TypeIdentifier, args: List[Expression]) -> NewExpression:
+def create_new_expr(type_name: TypeIdentifier, args: ExpressionList) -> NewExpression:
     return NewExpression(NodeType.NEW_EXPR, type_name, args)
 
 
@@ -121,7 +122,7 @@ def create_for_stmt(
     body: Statement,
     init: Optional[ForInit] = None,
     condition: Optional[Expression] = None,
-    update: Optional[List[Expression]] = None,
+    update: Optional[ExpressionList] = None,
 ) -> ForStatement:
     return ForStatement(NodeType.FOR_STMT, body, init, condition, update)
 
@@ -130,7 +131,7 @@ def create_while_stmt(condition: Expression, body: Statement) -> WhileStatement:
     return WhileStatement(NodeType.WHILE_STMT, condition, body)
 
 
-def create_block_stmt(statements: List[Statement]) -> BlockStatement:
+def create_block_stmt(statements: StatementList) -> BlockStatement:
     return BlockStatement(NodeType.BLOCK_STMT, statements)
 
 
@@ -142,5 +143,17 @@ def create_variable_declarator(name: Identifier,
 
 def create_local_var_decl(
         type_name: TypeIdentifier,
-        declarators: List[VariableDeclarator]) -> LocalVariableDeclaration:
+        declarators: VariableDeclaratorList) -> LocalVariableDeclaration:
     return LocalVariableDeclaration(NodeType.LOCAL_VAR_DECL, type_name, declarators)
+
+
+def create_expression_list(exprs: List[Expression]):
+    return ExpressionList(NodeType.EXPRESSION_LIST, exprs)
+
+
+def create_statement_list(stmts: List[Statement]):
+    return StatementList(NodeType.STATEMENT_LIST, stmts)
+
+
+def create_variable_declarator_list(declarators: List[VariableDeclarator]):
+    return VariableDeclaratorList(NodeType.VARIABLE_DECLARATOR_LIST, declarators)

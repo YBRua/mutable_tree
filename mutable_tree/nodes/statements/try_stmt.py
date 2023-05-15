@@ -2,14 +2,14 @@ from ..node import Node, NodeType
 from .statement import Statement
 from .block_stmt import BlockStatement
 from ..expressions import Identifier
-from ..types import TypeIdentifier
+from ..types import TypeIdentifierList
 from ..utils import throw_invalid_type
 from typing import List, Optional
 
 
 class CatchClause(Node):
 
-    def __init__(self, node_type: NodeType, catch_types: List[TypeIdentifier],
+    def __init__(self, node_type: NodeType, catch_types: TypeIdentifierList,
                  exception: Identifier, body: BlockStatement):
         super().__init__(node_type)
         self.catch_types = catch_types
@@ -24,18 +24,18 @@ class CatchClause(Node):
             throw_invalid_type(self.exception.node_type, self, attr='exception')
         if self.body.node_type != NodeType.BLOCK_STMT:
             throw_invalid_type(self.body.node_type, self, attr='body')
-        for i, ty in enumerate(self.catch_types):
-            if ty.node_type != NodeType.TYPE_IDENTIFIER:
-                throw_invalid_type(ty.node_type, self, attr=f'catch_types#{i}')
+        if self.catch_types.node_type != NodeType.TYPE_IDENTIFIER_LIST:
+            throw_invalid_type(self.catch_types.node_type, self, attr='catch_types')
 
     def to_string(self) -> str:
-        catch_types_str = ' | '.join([ty.to_string() for ty in self.catch_types])
+        catch_types_str = ' | '.join(
+            [ty.to_string() for ty in self.catch_types.get_children()])
         exception_str = self.exception.to_string()
         body_str = self.body.to_string()
         return f'catch ({catch_types_str} {exception_str}) {{\n{body_str}\n}}'
 
     def get_children(self) -> List[Node]:
-        return self.catch_types + [self.exception, self.body]
+        return [self.catch_types, self.exception, self.body]
 
 
 class FinallyClause(Node):

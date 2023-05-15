@@ -34,7 +34,7 @@ def for_stmt_to_while_stmt(for_stmt: ForStatement) -> WhileStatement:
         assert isinstance(for_body, BlockStatement)
         body_stmts = for_body.stmts
 
-    for u in update:
+    for u in update.get_children():
         assert is_expression(u)
         body_stmts.append(node_factory.create_expression_stmt(u))
     while_body = node_factory.create_block_stmt(body_stmts)

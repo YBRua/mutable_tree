@@ -1,2 +1,3 @@
 from .type_identifier import TypeIdentifier
+from .type_identifier_list import TypeIdentifierList
 from .dimension_specifier import DimensionSpecifier

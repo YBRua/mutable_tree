@@ -2,8 +2,8 @@ from enum import Enum
 from typing import List
 
 
-class NodeType(Enum):
     # types
+class NodeType(Enum):
     TYPE_IDENTIFIER = 'TypeIdentifier'
 
     # expressions
@@ -55,6 +55,11 @@ class NodeType(Enum):
     SWITCH_CASE = 'SwitchCase'
     CATCH_CLAUSE = 'CatchClause'
     FINALLY_CLAUSE = 'FinallyClause'
+    EXPRESSION_LIST = 'ExpressionList'
+    STATEMENT_LIST = 'StatementList'
+    VARIABLE_DECLARATOR_LIST = 'VariableDeclaratorList'
+    SWITCH_CASE_LIST = 'SwitchCaseList'
+    TYPE_IDENTIFIER_LIST = 'TypeIdentifierList'
 
 
 class Node:

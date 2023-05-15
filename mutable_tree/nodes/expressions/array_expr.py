@@ -1,25 +1,25 @@
 from ..node import Node, NodeType
 from .expression import Expression
-from .expression import is_expression
+from .expression_list import ExpressionList
+from ..utils import throw_invalid_type
 from typing import List
 
 
 class ArrayExpression(Expression):
 
-    def __init__(self, node_type: NodeType, elements: List[Expression]):
+    def __init__(self, node_type: NodeType, elements: ExpressionList):
         super().__init__(node_type)
         self.elements = elements
         self._check_types()
 
     def _check_types(self):
         if self.node_type != NodeType.ARRAY_EXPR:
-            raise TypeError(f'Invalid type: {self.node_type} for ArrayExpression')
-        for i, elem in enumerate(self.elements):
-            if not is_expression(elem):
-                raise TypeError(f'Invalid type: {elem.node_type} for array element {i}')
+            throw_invalid_type(self.node_type, self)
+        if self.elements.node_type != NodeType.EXPRESSION_LIST:
+            throw_invalid_type(self.elements.node_type, self, 'elements')
 
     def to_string(self) -> str:
-        return f'{{{", ".join(elem.to_string() for elem in self.elements)}}}'
+        return f'{{{", ".join(e.to_string() for e in self.elements.get_children())}}}'
 
     def get_children(self) -> List[Node]:
-        return self.elements
+        return [self.elements]
