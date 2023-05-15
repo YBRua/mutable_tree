@@ -1,8 +1,9 @@
-from ..node import NodeType
+from ..node import Node, NodeType
 from .statement import Statement
 from .statement import is_statement
 from ..expressions import Expression
 from ..expressions import is_expression
+from typing import List
 
 
 class DoStatement(Statement):
@@ -23,3 +24,6 @@ class DoStatement(Statement):
 
     def to_string(self) -> str:
         return f'do\n {self.body.to_string()} \nwhile {self.condition.to_string()};'
+
+    def get_children(self) -> List[Node]:
+        return [self.body, self.condition]

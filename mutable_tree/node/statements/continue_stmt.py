@@ -1,7 +1,7 @@
-from ..node import NodeType
+from ..node import Node, NodeType
 from .statement import Statement
 from ..expressions import Expression
-from typing import Optional
+from typing import List, Optional
 
 
 class ContinueStatement(Statement):
@@ -22,3 +22,9 @@ class ContinueStatement(Statement):
             return f'continue {self.label.to_string()};'
         else:
             return 'continue;'
+
+    def get_children(self) -> List[Node]:
+        if self.label is not None:
+            return [self.label]
+        else:
+            return []

@@ -1,5 +1,7 @@
 from enum import Enum
-from ..node import NodeType
+from typing import List
+
+from ..node import Node, NodeType
 from .expression import Expression
 from .expression import is_expression
 
@@ -37,3 +39,6 @@ class UpdateExpression(Expression):
             return f'{self.op.value}{self.operand.to_string()}'
         else:
             return f'{self.operand.to_string()}{self.op.value}'
+
+    def get_children(self) -> List[Node]:
+        return [self.operand]

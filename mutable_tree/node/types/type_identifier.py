@@ -1,6 +1,6 @@
 from ..node import Node, NodeType
 from .dimension_specifier import DimensionSpecifier
-from typing import Optional
+from typing import List, Optional
 
 
 class TypeIdentifier(Node):
@@ -20,3 +20,9 @@ class TypeIdentifier(Node):
             return f'{self.type_identifier}{self.dimension.to_string()}'
         else:
             return self.type_identifier
+
+    def get_children(self) -> List[Node]:
+        if self.dimension is not None:
+            return [self.dimension]
+        else:
+            return []

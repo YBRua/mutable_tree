@@ -1,7 +1,9 @@
 from enum import Enum
+
 from ..node import Node, NodeType
 from .expression import Expression
 from .expression import is_expression
+from typing import List
 
 
 class AssignmentOps(Enum):
@@ -60,3 +62,6 @@ class AssignmentExpression(Expression):
 
     def to_string(self) -> str:
         return f'{self.left.to_string()} {self.op.value} {self.right.to_string()}'
+
+    def get_children(self) -> List[Node]:
+        return [self.left, self.right]

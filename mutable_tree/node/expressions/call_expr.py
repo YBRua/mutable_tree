@@ -1,3 +1,4 @@
+from mutable_tree.node.node import Node
 from ..node import NodeType
 from .expression import Expression
 from .expression import is_primary_expression, is_expression
@@ -24,3 +25,6 @@ class CallExpression(Expression):
     def to_string(self) -> str:
         arg_list = ", ".join(arg.to_string() for arg in self.args)
         return f'{self.callee.to_string()}({arg_list})'
+
+    def get_children(self) -> List[Node]:
+        return [self.callee] + self.args

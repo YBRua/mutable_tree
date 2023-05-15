@@ -1,10 +1,10 @@
-from ..node import NodeType
+from ..node import Node, NodeType
 from .statement import Statement
 from .statement import is_statement
 from ..expressions import Expression
 from ..expressions import is_expression
 from ..utils import throw_invalid_type
-from typing import Optional
+from typing import List, Optional
 
 
 class IfStatement(Statement):
@@ -38,3 +38,9 @@ class IfStatement(Statement):
         else:
             else_str = self.alternate.to_string()
             return f'if ({cond_str}) {then_str} else {else_str}'
+
+    def get_children(self) -> List[Node]:
+        if self.alternate is None:
+            return [self.condition, self.consequence]
+        else:
+            return [self.condition, self.consequence, self.alternate]

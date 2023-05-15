@@ -1,8 +1,8 @@
-from ..node import NodeType
+from ..node import Node, NodeType
 from .statement import Statement
 from ..expressions import Expression
 from ..expressions import is_expression
-from typing import Optional
+from typing import List, Optional
 
 
 class AssertStatement(Statement):
@@ -30,3 +30,9 @@ class AssertStatement(Statement):
             return f'assert {self.condition.to_string()} : {self.message.to_string()};'
         else:
             return f'assert {self.condition.to_string()};'
+
+    def get_children(self) -> List[Node]:
+        if self.message is not None:
+            return [self.condition, self.message]
+        else:
+            return [self.condition]

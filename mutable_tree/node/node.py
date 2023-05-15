@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 
 
 class NodeType(Enum):
@@ -66,4 +67,7 @@ class Node:
         raise NotImplementedError('Base class Node should never be initialized')
 
     def to_string(self) -> str:
+        raise NotImplementedError()
+
+    def get_children(self) -> List['Node']:
         raise NotImplementedError()

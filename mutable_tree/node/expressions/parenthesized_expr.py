@@ -1,6 +1,7 @@
-from ..node import NodeType
+from ..node import Node, NodeType
 from .expression import Expression
 from .expression import is_expression
+from typing import List
 
 
 class ParenthesizedExpression(Expression):
@@ -20,3 +21,6 @@ class ParenthesizedExpression(Expression):
 
     def to_string(self) -> str:
         return f'({self.expr.to_string()})'
+
+    def get_children(self) -> List[Node]:
+        return [self.expr]

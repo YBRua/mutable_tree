@@ -35,6 +35,12 @@ class SwitchCase(Node):
         stmts_str = '\n'.join([stmt.to_string() for stmt in self.stmts])
         return f'{case_str}\n{stmts_str}'
 
+    def get_children(self) -> List[Node]:
+        if self.case is not None:
+            return [self.case] + self.stmts
+        else:
+            return self.stmts
+
 
 class SwitchStatement(Statement):
 
@@ -56,3 +62,6 @@ class SwitchStatement(Statement):
         cond_str = self.condition.to_string()
         body_str = '\n'.join([case.to_string() for case in self.body])
         return f'switch ({cond_str}) {{\n{body_str}\n}}'
+
+    def get_children(self) -> List[Node]:
+        return [self.condition] + self.body

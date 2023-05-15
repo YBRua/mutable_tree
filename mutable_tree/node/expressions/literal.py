@@ -16,3 +16,6 @@ class Literal(Expression):
 
     def to_string(self) -> str:
         return str(self.value)
+
+    def get_children(self):
+        return []

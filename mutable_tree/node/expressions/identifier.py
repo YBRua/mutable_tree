@@ -1,5 +1,6 @@
 from .expression import Expression
-from ..node import NodeType
+from ..node import Node, NodeType
+from typing import List
 
 
 class Identifier(Expression):
@@ -15,3 +16,6 @@ class Identifier(Expression):
 
     def to_string(self) -> str:
         return str(self.name)
+
+    def get_children(self) -> List[Node]:
+        return []

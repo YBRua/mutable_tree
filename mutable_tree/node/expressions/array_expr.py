@@ -1,4 +1,4 @@
-from ..node import NodeType
+from ..node import Node, NodeType
 from .expression import Expression
 from .expression import is_expression
 from typing import List
@@ -20,3 +20,6 @@ class ArrayExpression(Expression):
 
     def to_string(self) -> str:
         return f'{{{", ".join(elem.to_string() for elem in self.elements)}}}'
+
+    def get_children(self) -> List[Node]:
+        return self.elements

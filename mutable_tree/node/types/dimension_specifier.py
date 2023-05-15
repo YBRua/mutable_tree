@@ -1,5 +1,6 @@
 from ..node import Node, NodeType
 from ..utils import throw_invalid_type
+from typing import List
 
 
 class DimensionSpecifier(Node):
@@ -15,3 +16,6 @@ class DimensionSpecifier(Node):
 
     def to_string(self) -> str:
         return '[]' * self.dims
+
+    def get_children(self) -> List[Node]:
+        return []

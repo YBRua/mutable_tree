@@ -1,9 +1,10 @@
-from ..node import NodeType
+from ..node import Node, NodeType
 from .statement import Statement
 from .statement import is_statement
 from ..expressions import Expression, Identifier
 from ..types import TypeIdentifier
 from ..expressions import is_expression
+from typing import List
 
 
 class ForInStatement(Statement):
@@ -36,3 +37,6 @@ class ForInStatement(Statement):
         iterable_str = self.iterable.to_string()
         body_str = self.body.to_string()
         return f'for ({it_type_str} {iter_str} : {iterable_str})\n{body_str}'
+
+    def get_children(self) -> List[Node]:
+        return [self.it_type, self.iter, self.iterable, self.body]

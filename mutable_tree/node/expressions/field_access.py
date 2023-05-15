@@ -1,3 +1,5 @@
+from typing import List
+from mutable_tree.node.node import Node
 from ..node import NodeType
 from .expression import Expression
 from .expression import is_primary_expression
@@ -23,3 +25,6 @@ class FieldAccess(Expression):
 
     def to_string(self) -> str:
         return f'{self.object.to_string()}.{self.field.to_string()}'
+
+    def get_children(self) -> List[Node]:
+        return [self.object, self.field]

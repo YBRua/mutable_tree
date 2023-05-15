@@ -1,7 +1,7 @@
-from ..node import NodeType
+from ..node import Node, NodeType
 from .statement import Statement
 from ..expressions import Expression
-from typing import Optional
+from typing import List, Optional
 
 
 class BreakStatement(Statement):
@@ -22,3 +22,9 @@ class BreakStatement(Statement):
             return f'break {self.label.to_string()};'
         else:
             return 'break;'
+
+    def get_children(self) -> List[Node]:
+        if self.label is not None:
+            return [self.label]
+        else:
+            return []

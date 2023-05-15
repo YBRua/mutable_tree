@@ -1,7 +1,8 @@
-from ..node import NodeType
+from ..node import Node, NodeType
 from .statement import Statement
 from ..expressions import Expression
 from ..expressions import is_expression
+from typing import List
 
 
 class ExpressionStatement(Statement):
@@ -19,3 +20,6 @@ class ExpressionStatement(Statement):
 
     def to_string(self) -> str:
         return f'{self.expr.to_string()};'
+
+    def get_children(self) -> List[Node]:
+        return [self.expr]

@@ -1,3 +1,5 @@
+from typing import List
+from mutable_tree.node.node import Node
 from ..node import NodeType
 from .expression import Expression
 from ..types import TypeIdentifier
@@ -23,3 +25,6 @@ class CastExpression(Expression):
 
     def to_string(self) -> str:
         return f'({self.type.to_string()}) {self.value.to_string()}'
+
+    def get_children(self) -> List[Node]:
+        return [self.type, self.value]

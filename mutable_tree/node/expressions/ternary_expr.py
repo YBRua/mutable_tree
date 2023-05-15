@@ -1,6 +1,7 @@
-from ..node import NodeType
+from ..node import Node, NodeType
 from .expression import Expression
 from .expression import is_expression
+from typing import List
 
 
 class TernaryExpression(Expression):
@@ -30,3 +31,6 @@ class TernaryExpression(Expression):
         return (f'{self.condition.to_string()} ? '
                 f'{self.consequence.to_string()} : '
                 f'{self.alternative.to_string()}')
+
+    def get_children(self) -> List[Node]:
+        return [self.condition, self.consequence, self.alternative]

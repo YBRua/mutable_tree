@@ -1,4 +1,7 @@
 from enum import Enum
+from typing import List
+
+from mutable_tree.node.node import Node
 from ..node import NodeType
 from .expression import Expression
 from .expression import is_expression
@@ -73,3 +76,6 @@ class BinaryExpression(Expression):
 
     def to_string(self) -> str:
         return f'{self.left.to_string()} {self.op.value} {self.right.to_string()}'
+
+    def get_children(self) -> List[Node]:
+        return [self.left, self.right]

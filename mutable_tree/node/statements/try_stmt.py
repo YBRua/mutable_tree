@@ -34,6 +34,9 @@ class CatchClause(Node):
         body_str = self.body.to_string()
         return f'catch ({catch_types_str} {exception_str}) {{\n{body_str}\n}}'
 
+    def get_children(self) -> List[Node]:
+        return self.catch_types + [self.exception, self.body]
+
 
 class FinallyClause(Node):
 

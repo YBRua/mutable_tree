@@ -1,8 +1,8 @@
-from ..node import NodeType
+from ..node import Node, NodeType
 from .statement import Statement
 from ..expressions import Expression
 from ..utils import throw_invalid_type
-from typing import Optional
+from typing import List, Optional
 
 
 class ReturnStatement(Statement):
@@ -23,3 +23,9 @@ class ReturnStatement(Statement):
             return f'return {self.expr.to_string()};'
         else:
             return 'return;'
+
+    def get_children(self) -> List[Node]:
+        if self.expr is not None:
+            return [self.expr]
+        else:
+            return []

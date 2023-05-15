@@ -1,8 +1,9 @@
-from ..node import NodeType
+from ..node import Node, NodeType
 from .statement import Statement
 from .statement import is_statement
 from ..expressions import Identifier
 from ..utils import throw_invalid_type
+from typing import List
 
 
 class LabeledStatement(Statement):
@@ -23,3 +24,6 @@ class LabeledStatement(Statement):
 
     def to_string(self) -> str:
         return f'{self.label.to_string()} : {self.stmt.to_string()}'
+
+    def get_children(self) -> List[Node]:
+        return [self.label, self.stmt]

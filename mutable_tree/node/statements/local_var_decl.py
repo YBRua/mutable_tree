@@ -23,8 +23,8 @@ class VariableDeclarator(Node):
     def _check_types(self):
         if self.node_type != NodeType.VARIABLE_DECLARATOR:
             throw_invalid_type(self.node_type, self)
-        if (self.dimensions is not None
-                and self.dimensions.node_type != NodeType.DIMENSION_SPECIFIER):
+        if (self.dimensions is not None and
+                self.dimensions.node_type != NodeType.DIMENSION_SPECIFIER):
             throw_invalid_type(self.dimensions.node_type, self, attr='dimensions')
         if self.value is not None and not is_expression(self.value):
             throw_invalid_type(self.value.node_type, self, attr='value')
@@ -38,6 +38,14 @@ class VariableDeclarator(Node):
             return f'{declarator_id} = {self.value.to_string()}'
         else:
             return declarator_id
+
+    def get_children(self) -> List[Node]:
+        children = [self.name]
+        if self.dimensions is not None:
+            children.append(self.dimensions)
+        if self.value is not None:
+            children.append(self.value)
+        return children
 
 
 class LocalVariableDeclaration(Statement):
@@ -59,3 +67,6 @@ class LocalVariableDeclaration(Statement):
     def to_string(self) -> str:
         decl_strs = ', '.join(decl.to_string() for decl in self.declarators)
         return f'{self.type.to_string()} {decl_strs};'
+
+    def get_children(self) -> List[Node]:
+        return [self.type] + self.declarators

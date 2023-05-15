@@ -1,4 +1,4 @@
-from ..node import NodeType
+from ..node import Node, NodeType
 from .statement import Statement
 from .statement import is_statement
 from .local_var_decl import LocalVariableDeclaration
@@ -71,3 +71,17 @@ class ForStatement(Statement):
 
         body_str = self.body.to_string()
         return f'for ({init_str}{cond_str}{update_str}) {body_str}'
+
+    def get_children(self) -> List[Node]:
+        children = []
+        if self.init is not None:
+            if self.is_init_decl:
+                children.append(self.init)
+            else:
+                children.extend(self.init)
+        if self.condition is not None:
+            children.append(self.condition)
+        if self.update is not None:
+            children.extend(self.update)
+        children.append(self.body)
+        return children

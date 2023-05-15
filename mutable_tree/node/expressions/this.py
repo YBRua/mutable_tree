@@ -1,4 +1,5 @@
 from ..node import Node, NodeType
+from typing import List
 
 
 class ThisExpression(Node):
@@ -13,3 +14,6 @@ class ThisExpression(Node):
 
     def to_string(self) -> str:
         return 'this'
+
+    def get_children(self) -> List[Node]:
+        return []

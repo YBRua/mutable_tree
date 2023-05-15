@@ -1,4 +1,4 @@
-from ..node import NodeType
+from ..node import Node, NodeType
 from .statement import Statement
 from .statement import is_statement
 from typing import List
@@ -20,3 +20,6 @@ class BlockStatement(Statement):
 
     def to_string(self) -> str:
         return '{\n' + '\n'.join(stmt.to_string() for stmt in self.stmts) + '\n}'
+
+    def get_children(self) -> List[Node]:
+        return self.stmts

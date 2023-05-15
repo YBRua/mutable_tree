@@ -1,4 +1,4 @@
-from ..node import NodeType
+from ..node import Node, NodeType
 from ..types import TypeIdentifier
 from .expression import Expression
 from .expression import is_expression
@@ -24,3 +24,6 @@ class NewExpression(Expression):
     def to_string(self) -> str:
         arg_list = ", ".join(arg.to_string() for arg in self.args)
         return f'new {self.type.to_string()}({arg_list})'
+
+    def get_children(self) -> List[Node]:
+        return [self.type] + self.args

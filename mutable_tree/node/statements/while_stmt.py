@@ -1,9 +1,10 @@
-from ..node import NodeType
+from ..node import Node, NodeType
 from .statement import Statement
 from .statement import is_statement
 from ..expressions import Expression
 from ..expressions import is_expression
 from ..utils import throw_invalid_type
+from typing import List
 
 
 class WhileStatement(Statement):
@@ -27,3 +28,6 @@ class WhileStatement(Statement):
         body_str = self.body.to_string()
 
         return f'while ({cond_str}) {body_str}'
+
+    def get_children(self) -> List[Node]:
+        return [self.condition, self.body]

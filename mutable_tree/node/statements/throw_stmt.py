@@ -1,8 +1,9 @@
-from ..node import NodeType
+from ..node import Node, NodeType
 from .statement import Statement
 from ..expressions import Expression
 from ..expressions import is_expression
 from ..utils import throw_invalid_type
+from typing import List
 
 
 class ThrowStatement(Statement):
@@ -20,3 +21,6 @@ class ThrowStatement(Statement):
 
     def to_string(self) -> str:
         return f'throw {self.expr.to_string()};'
+
+    def get_children(self) -> List[Node]:
+        return [self.expr]
