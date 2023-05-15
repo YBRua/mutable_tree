@@ -1,4 +1,4 @@
-from ..node import Node, NodeType
+from ..node import Node, NodeType, NodeList
 from .statement import Statement
 from ..expressions import Expression, Identifier
 from ..types import TypeIdentifier, DimensionSpecifier
@@ -51,25 +51,20 @@ class VariableDeclarator(Node):
         return ['name', 'dimensions', 'value']
 
 
-class VariableDeclaratorList(Node):
+class VariableDeclaratorList(NodeList):
+    node_list: List[VariableDeclarator]
 
     def __init__(self, node_type: NodeType, declarators: List[VariableDeclarator]):
         super().__init__(node_type)
-        self.declarators = declarators
+        self.node_list = declarators
         self._check_types()
 
     def _check_types(self):
         if self.node_type != NodeType.VARIABLE_DECLARATOR_LIST:
             throw_invalid_type(self.node_type, self)
-        for i, decl in enumerate(self.declarators):
+        for i, decl in enumerate(self.node_list):
             if decl.node_type != NodeType.VARIABLE_DECLARATOR:
                 throw_invalid_type(decl.node_type, self, attr=f'declarator#{i}')
-
-    def get_children(self) -> List[Node]:
-        return self.declarators
-
-    def get_children_names(self) -> List[str]:
-        return list(map(str, range(len(self.declarators))))
 
 
 class LocalVariableDeclaration(Statement):

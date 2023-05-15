@@ -108,3 +108,6 @@ class NodeList(Node):
 
     def set_child_at(self, index: int, value: Node):
         self.node_list[index] = value
+
+    def replace_child_at(self, index: int, values: List[Node]):
+        self.node_list[index:index + 1] = values

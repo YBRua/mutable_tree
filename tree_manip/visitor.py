@@ -1,4 +1,5 @@
 from mutable_tree.nodes import Node, NodeList
+from mutable_tree.nodes import node_factory
 from typing import Optional, List
 
 
@@ -41,7 +42,10 @@ class TransformingVisitor:
 
     def _node_update(self, node: Node, child_attr: str, new_stmts: List[Node]):
         if isinstance(node, NodeList):
-            node.replace_children_at(child_attr, len(new_stmts), new_stmts)
+            node.replace_child_at(child_attr, new_stmts)
+        else:
+            stmt_list = node_factory.create_statement_list(new_stmts)
+            node.set_child_at(child_attr, node_factory.create_block_stmt(stmt_list))
 
     def _visit(self,
                node: Node,

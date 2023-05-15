@@ -10,6 +10,10 @@ class TestForToWhile(TransformTestBase):
         code = 'for (int i = 0; i < 10; ++i) { print(i); }'
         self.check_transform(code, visitor)
 
+        code = ('for (int i = 0; i < 10; ++i) '
+                'for (int j = 0; j < 10; ++j) { print(i); print(j); }')
+        self.check_transform(code, visitor)
+
 
 if __name__ == '__main__':
     unittest.main()
