@@ -1,4 +1,5 @@
 from .node import NodeType
+from .program import Program
 from .expressions import Expression
 from .expressions import BinaryOps, UnaryOps, UpdateOps, AssignmentOps
 from .expressions import (ArrayAccess, ArrayExpression, AssignmentExpression,
@@ -18,6 +19,13 @@ from .statements.for_stmt import ForInit
 from .types import TypeIdentifier, DimensionSpecifier
 
 from typing import Union, Optional, List
+
+# TOP LEVEL
+
+
+def create_program(stmts: StatementList) -> Program:
+    return Program(NodeType.PROGRAM, stmts)
+
 
 # TYPES
 

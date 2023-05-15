@@ -1,4 +1,4 @@
-from ..node import Node, NodeType
+from ..node import Node, NodeType, NodeList
 from .statement import Statement
 from .statement_list import StatementList
 from ..expressions import Expression
@@ -44,23 +44,18 @@ class SwitchCase(Node):
         return ['case', 'stmts']
 
 
-class SwitchCaseList(Node):
+class SwitchCaseList(NodeList):
+    node_list: List[SwitchCase]
 
     def __init__(self, node_type: NodeType, cases: List[SwitchCase]):
         super().__init__(node_type)
-        self.cases = cases
+        self.node_list = cases
         self._check_types()
 
     def _check_types(self):
-        for i, case in enumerate(self.cases):
+        for i, case in enumerate(self.node_list):
             if case.node_type != NodeType.SWITCH_CASE:
                 throw_invalid_type(case.node_type, self, attr=f'case#{i}')
-
-    def get_children(self) -> List[Node]:
-        return self.cases
-
-    def get_children_names(self) -> List[str]:
-        return ['cases']
 
 
 class SwitchStatement(Statement):

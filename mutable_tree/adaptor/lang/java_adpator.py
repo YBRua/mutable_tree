@@ -11,9 +11,18 @@ from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueS
                       LocalVariableDeclaration, VariableDeclarator, ReturnStatement,
                       SwitchStatement, ThrowStatement, TryStatement, WhileStatement,
                       YieldStatement, StatementList, VariableDeclaratorList)
+from ...nodes import Program
 from ...nodes import TypeIdentifier, DimensionSpecifier, TypeIdentifierList
 from ...nodes import get_assignment_op, get_binary_op, get_unary_op, get_update_op
 from ...nodes import node_factory
+
+
+def convert_program(node: tree_sitter.Node) -> Program:
+    assert node.type == 'program'
+    stmts = []
+    for ch in node.children:
+        stmts.append(convert_statement(ch))
+    return node_factory.create_program(node_factory.create_statement_list(stmts))
 
 
 def convert_expression(node: tree_sitter.Node) -> Expression:

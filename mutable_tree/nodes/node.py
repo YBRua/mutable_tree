@@ -2,9 +2,10 @@ from enum import Enum
 from typing import List
 
 
-    # types
+# types
 class NodeType(Enum):
-    TYPE_IDENTIFIER = 'TypeIdentifier'
+    # top-level
+    PROGRAM = 'Program'
 
     # expressions
     ASSIGNMENT_EXPR = 'AssignmentExpression'
@@ -59,6 +60,7 @@ class NodeType(Enum):
     STATEMENT_LIST = 'StatementList'
     VARIABLE_DECLARATOR_LIST = 'VariableDeclaratorList'
     SWITCH_CASE_LIST = 'SwitchCaseList'
+    TYPE_IDENTIFIER = 'TypeIdentifier'
     TYPE_IDENTIFIER_LIST = 'TypeIdentifierList'
 
 
@@ -79,3 +81,30 @@ class Node:
 
     def get_children_names(self) -> List[str]:
         raise NotImplementedError()
+
+    def get_child_at(self, attr: str) -> 'Node':
+        return getattr(self, attr)
+
+    def set_child_at(self, attr: str, value: 'Node'):
+        if not hasattr(self, attr):
+            raise AttributeError(f'{type(self).__name__} does not have attribute {attr}')
+        setattr(self, attr, value)
+
+
+class NodeList(Node):
+    node_list: List[Node]
+
+    def __init__(self, node_type: NodeType):
+        super().__init__(node_type)
+
+    def get_children(self) -> List[Node]:
+        return self.node_list
+
+    def get_children_names(self) -> List[int]:
+        return list(range(len(self.node_list)))
+
+    def get_child_at(self, index: int) -> Node:
+        return self.node_list[index]
+
+    def set_child_at(self, index: int, value: Node):
+        self.node_list[index] = value
