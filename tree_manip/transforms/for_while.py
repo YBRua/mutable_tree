@@ -1,5 +1,5 @@
 from ..visitor import TransformingVisitor
-from mutable_tree.nodes import Node, NodeType, NodeList
+from mutable_tree.nodes import Node, NodeType
 from mutable_tree.nodes import node_factory
 from mutable_tree.nodes import ForStatement
 from mutable_tree.nodes import is_expression
@@ -19,16 +19,21 @@ class ForToWhileVisitor(TransformingVisitor):
         update = node.update
         body = node.body
 
-        if init.node_type == NodeType.EXPRESSION_LIST:
-            init_exprs = init.get_children()
-            for init_expr in init_exprs:
-                new_stmts.append(node_factory.create_expression_stmt(init_expr))
-        else:
-            new_stmts.append(init)
+        if init is not None:
+            if init.node_type == NodeType.EXPRESSION_LIST:
+                init_exprs = init.get_children()
+                for init_expr in init_exprs:
+                    new_stmts.append(node_factory.create_expression_stmt(init_expr))
+            else:
+                new_stmts.append(init)
 
         if condition is None:
             condition = node_factory.create_literal('true')
-        update_exprs = [] if update is None else update.get_children()
+
+        if update is not None:
+            update_exprs = update.get_children()
+        else:
+            update_exprs = []
 
         if body.node_type != NodeType.BLOCK_STMT:
             body_stmts = [body]
