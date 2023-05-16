@@ -3,7 +3,7 @@ from .transform_test_base import TransformTestBase
 from tree_manip.transforms import ForToWhileVisitor
 
 
-class TestForToWhile(TransformTestBase):
+class TestLoopTransform(TransformTestBase):
 
     def test_for_to_while(self):
         visitor = ForToWhileVisitor()
@@ -21,6 +21,12 @@ class TestForToWhile(TransformTestBase):
         self.check_transform(code, visitor)
 
         code = 'for (int i = 0; i < 10;) { print(i); }'
+        self.check_transform(code, visitor)
+
+        code = 'for (int i = 0; i < 10; ++i);'
+        self.check_transform(code, visitor)
+
+        code = 'for (int i = 0; i < 10;);'
         self.check_transform(code, visitor)
 
 
