@@ -2,6 +2,13 @@
 
 > A mutable AST for source code transformation with Python
 
+## TODO
+
+- CI/CD
+- Perhaps a Python package
+- Function-level support for Java and perhaps C/C++
+- Refactor transformation visitors
+
 ## Getting Started
 
 ### Setting up the environment
