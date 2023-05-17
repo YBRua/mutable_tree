@@ -175,7 +175,7 @@ def convert_update_expr(node: tree_sitter.Node) -> UpdateExpression:
     return node_factory.create_update_expr(expr, op, prefix)
 
 
-def convert_new_expr(node: tree_sitter.Node):
+def convert_new_expr(node: tree_sitter.Node) -> NewExpression:
     # TODO: type_argument
     # type_arg_node = node.child_by_field_name('type_arguments')
     type_node = node.child_by_field_name('type')
