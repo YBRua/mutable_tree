@@ -50,6 +50,7 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         'instanceof_expression': convert_instanceof_expr,
         'ternary_expression': convert_ternary_expr,
         'this': convert_this_expr,
+        'unary_expression': convert_unary_expr,
     }
 
     return expr_convertors[node.type](node)
@@ -213,6 +214,12 @@ def convert_ternary_expr(node: tree_sitter.Node) -> TernaryExpression:
 
 def convert_this_expr(node: tree_sitter.Node) -> ThisExpression:
     return node_factory.create_this_expr()
+
+
+def convert_unary_expr(node: tree_sitter.Node) -> UnaryExpression:
+    op = get_unary_op(node.child_by_field_name('operator').text.decode())
+    operand = convert_expression(node.child_by_field_name('operand'))
+    return node_factory.create_unary_expr(operand, op)
 
 
 def convert_dimension(node: tree_sitter.Node) -> DimensionSpecifier:

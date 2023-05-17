@@ -145,5 +145,14 @@ class TestJavaThisExpr(JavaSnippetTestBase):
         self._stmt_round_trip('this.foo.bar;')
 
 
+class TestJavaUnaryExpr(JavaSnippetTestBase):
+
+    def test_unary_expr(self):
+        for op in ['+', '-', '~', '!']:
+            self._stmt_round_trip(f'{op}a;')
+            self._stmt_round_trip(f'{op}a.b;')
+            self._stmt_round_trip(f'c + {op}a;')
+
+
 if __name__ == '__main__':
     unittest.main()
