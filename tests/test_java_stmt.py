@@ -62,7 +62,7 @@ class TestJavaForStmt(JavaSnippetTestBase):
 
         code = 'for (i = 0; i < 10; ++i) for (int j = 0; j < 10; ++j) k = i * j;'
         self._stmt_round_trip(code)
-    
+
     def test_for_while(self):
         code = 'for (int i = 0; i < 10; ++i) { while (j < 2 * i) { j = 2 * j; } }'
         self._stmt_round_trip(code)
