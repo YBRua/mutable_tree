@@ -114,5 +114,12 @@ class TestJavaCastExpr(JavaSnippetTestBase):
         self._stmt_round_trip('(Foo) (Bar) a.b;')
 
 
+class TestJavaInstanceofExpr(JavaSnippetTestBase):
+
+    def test_simple_instanceof(self):
+        self._stmt_round_trip('a instanceof Foo;')
+        self._stmt_round_trip('a.b instanceof Foo;')
+
+
 if __name__ == '__main__':
     unittest.main()

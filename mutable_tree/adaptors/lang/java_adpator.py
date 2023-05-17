@@ -47,6 +47,7 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         'update_expression': convert_update_expr,
         'object_creation_expression': convert_new_expr,
         'cast_expression': convert_cast_expr,
+        'instanceof_expression': convert_instanceof_expr,
     }
 
     return expr_convertors[node.type](node)
@@ -184,6 +185,17 @@ def convert_new_expr(node: tree_sitter.Node) -> NewExpression:
     type_id = convert_type(type_node)
     args = convert_argument_list(args_node)
     return node_factory.create_new_expr(type_id, args)
+
+
+def convert_instanceof_expr(node: tree_sitter.Node) -> InstanceofExpression:
+    # TODO: name field, final modifier (children[2])
+    # name_node = node.child_by_field_name('name')
+    left_node = node.child_by_field_name('left')
+    right_node = node.child_by_field_name('right')
+
+    left = convert_expression(left_node)
+    right = convert_type(right_node)
+    return node_factory.create_instanceof_expr(left, right)
 
 
 def convert_dimension(node: tree_sitter.Node) -> DimensionSpecifier:
