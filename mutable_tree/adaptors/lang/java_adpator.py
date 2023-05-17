@@ -66,6 +66,7 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'block': convert_block_stmt,
         'for_statement': convert_for_stmt,
         'while_statement': convert_while_stmt,
+        'assert_statement': convert_assert_stmt,
     }
 
     return stmt_convertors[node.type](node)
@@ -319,3 +320,17 @@ def convert_while_stmt(node: tree_sitter.Node) -> WhileStatement:
     cond = convert_expression(cond_node)
     body = convert_statement(body_node)
     return node_factory.create_while_stmt(cond, body)
+
+
+def convert_assert_stmt(node: tree_sitter.Node) -> AssertStatement:
+    if node.child_count == 3:
+        cond_node = node.children[1]
+        msg_node = None
+    else:
+        assert node.child_count == 5
+        cond_node = node.children[1]
+        msg_node = node.children[3]
+
+    cond = convert_expression(cond_node)
+    msg = convert_expression(msg_node) if msg_node is not None else None
+    return node_factory.create_assert_stmt(cond, msg)

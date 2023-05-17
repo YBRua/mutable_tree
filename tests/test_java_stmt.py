@@ -94,5 +94,14 @@ class TestJavaWhileStmt(JavaSnippetTestBase):
         self._stmt_round_trip(code)
 
 
+class TestJavaAssertStmt(JavaSnippetTestBase):
+    
+    def test_assert(self):
+        self._stmt_round_trip('assert true;')
+        self._stmt_round_trip('assert true : "message";')
+        self._stmt_round_trip('assert true : message;')
+        self._stmt_round_trip('assert value : "message" + value;')
+
+
 if __name__ == '__main__':
     unittest.main()
