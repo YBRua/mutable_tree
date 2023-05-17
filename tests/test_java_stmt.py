@@ -95,12 +95,23 @@ class TestJavaWhileStmt(JavaSnippetTestBase):
 
 
 class TestJavaAssertStmt(JavaSnippetTestBase):
-    
+
     def test_assert(self):
         self._stmt_round_trip('assert true;')
         self._stmt_round_trip('assert true : "message";')
         self._stmt_round_trip('assert true : message;')
         self._stmt_round_trip('assert value : "message" + value;')
+
+
+class TestJavaBreakContinue(JavaSnippetTestBase):
+
+    def test_break(self):
+        self._stmt_round_trip('while (true) { break; }')
+        self._stmt_round_trip('while (true) break label;')
+
+    def test_continue(self):
+        self._stmt_round_trip('while (true) { continue; }')
+        self._stmt_round_trip('while (true) continue label;')
 
 
 if __name__ == '__main__':

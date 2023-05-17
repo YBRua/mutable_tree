@@ -67,6 +67,8 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'for_statement': convert_for_stmt,
         'while_statement': convert_while_stmt,
         'assert_statement': convert_assert_stmt,
+        'break_statement': convert_break_stmt,
+        'continue_statement': convert_continue_stmt,
     }
 
     return stmt_convertors[node.type](node)
@@ -334,3 +336,25 @@ def convert_assert_stmt(node: tree_sitter.Node) -> AssertStatement:
     cond = convert_expression(cond_node)
     msg = convert_expression(msg_node) if msg_node is not None else None
     return node_factory.create_assert_stmt(cond, msg)
+
+
+def convert_break_stmt(node: tree_sitter.Node) -> BreakStatement:
+    if node.child_count == 2:
+        label_node = None
+    else:
+        assert node.child_count == 3
+        label_node = node.children[1]
+
+    label = convert_expression(label_node) if label_node is not None else None
+    return node_factory.create_break_stmt(label)
+
+
+def convert_continue_stmt(node: tree_sitter.Node) -> ContinueStatement:
+    if node.child_count == 2:
+        label_node = None
+    else:
+        assert node.child_count == 3
+        label_node = node.children[1]
+
+    label = convert_expression(label_node) if label_node is not None else None
+    return node_factory.create_continue_stmt(label)
