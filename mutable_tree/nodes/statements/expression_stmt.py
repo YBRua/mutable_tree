@@ -2,6 +2,7 @@ from ..node import Node, NodeType
 from .statement import Statement
 from ..expressions import Expression
 from ..expressions import is_expression
+from ..utils import throw_invalid_type
 from typing import List
 
 
@@ -14,9 +15,9 @@ class ExpressionStatement(Statement):
 
     def _check_types(self):
         if self.node_type != NodeType.EXPRESSION_STMT:
-            raise TypeError(f'Invalid type: {self.node_type} for ExpressionStatement')
+            throw_invalid_type(self.node_type, self)
         if not is_expression(self.expr):
-            raise TypeError(f'Invalid type: {self.expr.node_type} for expr stmt')
+            throw_invalid_type(self.expr.node_type, self, attr='expr')
 
     def to_string(self) -> str:
         return f'{self.expr.to_string()};'

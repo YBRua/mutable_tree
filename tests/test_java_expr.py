@@ -137,5 +137,13 @@ class TestJavaTernaryExpr(JavaSnippetTestBase):
         self._stmt_round_trip('a ? b + 42 : c - 42 ? d + 42 : e - 42;')
 
 
+class TestJavaThisExpr(JavaSnippetTestBase):
+
+    def test_this_expr(self):
+        self._stmt_round_trip('this;')
+        self._stmt_round_trip('this.foo;')
+        self._stmt_round_trip('this.foo.bar;')
+
+
 if __name__ == '__main__':
     unittest.main()

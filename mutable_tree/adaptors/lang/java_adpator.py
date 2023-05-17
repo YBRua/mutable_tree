@@ -49,6 +49,7 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         'cast_expression': convert_cast_expr,
         'instanceof_expression': convert_instanceof_expr,
         'ternary_expression': convert_ternary_expr,
+        'this': convert_this_expr,
     }
 
     return expr_convertors[node.type](node)
@@ -208,6 +209,10 @@ def convert_ternary_expr(node: tree_sitter.Node) -> TernaryExpression:
     consequence = convert_expression(consequence_node)
     alternate = convert_expression(alternate_node)
     return node_factory.create_ternary_expr(condition, consequence, alternate)
+
+
+def convert_this_expr(node: tree_sitter.Node) -> ThisExpression:
+    return node_factory.create_this_expr()
 
 
 def convert_dimension(node: tree_sitter.Node) -> DimensionSpecifier:

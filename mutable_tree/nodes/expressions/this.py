@@ -1,8 +1,9 @@
 from ..node import Node, NodeType
+from .expression import Expression
 from typing import List
 
 
-class ThisExpression(Node):
+class ThisExpression(Expression):
 
     def __init__(self, node_type: NodeType):
         super().__init__(node_type)
