@@ -46,6 +46,7 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         'field_access': convert_field_access,
         'update_expression': convert_update_expr,
         'object_creation_expression': convert_new_expr,
+        'cast_expression': convert_cast_expr,
     }
 
     return expr_convertors[node.type](node)
@@ -113,6 +114,16 @@ def convert_binary_expr(node: tree_sitter.Node) -> BinaryExpression:
     rhs = convert_expression(node.child_by_field_name('right'))
     op = get_binary_op(node.child_by_field_name('operator').text.decode())
     return node_factory.create_binary_expr(lhs, rhs, op)
+
+
+def convert_cast_expr(node: tree_sitter.Node) -> CastExpression:
+    # TODO: type intersections
+    type_node = node.child_by_field_name('type')
+    value_node = node.child_by_field_name('value')
+
+    type_id = convert_type(type_node)
+    value_expr = convert_expression(value_node)
+    return node_factory.create_cast_expr(type_id, value_expr)
 
 
 def convert_field_access(node: tree_sitter.Node) -> FieldAccess:

@@ -103,5 +103,16 @@ class TestJavaNewExpr(JavaSnippetTestBase):
         self._stmt_round_trip('new Foo(new Bar(), b + 42);')
 
 
+class TestJavaCastExpr(JavaSnippetTestBase):
+
+    def test_simple_cast(self):
+        self._stmt_round_trip('(Foo) a;')
+        self._stmt_round_trip('(Foo) a.b;')
+
+    def test_nested_cast(self):
+        self._stmt_round_trip('(Foo) (Bar) a;')
+        self._stmt_round_trip('(Foo) (Bar) a.b;')
+
+
 if __name__ == '__main__':
     unittest.main()
