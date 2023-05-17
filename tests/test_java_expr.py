@@ -91,5 +91,17 @@ class TestJavaCallExpr(JavaSnippetTestBase):
         self._stmt_round_trip('foo.bar().baz[1] + boo.far().gaz();')
 
 
+class TestJavaNewExpr(JavaSnippetTestBase):
+
+    def test_simple_new(self):
+        self._stmt_round_trip('new Foo();')
+        self._stmt_round_trip('new Foo(a);')
+        self._stmt_round_trip('new Foo(a, b + 42);')
+
+    def test_complicated_new(self):
+        self._stmt_round_trip('new Foo().bar;')
+        self._stmt_round_trip('new Foo(new Bar(), b + 42);')
+
+
 if __name__ == '__main__':
     unittest.main()

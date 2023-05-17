@@ -45,6 +45,7 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         'method_invocation': convert_call_expr,
         'field_access': convert_field_access,
         'update_expression': convert_update_expr,
+        'object_creation_expression': convert_new_expr,
     }
 
     return expr_convertors[node.type](node)
@@ -123,18 +124,22 @@ def convert_field_access(node: tree_sitter.Node) -> FieldAccess:
     return node_factory.create_field_access(obj_expr, name_expr)
 
 
+def convert_argument_list(node: tree_sitter.Node) -> ExpressionList:
+    args = []
+    for ch in node.children[1:-1]:
+        # skip parenthesis and comma sep
+        if ch.type == ',':
+            continue
+        args.append(convert_expression(ch))
+    return node_factory.create_expression_list(args)
+
+
 def convert_call_expr(node: tree_sitter.Node) -> CallExpression:
     if node.child_count != 2 and node.child_count != 4:
         raise RuntimeError(f'call expr with {node.child_count} children')
 
     arg_node = node.child_by_field_name('arguments')
-    args = []
-    for arg in arg_node.children[1:-1]:
-        # skip parenthesis and comma sep
-        if arg.text.decode() == ',':
-            continue
-        args.append(convert_expression(arg))
-    args = node_factory.create_expression_list(args)
+    args = convert_argument_list(arg_node)
 
     name_expr = convert_expression(node.child_by_field_name('name'))
     obj_node = node.child_by_field_name('object')
@@ -157,6 +162,17 @@ def convert_update_expr(node: tree_sitter.Node) -> UpdateExpression:
         op = get_update_op(node.children[0].text.decode())
         expr = convert_expression(node.children[1])
     return node_factory.create_update_expr(expr, op, prefix)
+
+
+def convert_new_expr(node: tree_sitter.Node):
+    # TODO: type_argument
+    # type_arg_node = node.child_by_field_name('type_arguments')
+    type_node = node.child_by_field_name('type')
+    args_node = node.child_by_field_name('arguments')
+
+    type_id = convert_type(type_node)
+    args = convert_argument_list(args_node)
+    return node_factory.create_new_expr(type_id, args)
 
 
 def convert_expression_stmt(node: tree_sitter.Node) -> ExpressionStatement:
