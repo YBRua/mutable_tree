@@ -9,4 +9,4 @@ git clone https://github.com/tree-sitter/tree-sitter-java.git
 cd ..
 
 # build!
-python build_tree_sitter.py
+python build_tree_sitter.py tree-sitter

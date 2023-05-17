@@ -36,7 +36,7 @@ cd ..
 Then build the parsers with
 
 ```sh
-python build_tree_sitter.py
+python build_tree_sitter.py tree-sitter
 ```
 
 ### Running the tests
