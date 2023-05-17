@@ -48,6 +48,7 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         'object_creation_expression': convert_new_expr,
         'cast_expression': convert_cast_expr,
         'instanceof_expression': convert_instanceof_expr,
+        'ternary_expression': convert_ternary_expr,
     }
 
     return expr_convertors[node.type](node)
@@ -196,6 +197,17 @@ def convert_instanceof_expr(node: tree_sitter.Node) -> InstanceofExpression:
     left = convert_expression(left_node)
     right = convert_type(right_node)
     return node_factory.create_instanceof_expr(left, right)
+
+
+def convert_ternary_expr(node: tree_sitter.Node) -> TernaryExpression:
+    condition_node = node.child_by_field_name('condition')
+    consequence_node = node.child_by_field_name('consequence')
+    alternate_node = node.child_by_field_name('alternative')
+
+    condition = convert_expression(condition_node)
+    consequence = convert_expression(consequence_node)
+    alternate = convert_expression(alternate_node)
+    return node_factory.create_ternary_expr(condition, consequence, alternate)
 
 
 def convert_dimension(node: tree_sitter.Node) -> DimensionSpecifier:

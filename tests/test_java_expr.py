@@ -121,5 +121,21 @@ class TestJavaInstanceofExpr(JavaSnippetTestBase):
         self._stmt_round_trip('a.b instanceof Foo;')
 
 
+class TestJavaTernaryExpr(JavaSnippetTestBase):
+
+    def test_simple_ternary(self):
+        self._stmt_round_trip('a ? b : c;')
+        self._stmt_round_trip('isTrue == true ? true : false;')
+
+    def test_nested_ternary(self):
+        self._stmt_round_trip('a ? b ? c : d : e;')
+        self._stmt_round_trip('a ? b : c ? d : e;')
+        self._stmt_round_trip('a ? b ? c : d : e ? f : g;')
+
+    def test_ternary_with_exprs(self):
+        self._stmt_round_trip('a ? b + 42 : c - 42;')
+        self._stmt_round_trip('a ? b + 42 : c - 42 ? d + 42 : e - 42;')
+
+
 if __name__ == '__main__':
     unittest.main()
