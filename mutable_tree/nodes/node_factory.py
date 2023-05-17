@@ -256,17 +256,18 @@ def create_try_stmt(
 # MISCS
 
 
-def create_type_identifier_list(type_ids: List[TypeIdentifier]):
+def create_type_identifier_list(type_ids: List[TypeIdentifier]) -> TypeIdentifierList:
     return TypeIdentifierList(NodeType.TYPE_IDENTIFIER_LIST, type_ids)
 
 
-def create_expression_list(exprs: List[Expression]):
+def create_expression_list(exprs: List[Expression]) -> ExpressionList:
     return ExpressionList(NodeType.EXPRESSION_LIST, exprs)
 
 
-def create_statement_list(stmts: List[Statement]):
+def create_statement_list(stmts: List[Statement]) -> StatementList:
     return StatementList(NodeType.STATEMENT_LIST, stmts)
 
 
-def create_variable_declarator_list(declarators: List[VariableDeclarator]):
+def create_variable_declarator_list(
+        declarators: List[VariableDeclarator]) -> VariableDeclaratorList:
     return VariableDeclaratorList(NodeType.VARIABLE_DECLARATOR_LIST, declarators)
