@@ -4,7 +4,7 @@ from ...nodes import (ArrayAccess, ArrayExpression, AssignmentExpression,
                       BinaryExpression, CallExpression, CastExpression, FieldAccess,
                       Identifier, InstanceofExpression, Literal, NewExpression,
                       TernaryExpression, ThisExpression, UnaryExpression,
-                      UpdateExpression, PrimaryExpression, ExpressionList)
+                      UpdateExpression, ParenthesizedExpression, ExpressionList)
 from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueStatement,
                       DoStatement, EmptyStatement, ExpressionStatement, ForInStatement,
                       ForStatement, IfStatement, LabeledStatement,
@@ -51,6 +51,7 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         'ternary_expression': convert_ternary_expr,
         'this': convert_this_expr,
         'unary_expression': convert_unary_expr,
+        'parenthesized_expression': convert_parenthesized_expr,
     }
 
     return expr_convertors[node.type](node)
@@ -220,6 +221,12 @@ def convert_unary_expr(node: tree_sitter.Node) -> UnaryExpression:
     op = get_unary_op(node.child_by_field_name('operator').text.decode())
     operand = convert_expression(node.child_by_field_name('operand'))
     return node_factory.create_unary_expr(operand, op)
+
+
+def convert_parenthesized_expr(node: tree_sitter.Node) -> ParenthesizedExpression:
+    assert node.child_count == 3, 'parenthesized expr with != 3 children'
+    expr = convert_expression(node.children[1])
+    return node_factory.create_parenthesized_expr(expr)
 
 
 def convert_dimension(node: tree_sitter.Node) -> DimensionSpecifier:

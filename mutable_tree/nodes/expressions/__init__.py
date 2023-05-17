@@ -15,4 +15,5 @@ from .this import ThisExpression
 from .unary_expr import UnaryExpression, get_unary_op, UnaryOps
 from .update_expr import UpdateExpression, get_update_op, UpdateOps
 from .primary_expr import PrimaryExpression
+from .parenthesized_expr import ParenthesizedExpression
 from .expression_list import ExpressionList

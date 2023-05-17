@@ -154,5 +154,22 @@ class TestJavaUnaryExpr(JavaSnippetTestBase):
             self._stmt_round_trip(f'c + {op}a;')
 
 
+class TestJavaParenthesizedExpr(JavaSnippetTestBase):
+
+    def test_parenthesized_expr(self):
+        self._stmt_round_trip('(a);')
+        self._stmt_round_trip('(a + b) * c;')
+        self._stmt_round_trip('a + (b * c);')
+
+    def test_nested_parenthesized_expr(self):
+        self._stmt_round_trip('((a));')
+        self._stmt_round_trip('((a + b) * c) / 10;')
+        self._stmt_round_trip('(a + (b * c)) / 10;')
+        self._stmt_round_trip('((a + b) * (c + d)) / (m + (m * n));')
+
+    def test_parenthesized_call(self):
+        self._stmt_round_trip('(a + b).bar();')
+
+
 if __name__ == '__main__':
     unittest.main()

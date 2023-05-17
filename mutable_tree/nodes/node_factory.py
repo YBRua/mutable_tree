@@ -6,7 +6,8 @@ from .expressions import (ArrayAccess, ArrayExpression, AssignmentExpression,
                           BinaryExpression, CallExpression, CastExpression, FieldAccess,
                           Identifier, InstanceofExpression, Literal, NewExpression,
                           TernaryExpression, ThisExpression, UnaryExpression,
-                          UpdateExpression, PrimaryExpression, ExpressionList)
+                          UpdateExpression, PrimaryExpression, ParenthesizedExpression,
+                          ExpressionList)
 from .statements import Statement
 from .statements import (AssertStatement, BlockStatement, BreakStatement,
                          ContinueStatement, DoStatement, EmptyStatement,
@@ -113,6 +114,10 @@ def create_ternary_expr(condition: Expression, consequence: Expression,
 
 def create_this_expr() -> ThisExpression:
     return ThisExpression(NodeType.THIS_EXPR)
+
+
+def create_parenthesized_expr(expr: Expression) -> Expression:
+    return ParenthesizedExpression(NodeType.PARENTHESIZED_EXPR, expr)
 
 
 # STATEMENTS
