@@ -1,6 +1,6 @@
 import unittest
 from .transform_test_base import TransformTestBase
-from tree_manip.transforms import ForToWhileVisitor
+from tree_manip.transforms import ForToWhileVisitor, WhileToForVisitor
 
 
 class TestLoopTransform(TransformTestBase):
@@ -27,6 +27,14 @@ class TestLoopTransform(TransformTestBase):
         self.check_transform(code, visitor)
 
         code = 'for (int i = 0; i < 10;);'
+        self.check_transform(code, visitor)
+
+    def test_while_to_for(self):
+        visitor = WhileToForVisitor()
+        code = 'while (foo.bar()) { print(foo.getFoo()); }'
+        self.check_transform(code, visitor)
+
+        code = 'while (true);'
         self.check_transform(code, visitor)
 
 
