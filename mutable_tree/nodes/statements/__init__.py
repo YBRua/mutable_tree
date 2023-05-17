@@ -13,7 +13,7 @@ from .labeled_stmt import LabeledStatement
 from .local_var_decl import (LocalVariableDeclaration, VariableDeclarator,
                              VariableDeclaratorList)
 from .return_stmt import ReturnStatement
-from .switch_stmt import SwitchStatement
+from .switch_stmt import SwitchStatement, SwitchCase, SwitchCaseList
 from .throw_stmt import ThrowStatement
 from .try_stmt import TryStatement
 from .while_stmt import WhileStatement

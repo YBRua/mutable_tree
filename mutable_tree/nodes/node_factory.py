@@ -13,9 +13,9 @@ from .statements import (AssertStatement, BlockStatement, BreakStatement,
                          ContinueStatement, DoStatement, EmptyStatement,
                          ExpressionStatement, ForInStatement, ForStatement, IfStatement,
                          LabeledStatement, LocalVariableDeclaration, VariableDeclarator,
-                         ReturnStatement, SwitchStatement, ThrowStatement, TryStatement,
-                         WhileStatement, YieldStatement, StatementList,
-                         VariableDeclaratorList)
+                         ReturnStatement, SwitchCase, SwitchCaseList, SwitchStatement,
+                         ThrowStatement, TryStatement, WhileStatement, YieldStatement,
+                         StatementList, VariableDeclaratorList)
 from .statements.for_stmt import ForInit
 from .types import TypeIdentifier, DimensionSpecifier
 
@@ -158,6 +158,77 @@ def create_local_var_decl(
         type_name: TypeIdentifier,
         declarators: VariableDeclaratorList) -> LocalVariableDeclaration:
     return LocalVariableDeclaration(NodeType.LOCAL_VAR_DECL, type_name, declarators)
+
+
+def create_assert_stmt(condition: Expression,
+                       message: Optional[Expression] = None) -> AssertStatement:
+    return AssertStatement(NodeType.ASSERT_STMT, condition, message)
+
+
+def create_break_stmt(label: Optional[Identifier] = None) -> BreakStatement:
+    return BreakStatement(NodeType.BREAK_STMT, label)
+
+
+def create_continue_stmt(label: Optional[Identifier] = None) -> ContinueStatement:
+    return ContinueStatement(NodeType.CONTINUE_STMT, label)
+
+
+def create_do_stmt(condition: Expression, body: Statement) -> DoStatement:
+    return DoStatement(NodeType.DO_STMT, body, condition)
+
+
+def create_for_in_stmt(
+    type_id: TypeIdentifier,
+    iterator: Identifier,
+    iterable: Expression,
+    body: Statement,
+) -> ForInStatement:
+    return ForInStatement(NodeType.FOR_IN_STMT, type_id, iterator, iterable, body)
+
+
+def create_if_stmt(
+    condition: Expression,
+    consequence: Statement,
+    alternate: Optional[Statement] = None,
+) -> IfStatement:
+    return IfStatement(NodeType.IF_STMT, condition, consequence, alternate)
+
+
+def create_labeled_stmt(label: Identifier, stmt: Statement) -> LabeledStatement:
+    return LabeledStatement(NodeType.LABELED_STMT, label, stmt)
+
+
+def create_return_stmt(value: Optional[Expression] = None) -> ReturnStatement:
+    return ReturnStatement(NodeType.RETURN_STMT, value)
+
+
+def create_switch_case(
+    stmts: StatementList,
+    case: Optional[Expression] = None,
+) -> SwitchCase:
+    return SwitchCase(NodeType.SWITCH_CASE, stmts, case)
+
+
+def create_switch_case_list(cases: List[SwitchCase]) -> SwitchCaseList:
+    return SwitchCaseList(NodeType.SWITCH_CASE_LIST, cases)
+
+
+def create_switch_stmt(
+    condition: Expression,
+    cases: SwitchCaseList,
+) -> SwitchStatement:
+    return SwitchStatement(NodeType.SWITCH_STMT, condition, cases)
+
+
+def create_throw_stmt(expr: Expression) -> ThrowStatement:
+    return ThrowStatement(NodeType.THROW_STMT, expr)
+
+
+def create_yield_stmt(expr: Expression) -> YieldStatement:
+    return YieldStatement(NodeType.YIELD_STMT, expr)
+
+
+# MISCS
 
 
 def create_expression_list(exprs: List[Expression]):
