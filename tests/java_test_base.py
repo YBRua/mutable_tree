@@ -1,5 +1,5 @@
 import unittest
-from mutable_tree.adaptor import JavaAdaptor
+from mutable_tree.adaptors import JavaAdaptor
 from tree_sitter import Language, Parser
 
 from .utils import LANGUAGES_PATH, collect_tokens
