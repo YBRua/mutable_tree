@@ -30,9 +30,16 @@ class TransformTestBase(unittest.TestCase):
     def check_contains_statement(self, root: Node, node_type: NodeType, count: int):
         pass
 
-    def check_transform(self, code: str, transform_func: TransformingVisitor) -> Node:
+    def check_transform(self,
+                        code: str,
+                        transform_func: TransformingVisitor,
+                        verbose: bool = False) -> Node:
         root = self._statement_to_mutable(code)
         new_root = transform_func.visit(root)
         new_code = new_root.to_string()
         self._check_ast(new_code)
+
+        if verbose:
+            print(new_code)
+
         return root

@@ -11,7 +11,7 @@ class JavaSnippetTestBase(unittest.TestCase):
         self.parser = Parser()
         self.parser.set_language(Language(LANGUAGES_PATH, 'java'))
 
-    def _stmt_round_trip(self, code: str):
+    def _stmt_round_trip(self, code: str, verbose: bool = False):
         tree = self.parser.parse(code.encode())
         root = tree.root_node
         if root.has_error:
@@ -20,7 +20,9 @@ class JavaSnippetTestBase(unittest.TestCase):
         mutable_root = JavaAdaptor.convert_program(root)
         new_code = mutable_root.to_string()
 
-        # print(new_code)
+        if verbose:
+            print(new_code)
+
         new_tree = self.parser.parse(new_code.encode())
         new_root = new_tree.root_node
         self.assertFalse(new_root.has_error)
