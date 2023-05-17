@@ -1,4 +1,4 @@
-from ..node import Node, NodeType
+from ..node import Node, NodeType, NodeList
 from .statement import Statement
 from .block_stmt import BlockStatement
 from ..expressions import Identifier
@@ -41,6 +41,21 @@ class CatchClause(Node):
         return ['catch_types', 'exception', 'body']
 
 
+class TryHandlers(NodeList):
+    node_list: List[CatchClause]
+
+    def __init__(self, node_type: NodeType, handlers: List[CatchClause]):
+        super().__init__(node_type)
+        self.node_list = handlers
+
+    def _check_types(self):
+        if self.node_type != NodeType.TRY_HANDLERS:
+            throw_invalid_type(self.node_type, self)
+        for i, handler in enumerate(self.node_list):
+            if handler.node_type != NodeType.CATCH_CLAUSE:
+                throw_invalid_type(handler.node_type, self, attr=f'handler#{i}')
+
+
 class FinallyClause(Node):
 
     def __init__(self, node_type: NodeType, body: BlockStatement):
@@ -67,7 +82,7 @@ class TryStatement(Statement):
     def __init__(self,
                  node_type: NodeType,
                  body: BlockStatement,
-                 handlers: List[CatchClause],
+                 handlers: TryHandlers,
                  finalizer: Optional[FinallyClause] = None):
         super().__init__(node_type)
         self.body = body
@@ -83,13 +98,13 @@ class TryStatement(Statement):
         if (self.finalizer is not None
                 and self.finalizer.node_type != NodeType.FINALLY_CLAUSE):
             throw_invalid_type(self.finalizer.node_type, self, attr='finalizer')
-        for i, handler in enumerate(self.handlers):
-            if handler.node_type != NodeType.CATCH_CLAUSE:
-                throw_invalid_type(handler.node_type, self, attr=f'handler#{i}')
+        if self.handlers.node_type != NodeType.TRY_HANDLERS:
+            throw_invalid_type(self.handlers.node_type, self, attr='handlers')
 
     def to_string(self) -> str:
         body_str = self.body.to_string()
-        handlers_str = '\n'.join([handler.to_string() for handler in self.handlers])
+        handlers_str = '\n'.join(
+            [handler.to_string() for handler in self.handlers.get_children()])
         if self.finalizer is not None:
             finalizer_str = self.finalizer.to_string()
             return f'try {body_str}\n{handlers_str}\n{finalizer_str}'

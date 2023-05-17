@@ -62,6 +62,7 @@ class NodeType(Enum):
     SWITCH_CASE_LIST = 'SwitchCaseList'
     TYPE_IDENTIFIER = 'TypeIdentifier'
     TYPE_IDENTIFIER_LIST = 'TypeIdentifierList'
+    TRY_HANDLERS = 'TryHandlers'
 
 
 class Node:

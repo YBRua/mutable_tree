@@ -14,10 +14,11 @@ from .statements import (AssertStatement, BlockStatement, BreakStatement,
                          ExpressionStatement, ForInStatement, ForStatement, IfStatement,
                          LabeledStatement, LocalVariableDeclaration, VariableDeclarator,
                          ReturnStatement, SwitchCase, SwitchCaseList, SwitchStatement,
-                         ThrowStatement, TryStatement, WhileStatement, YieldStatement,
-                         StatementList, VariableDeclaratorList)
+                         ThrowStatement, TryStatement, TryHandlers, CatchClause,
+                         FinallyClause, WhileStatement, YieldStatement, StatementList,
+                         VariableDeclaratorList)
 from .statements.for_stmt import ForInit
-from .types import TypeIdentifier, DimensionSpecifier
+from .types import TypeIdentifier, DimensionSpecifier, TypeIdentifierList
 
 from typing import Union, Optional, List
 
@@ -228,7 +229,35 @@ def create_yield_stmt(expr: Expression) -> YieldStatement:
     return YieldStatement(NodeType.YIELD_STMT, expr)
 
 
+def create_catch_clause(
+    exception_types: TypeIdentifierList,
+    exception: Identifier,
+    body: BlockStatement,
+) -> CatchClause:
+    return CatchClause(NodeType.CATCH_CLAUSE, exception_types, exception, body)
+
+
+def create_finally_clause(body: BlockStatement) -> FinallyClause:
+    return FinallyClause(NodeType.FINALLY_CLAUSE, body)
+
+
+def create_try_handlers(catch_clauses: List[CatchClause]) -> TryHandlers:
+    return TryHandlers(NodeType.TRY_HANDLERS, catch_clauses)
+
+
+def create_try_stmt(
+    try_block: BlockStatement,
+    handlers: TryHandlers,
+    finally_clause: Optional[FinallyClause] = None,
+) -> TryStatement:
+    return TryStatement(NodeType.TRY_STMT, try_block, handlers, finally_clause)
+
+
 # MISCS
+
+
+def create_type_identifier_list(type_ids: List[TypeIdentifier]):
+    return TypeIdentifierList(NodeType.TYPE_IDENTIFIER_LIST, type_ids)
 
 
 def create_expression_list(exprs: List[Expression]):
