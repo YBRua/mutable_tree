@@ -186,11 +186,6 @@ def convert_new_expr(node: tree_sitter.Node) -> NewExpression:
     return node_factory.create_new_expr(type_id, args)
 
 
-def convert_expression_stmt(node: tree_sitter.Node) -> ExpressionStatement:
-    expr = convert_expression(node.children[0])
-    return node_factory.create_expression_stmt(expr)
-
-
 def convert_dimension(node: tree_sitter.Node) -> DimensionSpecifier:
     return node_factory.create_dimension_specifier(node.text.decode().count('['))
 
@@ -203,6 +198,11 @@ def convert_array_type(node: tree_sitter.Node) -> TypeIdentifier:
     element_ty = convert_type(node.child_by_field_name('element'))
     dimensions = convert_dimension(node.child_by_field_name('dimensions'))
     return node_factory.create_array_type(element_ty, dimensions)
+
+
+def convert_expression_stmt(node: tree_sitter.Node) -> ExpressionStatement:
+    expr = convert_expression(node.children[0])
+    return node_factory.create_expression_stmt(expr)
 
 
 def convert_variable_declarator(node: tree_sitter.Node) -> VariableDeclarator:
