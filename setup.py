@@ -24,5 +24,5 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=['tree_sitter'],
-    python_requires='~=3.10',
+    python_requires='~=3.8',
 )
