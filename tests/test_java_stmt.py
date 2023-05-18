@@ -121,5 +121,15 @@ class TestJavaDoWhileStmt(JavaSnippetTestBase):
         self._stmt_round_trip('do { something(); other.things(); } while (i < 10);')
 
 
+class TestJavaEnhancedForStmt(JavaSnippetTestBase):
+
+    def test_for_in(self):
+        self._stmt_round_trip('for (int i : array) { doSomethingWith(i); }')
+        self._stmt_round_trip('for (int i : array) doSomethingWith(i);')
+
+        self._stmt_round_trip(
+            'for (MyClass obj : objects.getObjs()) { doSomethingWith(obj); }')
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -70,6 +70,7 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'break_statement': convert_break_stmt,
         'continue_statement': convert_continue_stmt,
         'do_statement': convert_do_stmt,
+        'enhanced_for_statement': convert_enhanced_for_stmt,
     }
 
     return stmt_convertors[node.type](node)
@@ -368,3 +369,24 @@ def convert_do_stmt(node: tree_sitter.Node) -> DoStatement:
     body = convert_statement(body_node)
     cond = convert_expression(cond_node)
     return node_factory.create_do_stmt(cond, body)
+
+
+def convert_enhanced_for_stmt(node: tree_sitter.Node) -> ForInStatement:
+    if node.child_count == 8:
+        # without modifiers
+        type_node = node.child_by_field_name('type')
+        var_decl_node = node.children[3]
+        value_node = node.child_by_field_name('value')
+        body_node = node.child_by_field_name('body')
+
+        ty = convert_type(type_node)
+        # NOTE: should be variable declarator according to grammar specification
+        # but the tree-sitter parser returns an identifier here
+        var_decl = convert_identifier(var_decl_node)
+        value = convert_expression(value_node)
+        body = convert_statement(body_node)
+        return node_factory.create_for_in_stmt(ty, var_decl, value, body)
+
+    else:
+        assert node.child_count == 9
+        raise NotImplementedError('enhanced for stmt with modifiers')
