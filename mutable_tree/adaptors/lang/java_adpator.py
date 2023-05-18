@@ -69,6 +69,7 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'assert_statement': convert_assert_stmt,
         'break_statement': convert_break_stmt,
         'continue_statement': convert_continue_stmt,
+        'do_statement': convert_do_stmt,
     }
 
     return stmt_convertors[node.type](node)
@@ -358,3 +359,12 @@ def convert_continue_stmt(node: tree_sitter.Node) -> ContinueStatement:
 
     label = convert_expression(label_node) if label_node is not None else None
     return node_factory.create_continue_stmt(label)
+
+
+def convert_do_stmt(node: tree_sitter.Node) -> DoStatement:
+    body_node = node.child_by_field_name('body')
+    cond_node = node.child_by_field_name('condition')
+
+    body = convert_statement(body_node)
+    cond = convert_expression(cond_node)
+    return node_factory.create_do_stmt(cond, body)

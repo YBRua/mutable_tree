@@ -114,5 +114,12 @@ class TestJavaBreakContinue(JavaSnippetTestBase):
         self._stmt_round_trip('while (true) continue label;')
 
 
+class TestJavaDoWhileStmt(JavaSnippetTestBase):
+
+    def test_do_while(self):
+        self._stmt_round_trip('do { something(); } while (true);')
+        self._stmt_round_trip('do { something(); other.things(); } while (i < 10);')
+
+
 if __name__ == '__main__':
     unittest.main()
