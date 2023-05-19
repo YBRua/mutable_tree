@@ -18,6 +18,9 @@ from .statements import (AssertStatement, BlockStatement, BreakStatement,
                          FinallyClause, WhileStatement, YieldStatement, StatementList,
                          VariableDeclaratorList, TryResource, TryResourceList,
                          TryWithResourcesStatement)
+from .statements import (FormalParameter, FormalParameterList, FunctionDeclarator,
+                         FunctionDeclaration)
+from .miscs import Modifier, ModifierList
 from .statements.for_stmt import ForInit
 from .types import TypeIdentifier, DimensionSpecifier, TypeIdentifierList
 
@@ -274,6 +277,38 @@ def create_try_with_resources_stmt(
                                      try_block, handlers, finally_clause)
 
 
+# DECLARATIONS & DEFINITIONS
+
+
+def create_formal_param(type_id: TypeIdentifier,
+                        name: Identifier,
+                        dimensions: Optional[DimensionSpecifier] = None,
+                        modifiers: Optional[ModifierList] = None) -> FormalParameter:
+    return FormalParameter(NodeType.FORMAL_PARAMETER, type_id, name, dimensions,
+                           modifiers)
+
+
+def create_formal_param_list(params: List[FormalParameter]) -> FormalParameterList:
+    return FormalParameterList(NodeType.FORMAL_PARAMETER_LIST, params)
+
+
+def create_func_declarator(
+    return_type: TypeIdentifier,
+    name: Identifier,
+    params: FormalParameterList,
+    dimensions: Optional[DimensionSpecifier] = None,
+    modifiers: Optional[ModifierList] = None,
+) -> FunctionDeclarator:
+    return FunctionDeclarator(NodeType.FUNC_DECLARATOR, return_type, name, params,
+                              dimensions, modifiers)
+
+
+def create_func_declaration(
+        declarator: FunctionDeclarator,
+        body: Union[BlockStatement, EmptyStatement]) -> FunctionDeclaration:
+    return FunctionDeclaration(NodeType.FUNC_DECLARATION, declarator, body)
+
+
 # MISCS
 
 
@@ -292,3 +327,11 @@ def create_statement_list(stmts: List[Statement]) -> StatementList:
 def create_variable_declarator_list(
         declarators: List[VariableDeclarator]) -> VariableDeclaratorList:
     return VariableDeclaratorList(NodeType.VARIABLE_DECLARATOR_LIST, declarators)
+
+
+def create_modifier(name: str) -> Modifier:
+    return Modifier(NodeType.MODIFIER, name)
+
+
+def create_modifier_list(modifiers: List[Modifier]) -> ModifierList:
+    return ModifierList(NodeType.MODIFIER_LIST, modifiers)

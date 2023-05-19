@@ -14,6 +14,9 @@ from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueS
                       TryStatement, CatchClause, FinallyClause, TryHandlers,
                       WhileStatement, YieldStatement, TryResource, TryResourceList,
                       TryWithResourcesStatement)
+from ...nodes import (FormalParameter, FormalParameterList, FunctionDeclarator,
+                      FunctionDeclaration)
+from ...nodes import (Modifier, ModifierList)
 from ...nodes import Program
 from ...nodes import TypeIdentifier, DimensionSpecifier
 from ...nodes import get_assignment_op, get_binary_op, get_unary_op, get_update_op
@@ -624,3 +627,78 @@ def convert_yield_stmt(node: tree_sitter.Node) -> YieldStatement:
 
     expr = convert_expression(expr_node)
     return node_factory.create_yield_stmt(expr)
+
+
+def convert_modifier(node: tree_sitter.Node) -> Modifier:
+    modifier = node.text.decode()
+    return node_factory.create_modifier(modifier)
+
+
+def convert_modifier_list(node: tree_sitter.Node) -> ModifierList:
+    modifiers = []
+    for child in node.children:
+        modifiers.append(convert_modifier(child))
+    return node_factory.create_modifier_list(modifiers)
+
+
+def convert_formal_param(node: tree_sitter.Node) -> FormalParameter:
+    assert node.type == 'formal_parameter', node.type
+    if node.children[0].type == 'modifiers':
+        modifiers_node = node.children[0]
+        modifiers = convert_modifier_list(modifiers_node)
+    else:
+        modifiers = None
+
+    type_node = node.child_by_field_name('type')
+    type_id = convert_type(type_node)
+
+    name, dim = convert_variable_declartor_id(node)
+
+    return node_factory.create_formal_param(type_id, name, dim, modifiers)
+
+
+def convert_formal_parameters(node: tree_sitter.Node) -> FormalParameterList:
+    params = []
+    for child in node.children[1:-1]:
+        if child.type == ',':
+            continue
+        params.append(convert_formal_param(child))
+    return node_factory.create_formal_param_list(params)
+
+
+def convert_function_declarator(node: tree_sitter.Node) -> FunctionDeclarator:
+    # NOTE: the node should be method_declaration
+    assert node.type == 'method_declaration', node.type
+
+    # modifiers
+    if node.children[0].type == 'modifiers':
+        modifiers_node = node.children[0]
+        modifiers = convert_modifier_list(modifiers_node)
+    else:
+        modifiers = None
+
+    # header
+    type_node = node.child_by_field_name('type')
+    type_id = convert_type(type_node)
+    name_node = node.child_by_field_name('name')
+    name = convert_identifier(name_node)
+    params_node = node.child_by_field_name('parameters')
+    params = convert_formal_parameters(params_node)
+    dim_node = node.child_by_field_name('dimensions')
+    if dim_node is not None:
+        dim = convert_dimension(dim_node)
+    else:
+        dim = None
+
+    return node_factory.create_func_declarator(type_id, name, params, dim, modifiers)
+
+
+def convert_function_declaration(node: tree_sitter.Node) -> FunctionDeclaration:
+    declarator = convert_function_declarator(node)
+    body_node = node.child_by_field_name('body')
+    if body_node is not None:
+        body = convert_block_stmt(body_node)
+    else:
+        body = node_factory.create_empty_stmt()
+
+    return node_factory.create_func_declaration(declarator, body)

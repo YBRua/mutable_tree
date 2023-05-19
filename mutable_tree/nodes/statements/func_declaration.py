@@ -90,12 +90,14 @@ class FunctionDeclarator(Node):
                  return_type: TypeIdentifier,
                  name: Identifier,
                  parameters: FormalParameterList,
-                 dimensions: Optional[DimensionSpecifier] = None):
+                 dimensions: Optional[DimensionSpecifier] = None,
+                 modifiers: Optional[ModifierList] = None):
         super().__init__(node_type)
         self.return_type = return_type
         self.name = name
         self.parameters = parameters
         self.dimensions = dimensions
+        self.modifiers = modifiers
         # TODO: dimensions for functions?
         if dimensions is not None:
             raise NotImplementedError('dimensions for functions are not supported yet')
@@ -113,13 +115,23 @@ class FunctionDeclarator(Node):
         if (self.dimensions is not None
                 and self.dimensions.node_type != NodeType.DIMENSION_SPECIFIER):
             throw_invalid_type(self.dimensions.node_type, self, attr='dimensions')
+        if (self.modifiers is not None
+                and self.modifiers.node_type != NodeType.MODIFIER_LIST):
+            throw_invalid_type(self.modifiers.node_type, self, attr='modifiers')
 
     def to_string(self) -> str:
         ret_type_str = self.return_type.to_string()
         name_str = self.name.to_string()
         params_str = ', '.join(param.to_string()
                                for param in self.parameters.get_children())
-        return f'{ret_type_str} {name_str}({params_str})'
+        res = f'{ret_type_str} {name_str}({params_str})'
+
+        if self.modifiers is not None:
+            modifiers_str = ' '.join(modifier.to_string()
+                                     for modifier in self.modifiers.get_children())
+            res = f'{modifiers_str} {res}'
+
+        return res
 
 
 class FunctionDeclaration(Statement):

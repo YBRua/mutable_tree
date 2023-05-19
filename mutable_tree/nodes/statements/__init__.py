@@ -21,3 +21,6 @@ from .yield_stmt import YieldStatement
 from .statement_list import StatementList
 from .try_with_resources_stmt import (TryResource, TryResourceList,
                                       TryWithResourcesStatement)
+
+from .func_declaration import (FormalParameter, FormalParameterList, FunctionDeclarator,
+                               FunctionDeclaration)
