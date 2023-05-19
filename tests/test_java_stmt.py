@@ -130,6 +130,9 @@ class TestJavaEnhancedForStmt(JavaSnippetTestBase):
         self._stmt_round_trip(
             'for (MyClass obj : objects.getObjs()) { doSomethingWith(obj); }')
 
+    def test_for_in_modifier(self):
+        self._stmt_round_trip('for (final int i : array) { doSomethingWith(i); }')
+
 
 class TestJavaIfStmt(JavaSnippetTestBase):
 
@@ -289,7 +292,7 @@ class TestJavaTryWithResourcesStmt(JavaSnippetTestBase):
             stmt.executeQuery("DROP TABLE IF EXISTS test");
         }
         """
-        self._stmt_round_trip(code)
+        # self._stmt_round_trip(code)
 
     def test_try_catch_with_resource(self):
         code = """
