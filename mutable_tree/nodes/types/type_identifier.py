@@ -1,5 +1,5 @@
 from ..node import Node, NodeType
-from .dimension_specifier import DimensionSpecifier
+from .dimensions import Dimensions
 from typing import List, Optional
 
 
@@ -8,7 +8,7 @@ class TypeIdentifier(Node):
     def __init__(self,
                  node_type: NodeType,
                  type_identifier: str,
-                 dimension: Optional[DimensionSpecifier] = None):
+                 dimension: Optional[Dimensions] = None):
         super().__init__(node_type)
         self.type_identifier = type_identifier
         self.dimension = dimension

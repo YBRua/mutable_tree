@@ -22,7 +22,7 @@ from .statements import (FormalParameter, FormalParameterList, FunctionDeclarato
                          FunctionDeclaration)
 from .miscs import Modifier, ModifierList
 from .statements.for_stmt import ForInit
-from .types import TypeIdentifier, DimensionSpecifier, TypeIdentifierList
+from .types import TypeIdentifier, TypeIdentifierList, DimensionSpecifier, Dimensions
 
 from typing import Union, Optional, List
 
@@ -37,20 +37,24 @@ def create_program(stmts: StatementList) -> Program:
 
 
 def create_array_type(type_identifier: TypeIdentifier,
-                      dimension: DimensionSpecifier) -> TypeIdentifier:
+                      dimension: Dimensions) -> TypeIdentifier:
     type_identifier.dimension = dimension
     return type_identifier
 
 
 def create_type_identifier(
     name: str,
-    dimension: Optional[DimensionSpecifier] = None,
+    dimension: Optional[Dimensions] = None,
 ) -> TypeIdentifier:
     return TypeIdentifier(NodeType.TYPE_IDENTIFIER, name, dimension)
 
 
-def create_dimension_specifier(dims: int) -> DimensionSpecifier:
-    return DimensionSpecifier(NodeType.DIMENSION_SPECIFIER, dims)
+def create_dimension_specifier(expr: Optional[Expression] = None) -> DimensionSpecifier:
+    return DimensionSpecifier(NodeType.DIMENSION_SPECIFIER, expr)
+
+
+def create_dimensions(dims: List[DimensionSpecifier]) -> Dimensions:
+    return Dimensions(NodeType.DIMENSIONS, dims)
 
 
 # EXPRESSIONS
@@ -154,7 +158,7 @@ def create_block_stmt(statements: StatementList) -> BlockStatement:
 
 
 def create_variable_declarator(name: Identifier,
-                               dimension: Optional[DimensionSpecifier] = None,
+                               dimension: Optional[Dimensions] = None,
                                value: Optional[Expression] = None) -> VariableDeclarator:
     return VariableDeclarator(NodeType.VARIABLE_DECLARATOR, name, dimension, value)
 
@@ -282,7 +286,7 @@ def create_try_with_resources_stmt(
 
 def create_formal_param(type_id: TypeIdentifier,
                         name: Identifier,
-                        dimensions: Optional[DimensionSpecifier] = None,
+                        dimensions: Optional[Dimensions] = None,
                         modifiers: Optional[ModifierList] = None) -> FormalParameter:
     return FormalParameter(NodeType.FORMAL_PARAMETER, type_id, name, dimensions,
                            modifiers)
@@ -296,11 +300,12 @@ def create_func_declarator(
     return_type: TypeIdentifier,
     name: Identifier,
     params: FormalParameterList,
-    dimensions: Optional[DimensionSpecifier] = None,
+    dimensions: Optional[Dimensions] = None,
+    throws: Optional[TypeIdentifierList] = None,
     modifiers: Optional[ModifierList] = None,
 ) -> FunctionDeclarator:
     return FunctionDeclarator(NodeType.FUNC_DECLARATOR, return_type, name, params,
-                              dimensions, modifiers)
+                              dimensions, throws, modifiers)
 
 
 def create_func_declaration(

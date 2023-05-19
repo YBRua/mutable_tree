@@ -14,7 +14,7 @@ class NewExpression(Expression):
         self.args = args
 
     def _check_types(self):
-        if self.node_type != NodeType.CALL_EXPR:
+        if self.node_type != NodeType.NEW_EXPR:
             throw_invalid_type(self.node_type, self)
         if self.type.node_type != NodeType.TYPE_IDENTIFIER:
             throw_invalid_type(self.type.node_type, self, 'type')

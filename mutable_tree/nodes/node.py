@@ -16,6 +16,7 @@ class NodeType(Enum):
     UPDATE_EXPR = 'UpdateExpression'
     UNARY_EXPR = 'UnaryExpression'
     CAST_EXPR = 'CastExpression'  # NOT IMPLEMENTED
+    ARRAY_CREATION_EXPR = 'ArrayCreationExpression'
 
     # primary expressions
     LITERAL = 'Literal'
@@ -57,6 +58,7 @@ class NodeType(Enum):
 
     # miscs
     DIMENSION_SPECIFIER = 'DimensionSpecifier'
+    DIMENSIONS = 'Dimensions'
     VARIABLE_DECLARATOR = 'VariableDeclarator'
     SWITCH_CASE = 'SwitchCase'
     CATCH_CLAUSE = 'CatchClause'

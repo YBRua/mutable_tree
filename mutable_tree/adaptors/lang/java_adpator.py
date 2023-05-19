@@ -18,7 +18,7 @@ from ...nodes import (FormalParameter, FormalParameterList, FunctionDeclarator,
                       FunctionDeclaration)
 from ...nodes import (Modifier, ModifierList)
 from ...nodes import Program
-from ...nodes import TypeIdentifier, DimensionSpecifier
+from ...nodes import TypeIdentifier, Dimensions
 from ...nodes import get_assignment_op, get_binary_op, get_unary_op, get_update_op
 from ...nodes import node_factory
 from typing import Tuple, Optional, List
@@ -201,13 +201,17 @@ def convert_update_expr(node: tree_sitter.Node) -> UpdateExpression:
 
 
 def convert_new_expr(node: tree_sitter.Node) -> NewExpression:
-    # TODO: type_argument
+    # TODO: type_argument, class body
     # type_arg_node = node.child_by_field_name('type_arguments')
     type_node = node.child_by_field_name('type')
     args_node = node.child_by_field_name('arguments')
 
     type_id = convert_type(type_node)
     args = convert_argument_list(args_node)
+
+    if node.children[-1].type == 'class_body':
+        raise NotImplementedError('class_body in object creation is not supported')
+
     return node_factory.create_new_expr(type_id, args)
 
 
@@ -249,8 +253,12 @@ def convert_parenthesized_expr(node: tree_sitter.Node) -> ParenthesizedExpressio
     return node_factory.create_parenthesized_expr(expr)
 
 
-def convert_dimension(node: tree_sitter.Node) -> DimensionSpecifier:
-    return node_factory.create_dimension_specifier(node.text.decode().count('['))
+def convert_dimensions(node: tree_sitter.Node) -> Dimensions:
+    n_dims = node.text.decode().count('[')
+    dims = []
+    for _ in range(n_dims):
+        dims.append(node_factory.create_dimension_specifier())
+    return node_factory.create_dimensions(dims)
 
 
 def convert_simple_type(node: tree_sitter.Node) -> TypeIdentifier:
@@ -259,7 +267,7 @@ def convert_simple_type(node: tree_sitter.Node) -> TypeIdentifier:
 
 def convert_array_type(node: tree_sitter.Node) -> TypeIdentifier:
     element_ty = convert_type(node.child_by_field_name('element'))
-    dimensions = convert_dimension(node.child_by_field_name('dimensions'))
+    dimensions = convert_dimensions(node.child_by_field_name('dimensions'))
     return node_factory.create_array_type(element_ty, dimensions)
 
 
@@ -269,12 +277,12 @@ def convert_expression_stmt(node: tree_sitter.Node) -> ExpressionStatement:
 
 
 def convert_variable_declartor_id(
-        node: tree_sitter.Node) -> Tuple[Expression, DimensionSpecifier]:
+        node: tree_sitter.Node) -> Tuple[Expression, Dimensions]:
     name_node = node.child_by_field_name('name')
     dim_node = node.child_by_field_name('dimensions')
 
     name = convert_expression(name_node)
-    dim = convert_dimension(dim_node) if dim_node is not None else None
+    dim = convert_dimensions(dim_node) if dim_node is not None else None
     return name, dim
 
 
@@ -686,11 +694,24 @@ def convert_function_declarator(node: tree_sitter.Node) -> FunctionDeclarator:
     params = convert_formal_parameters(params_node)
     dim_node = node.child_by_field_name('dimensions')
     if dim_node is not None:
-        dim = convert_dimension(dim_node)
+        dim = convert_dimensions(dim_node)
     else:
         dim = None
 
-    return node_factory.create_func_declarator(type_id, name, params, dim, modifiers)
+    # FIXME: maybe optimize this
+    throws = None
+    for ch in node.children:
+        if ch.type == 'throws':
+            throws = []
+            # ignore 'throws'
+            for child in ch.children[1:]:
+                if child.type == ',':
+                    continue
+                throws.append(convert_type(child))
+            throws = node_factory.create_type_identifier_list(throws)
+
+    return node_factory.create_func_declarator(type_id, name, params, dim, throws,
+                                               modifiers)
 
 
 def convert_function_declaration(node: tree_sitter.Node) -> FunctionDeclaration:
