@@ -394,7 +394,7 @@ def convert_enhanced_for_stmt(node: tree_sitter.Node) -> ForInStatement:
         raise NotImplementedError('enhanced for stmt with modifiers')
 
 
-def convert_if_stmt(node: tree_sitter.Node):
+def convert_if_stmt(node: tree_sitter.Node) -> IfStatement:
     cond_node = node.child_by_field_name('condition')
     consequence_node = node.child_by_field_name('consequence')
     alternative_node = node.child_by_field_name('alternative')
