@@ -227,7 +227,7 @@ class TestJavaSwitchStmt(JavaSnippetTestBase):
                 break;
         }
         """
-        self._stmt_round_trip(code, verbose=True)
+        self._stmt_round_trip(code)
 
 
 if __name__ == '__main__':
