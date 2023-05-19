@@ -173,8 +173,10 @@ def create_variable_declarator(name: Identifier,
 
 def create_local_var_decl(
         type_name: TypeIdentifier,
-        declarators: VariableDeclaratorList) -> LocalVariableDeclaration:
-    return LocalVariableDeclaration(NodeType.LOCAL_VAR_DECL, type_name, declarators)
+        declarators: VariableDeclaratorList,
+        modifiers: Optional[ModifierList] = None) -> LocalVariableDeclaration:
+    return LocalVariableDeclaration(NodeType.LOCAL_VAR_DECL, type_name, declarators,
+                                    modifiers)
 
 
 def create_assert_stmt(condition: Expression,

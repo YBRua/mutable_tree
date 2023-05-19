@@ -34,3 +34,6 @@ class ModifierList(NodeList):
                 throw_invalid_type(modifier.node_type,
                                    NodeType.MODIFIER,
                                    attr=f'modifier#{i}')
+
+    def to_string(self) -> str:
+        return ' '.join(mod.to_string() for mod in self.node_list)

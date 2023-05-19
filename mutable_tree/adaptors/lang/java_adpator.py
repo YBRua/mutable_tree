@@ -334,7 +334,9 @@ def convert_variable_declarator(node: tree_sitter.Node) -> VariableDeclarator:
 def convert_local_variable_declaration(
         node: tree_sitter.Node) -> LocalVariableDeclaration:
     if node.children[0].type == 'modifiers':
-        raise NotImplementedError('modifiers in local var decl')
+        modifiers = convert_modifier_list(node.children[0])
+    else:
+        modifiers = None
 
     ty = convert_type(node.child_by_field_name('type'))
     declarators = []
@@ -342,7 +344,7 @@ def convert_local_variable_declaration(
         declarators.append(convert_variable_declarator(decl_node))
     declarators = node_factory.create_variable_declarator_list(declarators)
 
-    return node_factory.create_local_var_decl(ty, declarators)
+    return node_factory.create_local_var_decl(ty, declarators, modifiers)
 
 
 def convert_empty_stmt(node: tree_sitter.Node) -> EmptyStatement:
