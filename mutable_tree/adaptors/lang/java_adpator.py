@@ -1,3 +1,4 @@
+# https://github.com/tree-sitter/tree-sitter-java/blob/master/grammar.js
 import tree_sitter
 from ...nodes import Expression, Statement
 from ...nodes import (ArrayAccess, ArrayExpression, AssignmentExpression,
@@ -10,13 +11,14 @@ from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueS
                       ForStatement, IfStatement, LabeledStatement,
                       LocalVariableDeclaration, VariableDeclarator, ReturnStatement,
                       SwitchStatement, SwitchCase, SwitchCaseList, ThrowStatement,
-                      TryStatement, CatchClause, FinallyClause, WhileStatement,
-                      YieldStatement)
+                      TryStatement, CatchClause, FinallyClause, TryHandlers,
+                      WhileStatement, YieldStatement, TryResource, TryResourceList,
+                      TryWithResourcesStatement)
 from ...nodes import Program
 from ...nodes import TypeIdentifier, DimensionSpecifier
 from ...nodes import get_assignment_op, get_binary_op, get_unary_op, get_update_op
 from ...nodes import node_factory
-from typing import Tuple
+from typing import Tuple, Optional, List
 
 
 def convert_program(node: tree_sitter.Node) -> Program:
@@ -79,6 +81,7 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'return_statement': convert_return_stmt,
         'switch_expression': convert_switch_stmt,
         'try_statement': convert_try_stmt,
+        'try_with_resources_statement': convert_try_with_resources_stmt,
         'yield_statement': convert_yield_stmt,
     }
 
@@ -534,6 +537,23 @@ def convert_try_finalizer(node: tree_sitter.Node) -> FinallyClause:
     return node_factory.create_finally_clause(body)
 
 
+def convert_try_handlers(
+        handler_nodes: List[tree_sitter.Node]
+) -> Tuple[TryHandlers, Optional[FinallyClause]]:
+    if handler_nodes[-1].type == 'finally_clause':
+        finally_node = handler_nodes[-1]
+        handler_nodes = handler_nodes[:-1]
+        finalizer = convert_try_finalizer(finally_node)
+    else:
+        finalizer = None
+    handlers = []
+    for handler_node in handler_nodes:
+        handlers.append(convert_catch_handler(handler_node))
+    handlers = node_factory.create_try_handlers(handlers)
+
+    return handlers, finalizer
+
+
 def convert_try_stmt(node: tree_sitter.Node) -> TryStatement:
     assert node.child_count >= 3
 
@@ -543,19 +563,59 @@ def convert_try_stmt(node: tree_sitter.Node) -> TryStatement:
 
     # handlers and finalizer
     handler_nodes = node.children[2:]
-    if handler_nodes[-1].type == 'finally_clause':
-        finally_node = handler_nodes[-1]
-        handler_nodes = handler_nodes[:-1]
-        finalizer = convert_try_finalizer(finally_node)
-    else:
-        finalizer = None
-
-    handlers = []
-    for handler_node in handler_nodes:
-        handlers.append(convert_catch_handler(handler_node))
-    handlers = node_factory.create_try_handlers(handlers)
+    handlers, finalizer = convert_try_handlers(handler_nodes)
 
     return node_factory.create_try_stmt(body, handlers, finalizer)
+
+
+def convert_resource(node: tree_sitter.Node) -> TryResource:
+    if node.child_count == 1:
+        # identifier or field access
+        assert node.children[0].type in {'identifier', 'field_access'}
+        resource = convert_expression(node.children[0])
+    else:
+        if node.child_count != 4:
+            raise NotImplementedError('try resource with modifiers')
+        ty = convert_type(node.child_by_field_name('type'))
+        name, dim = convert_variable_declartor_id(node)
+        value = convert_expression(node.child_by_field_name('value'))
+
+        declarator = node_factory.create_variable_declarator_list(
+            [node_factory.create_variable_declarator(name, dim, value)])
+
+        resource = node_factory.create_local_var_decl(ty, declarator)
+
+    return node_factory.create_try_resource(resource)
+
+
+def convert_try_resources(node: tree_sitter.Node) -> TryResourceList:
+    resources = []
+    # skip parentheses
+    for resource in node.children[1:-1]:
+        if resource.type == ';':
+            continue
+        resources.append(convert_resource(resource))
+    resources = node_factory.create_try_resource_list(resources)
+    return resources
+
+
+def convert_try_with_resources_stmt(node: tree_sitter.Node) -> TryWithResourcesStatement:
+    assert node.child_count >= 4
+
+    # resources
+    resource_nodes = node.child_by_field_name('resources')
+    resources = convert_try_resources(resource_nodes)
+
+    # body
+    body_node = node.child_by_field_name('body')
+    body = convert_block_stmt(body_node)
+
+    # handlers and finalizer
+    handler_nodes = node.children[3:]
+    handlers, finalizer = convert_try_handlers(handler_nodes)
+
+    return node_factory.create_try_with_resources_stmt(resources, body, handlers,
+                                                       finalizer)
 
 
 def convert_yield_stmt(node: tree_sitter.Node) -> YieldStatement:

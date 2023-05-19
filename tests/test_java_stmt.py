@@ -273,6 +273,49 @@ class TestJavaTryStmt(JavaSnippetTestBase):
         self._stmt_round_trip(code)
 
 
+class TestJavaTryWithResourcesStmt(JavaSnippetTestBase):
+
+    def test_try_with_resource(self):
+        code = """
+        try (Statement stmt = con.createStatement()) {
+            stmt.executeQuery("DROP TABLE IF EXISTS test");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        """
+        self._stmt_round_trip(code)
+
+        code = """
+        try (Statement stmt = con.createStatement()) {
+            stmt.executeQuery("DROP TABLE IF EXISTS test");
+        } catch (SQLException | MaybeSomeOtherException e) {
+            e.printStackTrace();
+        }
+        """
+        self._stmt_round_trip(code)
+
+    def test_try_finally_with_resource(self):
+        code = """
+        try (Statement stmt = con.createStatement()) {
+            stmt.executeQuery("DROP TABLE IF EXISTS test");
+        } finally {
+            cleanUp();
+        }
+        """
+        self._stmt_round_trip(code)
+
+        code = """
+        try (Statement stmt = con.createStatement()) {
+            stmt.executeQuery("DROP TABLE IF EXISTS test");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            cleanUp();
+        }
+        """
+        self._stmt_round_trip(code)
+
+
 class TestJavaYieldStmt(JavaSnippetTestBase):
 
     def test_yield(self):

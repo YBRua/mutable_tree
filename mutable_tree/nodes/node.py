@@ -47,6 +47,7 @@ class NodeType(Enum):
     SYNC_STMT = 'SynchronizedStatement'
     THROW_STMT = 'ThrowStatement'
     TRY_STMT = 'TryStatement'
+    TRY_WITH_RESOURCES_STMT = 'TryWithResourcesStatement'
     WHILE_STMT = 'WhileStatement'
     YIELD_STMT = 'YieldStatement'
 
@@ -63,6 +64,8 @@ class NodeType(Enum):
     TYPE_IDENTIFIER = 'TypeIdentifier'
     TYPE_IDENTIFIER_LIST = 'TypeIdentifierList'
     TRY_HANDLERS = 'TryHandlers'
+    TRY_RESOURCE = 'TryResource'
+    TRY_RESOURCE_LIST = 'TryResourceList'
 
 
 class Node:

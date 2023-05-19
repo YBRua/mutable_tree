@@ -19,3 +19,5 @@ from .try_stmt import TryStatement, TryHandlers, CatchClause, FinallyClause
 from .while_stmt import WhileStatement
 from .yield_stmt import YieldStatement
 from .statement_list import StatementList
+from .try_with_resources_stmt import (TryResource, TryResourceList,
+                                      TryWithResourcesStatement)

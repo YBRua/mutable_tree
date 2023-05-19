@@ -16,7 +16,8 @@ from .statements import (AssertStatement, BlockStatement, BreakStatement,
                          ReturnStatement, SwitchCase, SwitchCaseList, SwitchStatement,
                          ThrowStatement, TryStatement, TryHandlers, CatchClause,
                          FinallyClause, WhileStatement, YieldStatement, StatementList,
-                         VariableDeclaratorList)
+                         VariableDeclaratorList, TryResource, TryResourceList,
+                         TryWithResourcesStatement)
 from .statements.for_stmt import ForInit
 from .types import TypeIdentifier, DimensionSpecifier, TypeIdentifierList
 
@@ -251,6 +252,26 @@ def create_try_stmt(
     finally_clause: Optional[FinallyClause] = None,
 ) -> TryStatement:
     return TryStatement(NodeType.TRY_STMT, try_block, handlers, finally_clause)
+
+
+def create_try_resource(
+        resource: Union[Identifier, FieldAccess,
+                        LocalVariableDeclaration]) -> TryResource:
+    return TryResource(NodeType.TRY_RESOURCE, resource)
+
+
+def create_try_resource_list(resources: List[TryResource]) -> TryResourceList:
+    return TryResourceList(NodeType.TRY_RESOURCE_LIST, resources)
+
+
+def create_try_with_resources_stmt(
+    resources: TryResourceList,
+    try_block: BlockStatement,
+    handlers: TryHandlers,
+    finally_clause: Optional[FinallyClause] = None,
+) -> TryWithResourcesStatement:
+    return TryWithResourcesStatement(NodeType.TRY_WITH_RESOURCES_STMT, resources,
+                                     try_block, handlers, finally_clause)
 
 
 # MISCS
