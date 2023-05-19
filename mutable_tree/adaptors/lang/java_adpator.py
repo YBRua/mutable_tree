@@ -1,5 +1,5 @@
 import tree_sitter
-from ...nodes import Node, Expression, Statement
+from ...nodes import Expression, Statement
 from ...nodes import (ArrayAccess, ArrayExpression, AssignmentExpression,
                       BinaryExpression, CallExpression, CastExpression, FieldAccess,
                       Identifier, InstanceofExpression, Literal, NewExpression,
@@ -10,11 +10,10 @@ from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueS
                       ForStatement, IfStatement, LabeledStatement,
                       LocalVariableDeclaration, VariableDeclarator, ReturnStatement,
                       SwitchStatement, SwitchCase, SwitchCaseList, ThrowStatement,
-                      TryStatement, CatchClause, TryHandlers, FinallyClause,
-                      WhileStatement, YieldStatement, StatementList,
-                      VariableDeclaratorList)
+                      TryStatement, CatchClause, FinallyClause, WhileStatement,
+                      YieldStatement)
 from ...nodes import Program
-from ...nodes import TypeIdentifier, DimensionSpecifier, TypeIdentifierList
+from ...nodes import TypeIdentifier, DimensionSpecifier
 from ...nodes import get_assignment_op, get_binary_op, get_unary_op, get_update_op
 from ...nodes import node_factory
 from typing import Tuple
@@ -80,6 +79,7 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'return_statement': convert_return_stmt,
         'switch_expression': convert_switch_stmt,
         'try_statement': convert_try_stmt,
+        'yield_statement': convert_yield_stmt,
     }
 
     return stmt_convertors[node.type](node)
@@ -556,3 +556,11 @@ def convert_try_stmt(node: tree_sitter.Node) -> TryStatement:
     handlers = node_factory.create_try_handlers(handlers)
 
     return node_factory.create_try_stmt(body, handlers, finalizer)
+
+
+def convert_yield_stmt(node: tree_sitter.Node) -> YieldStatement:
+    assert node.child_count == 3
+    expr_node = node.children[1]
+
+    expr = convert_expression(expr_node)
+    return node_factory.create_yield_stmt(expr)

@@ -273,5 +273,14 @@ class TestJavaTryStmt(JavaSnippetTestBase):
         self._stmt_round_trip(code)
 
 
+class TestJavaYieldStmt(JavaSnippetTestBase):
+
+    def test_yield(self):
+        self._stmt_round_trip('yield 1;')
+        self._stmt_round_trip('yield 1 + 2;')
+        self._stmt_round_trip('yield something;')
+        self._stmt_round_trip('yield giveMeSomething();')
+
+
 if __name__ == '__main__':
     unittest.main()
