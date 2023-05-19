@@ -237,7 +237,7 @@ def convert_array_creation_expr(node: tree_sitter.Node) -> ArrayCreationExpressi
             expr = convert_expression(dim_node.children[1])
             dim_specifiers.append(node_factory.create_dimension_specifier(expr))
         else:
-            n_dims = node.text.decode().count('[')
+            n_dims = dim_node.text.decode().count('[')
             for _ in range(n_dims):
                 dim_specifiers.append(node_factory.create_dimension_specifier())
     dims = node_factory.create_dimensions(dim_specifiers)

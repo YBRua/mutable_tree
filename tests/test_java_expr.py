@@ -113,6 +113,9 @@ class TestJavaArrayCreationExpr(JavaSnippetTestBase):
         self._stmt_round_trip('int[] arr = new int[] {1, 2, 3};')
         self._stmt_round_trip('int[][] arr = new int[][] {{1, 2, 3}, {4, 5, 6}};')
 
+    def test_confusing_brackets(self):
+        self._stmt_round_trip('String[] strArr = new String[]{"[][]"};')
+
 
 class TestJavaCastExpr(JavaSnippetTestBase):
 
