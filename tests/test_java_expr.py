@@ -103,6 +103,17 @@ class TestJavaNewExpr(JavaSnippetTestBase):
         self._stmt_round_trip('new Foo(new Bar(), b + 42);')
 
 
+class TestJavaArrayCreationExpr(JavaSnippetTestBase):
+
+    def test_array_creation(self):
+        self._stmt_round_trip('int[] arr = new int[10];')
+        self._stmt_round_trip('int[][] arr = new int[10][20];')
+
+    def test_array_creation_with_init(self):
+        self._stmt_round_trip('int[] arr = new int[] {1, 2, 3};')
+        self._stmt_round_trip('int[][] arr = new int[][] {{1, 2, 3}, {4, 5, 6}};')
+
+
 class TestJavaCastExpr(JavaSnippetTestBase):
 
     def test_simple_cast(self):

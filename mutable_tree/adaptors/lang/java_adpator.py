@@ -1,11 +1,12 @@
 # https://github.com/tree-sitter/tree-sitter-java/blob/master/grammar.js
 import tree_sitter
 from ...nodes import Expression, Statement
-from ...nodes import (ArrayAccess, ArrayExpression, AssignmentExpression,
-                      BinaryExpression, CallExpression, CastExpression, FieldAccess,
-                      Identifier, InstanceofExpression, Literal, NewExpression,
-                      TernaryExpression, ThisExpression, UnaryExpression,
-                      UpdateExpression, ParenthesizedExpression, ExpressionList)
+from ...nodes import (ArrayAccess, ArrayCreationExpression, ArrayExpression,
+                      AssignmentExpression, BinaryExpression, CallExpression,
+                      CastExpression, FieldAccess, Identifier, InstanceofExpression,
+                      Literal, NewExpression, TernaryExpression, ThisExpression,
+                      UnaryExpression, UpdateExpression, ParenthesizedExpression,
+                      ExpressionList)
 from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueStatement,
                       DoStatement, EmptyStatement, ExpressionStatement, ForInStatement,
                       ForStatement, IfStatement, LabeledStatement,
@@ -60,6 +61,9 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         'unary_expression': convert_unary_expr,
         'parenthesized_expression': convert_parenthesized_expr,
         'condition': convert_parenthesized_expr,  # they seem to be the same
+        'array_creation_expression': convert_array_creation_expr,
+        # NOTE: array_initializer is not an expression, but we treat it as one
+        'array_initializer': convert_array_expr,
     }
 
     return expr_convertors[node.type](node)
@@ -124,7 +128,12 @@ def convert_array_access(node: tree_sitter.Node) -> ArrayAccess:
 
 
 def convert_array_expr(node: tree_sitter.Node) -> ArrayExpression:
-    raise NotImplementedError('pending on variable initializer')
+    elements = []
+    for ch in node.children[1:-1]:
+        if ch.type == ',':
+            continue
+        elements.append(convert_expression(ch))
+    return node_factory.create_array_expr(node_factory.create_expression_list(elements))
 
 
 def convert_assignment_expr(node: tree_sitter.Node) -> AssignmentExpression:
@@ -213,6 +222,30 @@ def convert_new_expr(node: tree_sitter.Node) -> NewExpression:
         raise NotImplementedError('class_body in object creation is not supported')
 
     return node_factory.create_new_expr(type_id, args)
+
+
+def convert_array_creation_expr(node: tree_sitter.Node) -> ArrayCreationExpression:
+    type_node = node.child_by_field_name('type')
+    type_id = convert_type(type_node)
+
+    dim_nodes = node.children_by_field_name('dimensions')
+    dim_specifiers = []
+    for dim_node in dim_nodes:
+        if dim_node.type == 'dimensions_expr':
+            if dim_node.child_count != 3:
+                raise NotImplementedError('dimensions_expr with annotations')
+            expr = convert_expression(dim_node.children[1])
+            dim_specifiers.append(node_factory.create_dimension_specifier(expr))
+        else:
+            n_dims = node.text.decode().count('[')
+            for _ in range(n_dims):
+                dim_specifiers.append(node_factory.create_dimension_specifier())
+    dims = node_factory.create_dimensions(dim_specifiers)
+
+    value_node = node.child_by_field_name('value')
+    value = convert_array_expr(value_node) if value_node is not None else None
+
+    return node_factory.create_array_creation_expr(type_id, dims, value)
 
 
 def convert_instanceof_expr(node: tree_sitter.Node) -> InstanceofExpression:

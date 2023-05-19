@@ -2,12 +2,12 @@ from .node import NodeType
 from .program import Program
 from .expressions import Expression
 from .expressions import BinaryOps, UnaryOps, UpdateOps, AssignmentOps
-from .expressions import (ArrayAccess, ArrayExpression, AssignmentExpression,
-                          BinaryExpression, CallExpression, CastExpression, FieldAccess,
-                          Identifier, InstanceofExpression, Literal, NewExpression,
-                          TernaryExpression, ThisExpression, UnaryExpression,
-                          UpdateExpression, PrimaryExpression, ParenthesizedExpression,
-                          ExpressionList)
+from .expressions import (ArrayAccess, ArrayExpression, ArrayCreationExpression,
+                          AssignmentExpression, BinaryExpression, CallExpression,
+                          CastExpression, FieldAccess, Identifier, InstanceofExpression,
+                          Literal, NewExpression, TernaryExpression, ThisExpression,
+                          UnaryExpression, UpdateExpression, PrimaryExpression,
+                          ParenthesizedExpression, ExpressionList)
 from .statements import Statement
 from .statements import (AssertStatement, BlockStatement, BreakStatement,
                          ContinueStatement, DoStatement, EmptyStatement,
@@ -114,6 +114,14 @@ def create_instanceof_expr(expr: Expression,
 
 def create_new_expr(type_name: TypeIdentifier, args: ExpressionList) -> NewExpression:
     return NewExpression(NodeType.NEW_EXPR, type_name, args)
+
+
+def create_array_creation_expr(
+        type_name: TypeIdentifier,
+        dimensions: Dimensions,
+        initializer: Optional[ArrayExpression] = None) -> ArrayCreationExpression:
+    return ArrayCreationExpression(NodeType.ARRAY_CREATION_EXPR, type_name, dimensions,
+                                   initializer)
 
 
 def create_ternary_expr(condition: Expression, consequence: Expression,
