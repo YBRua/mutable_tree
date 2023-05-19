@@ -446,24 +446,25 @@ def convert_do_stmt(node: tree_sitter.Node) -> DoStatement:
 
 
 def convert_enhanced_for_stmt(node: tree_sitter.Node) -> ForInStatement:
-    if node.child_count == 8:
-        # without modifiers
-        type_node = node.child_by_field_name('type')
-        var_decl_node = node.children[3]
-        value_node = node.child_by_field_name('value')
-        body_node = node.child_by_field_name('body')
-
-        ty = convert_type(type_node)
-        # NOTE: should be variable declarator according to grammar specification
-        var_decl = convert_identifier(var_decl_node)
-        value = convert_expression(value_node)
-        body = convert_statement(body_node)
-        return node_factory.create_for_in_stmt(ty, var_decl, value, body)
-
+    if node.child_count == 9:
+        modifiers = convert_modifier_list(node.children[2])
+        offset = 1
     else:
-        assert node.child_count == 9
-        raise NotImplementedError('enhanced for stmt with modifiers')
+        modifiers = None
+        offset = 0
 
+    # without modifiers
+    type_node = node.child_by_field_name('type')
+    var_decl_node = node.children[3 + offset]
+    value_node = node.child_by_field_name('value')
+    body_node = node.child_by_field_name('body')
+
+    ty = convert_type(type_node)
+    # NOTE: should be variable declarator according to grammar specification
+    var_decl = convert_identifier(var_decl_node)
+    value = convert_expression(value_node)
+    body = convert_statement(body_node)
+    return node_factory.create_for_in_stmt(ty, var_decl, value, body, modifiers)
 
 def convert_if_stmt(node: tree_sitter.Node) -> IfStatement:
     cond_node = node.child_by_field_name('condition')
@@ -589,7 +590,7 @@ def convert_try_finalizer(node: tree_sitter.Node) -> FinallyClause:
 
 
 def convert_try_handlers(
-        handler_nodes: List[tree_sitter.Node]
+    handler_nodes: List[tree_sitter.Node]
 ) -> Tuple[Optional[TryHandlers], Optional[FinallyClause]]:
     if len(handler_nodes) == 0:
         # try-with-resources allow empty catch and finally

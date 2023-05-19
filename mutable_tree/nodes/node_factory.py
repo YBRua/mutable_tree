@@ -201,8 +201,9 @@ def create_for_in_stmt(
     iterator: Identifier,
     iterable: Expression,
     body: Statement,
+    modifiers: Optional[ModifierList] = None,
 ) -> ForInStatement:
-    return ForInStatement(NodeType.FOR_IN_STMT, type_id, iterator, iterable, body)
+    return ForInStatement(NodeType.FOR_IN_STMT, type_id, iterator, iterable, body, modifiers)
 
 
 def create_if_stmt(
