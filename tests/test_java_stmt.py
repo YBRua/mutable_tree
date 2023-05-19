@@ -184,5 +184,51 @@ class TestJavaReturnStmt(JavaSnippetTestBase):
         self._stmt_round_trip('if (true) return actuallyFalse;')
 
 
+class TestJavaSwitchStmt(JavaSnippetTestBase):
+
+    def test_switch(self):
+        code = """
+        switch (value) {
+            case 1:
+                doSomething();
+                break;
+            case 2:
+                doSomethingElse();
+                break;
+        }
+        """
+        self._stmt_round_trip(code)
+
+    def test_default(self):
+        code = """
+        switch (value) {
+            case 1:
+                doSomething();
+                break;
+            default:
+                doSomethingElse();
+        }
+        """
+        self._stmt_round_trip(code)
+
+    def test_empty_case(self):
+        code = """
+        switch (value) {
+            case 1:
+            case 2:
+                doSomething();
+                break;
+            case 3:
+                doAnother();
+                break;
+            case 4:
+            default:
+                doSomethingElse();
+                break;
+        }
+        """
+        self._stmt_round_trip(code, verbose=True)
+
+
 if __name__ == '__main__':
     unittest.main()

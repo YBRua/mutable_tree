@@ -9,8 +9,9 @@ from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueS
                       DoStatement, EmptyStatement, ExpressionStatement, ForInStatement,
                       ForStatement, IfStatement, LabeledStatement,
                       LocalVariableDeclaration, VariableDeclarator, ReturnStatement,
-                      SwitchStatement, ThrowStatement, TryStatement, WhileStatement,
-                      YieldStatement, StatementList, VariableDeclaratorList)
+                      SwitchStatement, SwitchCase, SwitchCaseList, ThrowStatement,
+                      TryStatement, WhileStatement, YieldStatement, StatementList,
+                      VariableDeclaratorList)
 from ...nodes import Program
 from ...nodes import TypeIdentifier, DimensionSpecifier, TypeIdentifierList
 from ...nodes import get_assignment_op, get_binary_op, get_unary_op, get_update_op
@@ -75,6 +76,7 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'if_statement': convert_if_stmt,
         'labeled_statement': convert_labeled_stmt,
         'return_statement': convert_return_stmt,
+        'switch_expression': convert_switch_stmt,
     }
 
     return stmt_convertors[node.type](node)
@@ -370,6 +372,10 @@ def convert_do_stmt(node: tree_sitter.Node) -> DoStatement:
     body_node = node.child_by_field_name('body')
     cond_node = node.child_by_field_name('condition')
 
+    assert cond_node.type == 'parenthesized_expression'
+    assert cond_node.child_count == 3
+    cond_node = cond_node.children[1]
+
     body = convert_statement(body_node)
     cond = convert_expression(cond_node)
     return node_factory.create_do_stmt(cond, body)
@@ -401,6 +407,9 @@ def convert_if_stmt(node: tree_sitter.Node) -> IfStatement:
     consequence_node = node.child_by_field_name('consequence')
     alternative_node = node.child_by_field_name('alternative')
 
+    assert cond_node.type == 'condition' and cond_node.child_count == 3
+    cond_node = cond_node.children[1]
+
     condition = convert_expression(cond_node)
     consequence = convert_statement(consequence_node)
     if alternative_node is None:
@@ -430,3 +439,45 @@ def convert_return_stmt(node: tree_sitter.Node) -> ReturnStatement:
 
     expr = convert_expression(expr_node) if expr_node is not None else None
     return node_factory.create_return_stmt(expr)
+
+
+def convert_switch_case(node: tree_sitter.Node) -> SwitchCase:
+    assert node.child_count >= 2
+    label_node = node.children[0]
+    stmt_nodes = node.children[2:]
+
+    # convert label
+    if label_node.child_count == 1:
+        # default
+        label = None
+    else:
+        assert label_node.child_count == 2
+        label = convert_expression(label_node.children[1])
+
+    # convert body
+    stmts = [convert_statement(stmt_node) for stmt_node in stmt_nodes]
+    stmt_list = node_factory.create_statement_list(stmts)
+
+    return node_factory.create_switch_case(stmt_list, label)
+
+
+def convert_switch_block(node: tree_sitter.Node) -> SwitchCaseList:
+    # ignore curly braces
+    cases = []
+    for child in node.children[1:-1]:
+        cases.append(convert_switch_case(child))
+
+    return node_factory.create_switch_case_list(cases)
+
+
+def convert_switch_stmt(node: tree_sitter.Node) -> SwitchStatement:
+    cond_node = node.child_by_field_name('condition')
+    body_node = node.child_by_field_name('body')
+
+    assert cond_node.type == 'parenthesized_expression' and cond_node.child_count == 3
+    cond_node = cond_node.children[1]
+
+    cond = convert_expression(cond_node)
+    body = convert_switch_block(body_node)
+
+    return node_factory.create_switch_stmt(cond, body)
