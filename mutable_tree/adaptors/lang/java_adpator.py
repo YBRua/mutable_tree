@@ -42,14 +42,15 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         'binary_integer_literal': convert_literal,
         'decimal_floating_point_literal': convert_literal,
         'hex_floating_point_literal': convert_literal,
-        # NOTE: class_literal is separated from literals in the grammar,
-        # but we dont consider the difference here
-        'class_literal': convert_literal,
         'true': convert_literal,
         'false': convert_literal,
         'character_literal': convert_literal,
         'string_literal': convert_literal,
         'null_literal': convert_literal,
+        # NOTE: things below are not literals in the grammar,
+        # but we temporarily ignore the differences here
+        'class_literal': convert_literal,
+        'super': convert_literal,
         'array_access': convert_array_access,
         'assignment_expression': convert_assignment_expr,
         'binary_expression': convert_binary_expr,
@@ -589,7 +590,11 @@ def convert_try_finalizer(node: tree_sitter.Node) -> FinallyClause:
 
 def convert_try_handlers(
         handler_nodes: List[tree_sitter.Node]
-) -> Tuple[TryHandlers, Optional[FinallyClause]]:
+) -> Tuple[Optional[TryHandlers], Optional[FinallyClause]]:
+    if len(handler_nodes) == 0:
+        # try-with-resources allow empty catch and finally
+        return None, None
+
     if handler_nodes[-1].type == 'finally_clause':
         finally_node = handler_nodes[-1]
         handler_nodes = handler_nodes[:-1]
@@ -650,7 +655,7 @@ def convert_try_resources(node: tree_sitter.Node) -> TryResourceList:
 
 
 def convert_try_with_resources_stmt(node: tree_sitter.Node) -> TryWithResourcesStatement:
-    assert node.child_count >= 4
+    assert node.child_count >= 3, node.child_count
 
     # resources
     resource_nodes = node.child_by_field_name('resources')

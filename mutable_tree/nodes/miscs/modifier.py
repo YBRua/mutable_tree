@@ -17,6 +17,12 @@ class Modifier(Node):
     def to_string(self) -> str:
         return self.modifier
 
+    def get_children(self) -> List[Node]:
+        return []
+
+    def get_children_names(self) -> List[str]:
+        return []
+
 
 class ModifierList(NodeList):
     node_list: List[Modifier]

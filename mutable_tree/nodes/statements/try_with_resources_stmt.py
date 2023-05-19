@@ -65,7 +65,7 @@ class TryWithResourcesStatement(Statement):
                  node_type: NodeType,
                  resources: TryResourceList,
                  body: BlockStatement,
-                 handlers: TryHandlers,
+                 handlers: Optional[TryHandlers] = None,
                  finalizer: Optional[FinallyClause] = None):
         super().__init__(node_type)
         self.body = body
@@ -82,25 +82,36 @@ class TryWithResourcesStatement(Statement):
         if (self.finalizer is not None
                 and self.finalizer.node_type != NodeType.FINALLY_CLAUSE):
             throw_invalid_type(self.finalizer.node_type, self, attr='finalizer')
-        if self.handlers.node_type != NodeType.TRY_HANDLERS:
+        if (self.handlers is not None
+                and self.handlers.node_type != NodeType.TRY_HANDLERS):
             throw_invalid_type(self.handlers.node_type, self, attr='handlers')
         if self.resources.node_type != NodeType.TRY_RESOURCE_LIST:
             throw_invalid_type(self.resources.node_type, self, attr='resources')
 
     def to_string(self) -> str:
-        body_str = self.body.to_string()
-        handlers_str = '\n'.join(
-            [handler.to_string() for handler in self.handlers.get_children()])
         resource_str = '; '.join(res.to_string() for res in self.resources.get_children())
+        body_str = self.body.to_string()
+
+        res_str = f'try ({resource_str}) {body_str}'
+
+        if self.handlers is not None:
+            handlers_str = '\n'.join(
+                [handler.to_string() for handler in self.handlers.get_children()])
+            res_str += f'\n{handlers_str}'
 
         if self.finalizer is not None:
             finalizer_str = self.finalizer.to_string()
-            return f'try ({resource_str}) {body_str}\n{handlers_str}\n{finalizer_str}'
-        else:
-            return f'try ({resource_str}) {body_str}\n{handlers_str}'
+            res_str += f'\n{finalizer_str}'
+
+        return res_str
 
     def get_children_names(self) -> List[str]:
         return ['resources', 'body', 'handlers', 'finalizer']
 
     def get_children(self) -> List[Node]:
-        return [self.resources, self.body, self.handlers, self.finalizer]
+        children = [self.resources, self.body]
+        if self.handlers is not None:
+            children.append(self.handlers)
+        if self.finalizer is not None:
+            children.append(self.finalizer)
+        return children

@@ -143,6 +143,23 @@ class FunctionDeclarator(Node):
 
         return res
 
+    def get_children(self) -> List[Node]:
+        children = []
+        if self.modifiers is not None:
+            children.append(self.modifiers)
+        children.append(self.return_type)
+        children.append(self.name)
+        children.append(self.parameters)
+        if self.dimensions is not None:
+            children.append(self.dimensions)
+        if self.throws is not None:
+            children.append(self.throws)
+
+        return children
+
+    def get_children_names(self) -> List[str]:
+        return ['modifiers', 'return_type', 'name', 'parameters', 'dimensions', 'throws']
+
 
 class FunctionDeclaration(Statement):
 
@@ -164,3 +181,9 @@ class FunctionDeclaration(Statement):
 
     def to_string(self) -> str:
         return f'{self.decorator.to_string()} {self.body.to_string()}'
+
+    def get_children(self) -> List[Node]:
+        return [self.decorator, self.body]
+    
+    def get_children_names(self) -> List[str]:
+        return ['decorator', 'body']

@@ -279,6 +279,14 @@ class TestJavaTryWithResourcesStmt(JavaSnippetTestBase):
         code = """
         try (Statement stmt = con.createStatement()) {
             stmt.executeQuery("DROP TABLE IF EXISTS test");
+        }
+        """
+        self._stmt_round_trip(code)
+
+    def test_try_catch_with_resource(self):
+        code = """
+        try (Statement stmt = con.createStatement()) {
+            stmt.executeQuery("DROP TABLE IF EXISTS test");
         } catch (SQLException e) {
             e.printStackTrace();
         }
