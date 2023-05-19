@@ -67,6 +67,9 @@ class NodeType(Enum):
     TRY_RESOURCE = 'TryResource'
     TRY_RESOURCE_LIST = 'TryResourceList'
 
+    MODIFIER = 'Modifier'
+    MODIFIER_LIST = 'ModifierList'
+
 
 class Node:
     node_type: NodeType
