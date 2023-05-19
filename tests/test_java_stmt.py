@@ -131,5 +131,44 @@ class TestJavaEnhancedForStmt(JavaSnippetTestBase):
             'for (MyClass obj : objects.getObjs()) { doSomethingWith(obj); }')
 
 
+class TestJavaIfStmt(JavaSnippetTestBase):
+
+    def test_if(self):
+        self._stmt_round_trip('if (goingToFailUnitTest()) dont();')
+        self._stmt_round_trip('if (goingToFailUnitTest()) { dont(); }')
+
+    def test_if_else(self):
+        code = """
+        if (goingToFailUnitTest()) {
+            dont();
+        } else {
+            declareVictory();
+            goHome();
+        }
+        """
+        self._stmt_round_trip(code)
+
+        code = """
+        if (goingToFailUnitTest())
+            dont();
+        else
+            declareVictory();
+        """
+        self._stmt_round_trip(code)
+
+    def test_if_elif(self):
+        code = """
+        if (goingToFailUnitTest()) {
+            dont();
+        } else if (goingToFailCicd() || hasLineTooLongs()) {
+            alsoDont();
+        } else {
+            declareVictory();
+            goHome();
+        }
+        """
+        self._stmt_round_trip(code)
+
+
 if __name__ == '__main__':
     unittest.main()

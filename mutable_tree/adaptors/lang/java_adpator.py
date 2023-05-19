@@ -52,6 +52,7 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         'this': convert_this_expr,
         'unary_expression': convert_unary_expr,
         'parenthesized_expression': convert_parenthesized_expr,
+        'condition': convert_parenthesized_expr,  # they seem to be the same
     }
 
     return expr_convertors[node.type](node)
@@ -71,6 +72,7 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'continue_statement': convert_continue_stmt,
         'do_statement': convert_do_stmt,
         'enhanced_for_statement': convert_enhanced_for_stmt,
+        'if_statement': convert_if_stmt,
     }
 
     return stmt_convertors[node.type](node)
@@ -390,3 +392,18 @@ def convert_enhanced_for_stmt(node: tree_sitter.Node) -> ForInStatement:
     else:
         assert node.child_count == 9
         raise NotImplementedError('enhanced for stmt with modifiers')
+
+
+def convert_if_stmt(node: tree_sitter.Node):
+    cond_node = node.child_by_field_name('condition')
+    consequence_node = node.child_by_field_name('consequence')
+    alternative_node = node.child_by_field_name('alternative')
+
+    condition = convert_expression(cond_node)
+    consequence = convert_statement(consequence_node)
+    if alternative_node is None:
+        alternative = None
+    else:
+        alternative = convert_statement(alternative_node)
+
+    return node_factory.create_if_stmt(condition, consequence, alternative)
