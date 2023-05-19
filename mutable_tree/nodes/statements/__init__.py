@@ -14,6 +14,7 @@ from .local_var_decl import (LocalVariableDeclaration, VariableDeclarator,
                              VariableDeclaratorList)
 from .return_stmt import ReturnStatement
 from .switch_stmt import SwitchStatement, SwitchCase, SwitchCaseList
+from .synchronized_stmt import SynchronizedStatement
 from .throw_stmt import ThrowStatement
 from .try_stmt import TryStatement, TryHandlers, CatchClause, FinallyClause
 from .while_stmt import WhileStatement

@@ -354,5 +354,16 @@ class TestJavaYieldStmt(JavaSnippetTestBase):
         self._stmt_round_trip('yield giveMeSomething();')
 
 
+class TestJavaSynchronizedStmt(JavaSnippetTestBase):
+
+    def test_synchronized(self):
+        code = """
+        synchronized (lock) {
+            doSomething();
+        }
+        """
+        self._stmt_round_trip(code)
+
+
 if __name__ == '__main__':
     unittest.main()

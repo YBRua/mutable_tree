@@ -17,7 +17,7 @@ from .statements import (AssertStatement, BlockStatement, BreakStatement,
                          ThrowStatement, TryStatement, TryHandlers, CatchClause,
                          FinallyClause, WhileStatement, YieldStatement, StatementList,
                          VariableDeclaratorList, TryResource, TryResourceList,
-                         TryWithResourcesStatement)
+                         TryWithResourcesStatement, SynchronizedStatement)
 from .statements import (FormalParameter, FormalParameterList, FunctionDeclarator,
                          FunctionDeclaration)
 from .miscs import Modifier, ModifierList
@@ -289,6 +289,11 @@ def create_try_with_resources_stmt(
 ) -> TryWithResourcesStatement:
     return TryWithResourcesStatement(NodeType.TRY_WITH_RESOURCES_STMT, resources,
                                      try_block, handlers, finally_clause)
+
+
+def create_synchronized_stmt(expr: ParenthesizedExpression,
+                             body: BlockStatement) -> SynchronizedStatement:
+    return SynchronizedStatement(NodeType.SYNCHRONIZED_STMT, expr, body)
 
 
 # DECLARATIONS & DEFINITIONS

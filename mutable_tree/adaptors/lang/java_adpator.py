@@ -14,7 +14,7 @@ from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueS
                       SwitchStatement, SwitchCase, SwitchCaseList, ThrowStatement,
                       TryStatement, CatchClause, FinallyClause, TryHandlers,
                       WhileStatement, YieldStatement, TryResource, TryResourceList,
-                      TryWithResourcesStatement)
+                      TryWithResourcesStatement, SynchronizedStatement)
 from ...nodes import (FormalParameter, FormalParameterList, FunctionDeclarator,
                       FunctionDeclaration)
 from ...nodes import (Modifier, ModifierList)
@@ -95,6 +95,7 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'try_with_resources_statement': convert_try_with_resources_stmt,
         'throw_statement': convert_throw_stmt,
         'yield_statement': convert_yield_stmt,
+        'synchronized_statement': convert_synchronized_stmt,
     }
 
     return stmt_convertors[node.type](node)
@@ -685,6 +686,16 @@ def convert_yield_stmt(node: tree_sitter.Node) -> YieldStatement:
 
     expr = convert_expression(expr_node)
     return node_factory.create_yield_stmt(expr)
+
+
+def convert_synchronized_stmt(node: tree_sitter.Node) -> SynchronizedStatement:
+    assert node.child_count == 3, node.child_count
+    expr_node = node.children[1]
+    body_node = node.child_by_field_name('body')
+
+    expr = convert_parenthesized_expr(expr_node)
+    body = convert_block_stmt(body_node)
+    return node_factory.create_synchronized_stmt(expr, body)
 
 
 def convert_modifier(node: tree_sitter.Node) -> Modifier:

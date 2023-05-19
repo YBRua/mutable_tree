@@ -45,7 +45,7 @@ class NodeType(Enum):
     LOCAL_VAR_DECL = 'LocalVariableDeclaration'
     RETURN_STMT = 'ReturnStatement'
     SWITCH_STMT = 'SwitchStatement'
-    SYNC_STMT = 'SynchronizedStatement'
+    SYNCHRONIZED_STMT = 'SynchronizedStatement'
     THROW_STMT = 'ThrowStatement'
     TRY_STMT = 'TryStatement'
     TRY_WITH_RESOURCES_STMT = 'TryWithResourcesStatement'
