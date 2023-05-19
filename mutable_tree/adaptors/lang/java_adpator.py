@@ -42,6 +42,9 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         'binary_integer_literal': convert_literal,
         'decimal_floating_point_literal': convert_literal,
         'hex_floating_point_literal': convert_literal,
+        # NOTE: class_literal is separated from literals in the grammar,
+        # but we dont consider the difference here
+        'class_literal': convert_literal,
         'true': convert_literal,
         'false': convert_literal,
         'character_literal': convert_literal,
@@ -89,6 +92,7 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'switch_expression': convert_switch_stmt,
         'try_statement': convert_try_stmt,
         'try_with_resources_statement': convert_try_with_resources_stmt,
+        'throw_statement': convert_throw_stmt,
         'yield_statement': convert_yield_stmt,
     }
 
