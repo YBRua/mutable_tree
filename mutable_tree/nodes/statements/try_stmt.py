@@ -32,7 +32,7 @@ class CatchClause(Node):
             [ty.to_string() for ty in self.catch_types.get_children()])
         exception_str = self.exception.to_string()
         body_str = self.body.to_string()
-        return f'catch ({catch_types_str} {exception_str}) {{\n{body_str}\n}}'
+        return f'catch ({catch_types_str} {exception_str}) {body_str}'
 
     def get_children(self) -> List[Node]:
         return [self.catch_types, self.exception, self.body]
@@ -71,7 +71,7 @@ class FinallyClause(Node):
 
     def to_string(self) -> str:
         body_str = self.body.to_string()
-        return f'finally {{\n{body_str}\n}}'
+        return f'finally \n{body_str}\n'
 
     def get_children_names(self) -> List[str]:
         return ['body']

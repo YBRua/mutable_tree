@@ -230,5 +230,48 @@ class TestJavaSwitchStmt(JavaSnippetTestBase):
         self._stmt_round_trip(code)
 
 
+class TestJavaTryStmt(JavaSnippetTestBase):
+
+    def test_try(self):
+        code = """
+        try {
+            somethingExplosive();
+        } catch (Exception e) {
+            ohNo(e);
+        }
+        """
+        self._stmt_round_trip(code)
+
+        code = """
+        try {
+            somethingExplosive();
+        } catch (ExplosionA | ExplosionB | ExplosionC e) {
+            defuseBomb(e);
+        }
+        """
+        self._stmt_round_trip(code)
+
+    def test_finally(self):
+        code = """
+        try {
+            somethingExplosive();
+        } finally {
+            cleanUp();
+        }
+        """
+        self._stmt_round_trip(code)
+
+        code = """
+        try {
+            somethingExplosive();
+        } catch (Explosion e) {
+            ohNo(e);
+        } finally {
+            cleanUp();
+        }
+        """
+        self._stmt_round_trip(code)
+
+
 if __name__ == '__main__':
     unittest.main()

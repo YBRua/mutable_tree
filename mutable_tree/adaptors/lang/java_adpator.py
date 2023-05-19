@@ -10,12 +10,14 @@ from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueS
                       ForStatement, IfStatement, LabeledStatement,
                       LocalVariableDeclaration, VariableDeclarator, ReturnStatement,
                       SwitchStatement, SwitchCase, SwitchCaseList, ThrowStatement,
-                      TryStatement, WhileStatement, YieldStatement, StatementList,
+                      TryStatement, CatchClause, TryHandlers, FinallyClause,
+                      WhileStatement, YieldStatement, StatementList,
                       VariableDeclaratorList)
 from ...nodes import Program
 from ...nodes import TypeIdentifier, DimensionSpecifier, TypeIdentifierList
 from ...nodes import get_assignment_op, get_binary_op, get_unary_op, get_update_op
 from ...nodes import node_factory
+from typing import Tuple
 
 
 def convert_program(node: tree_sitter.Node) -> Program:
@@ -77,6 +79,7 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'labeled_statement': convert_labeled_stmt,
         'return_statement': convert_return_stmt,
         'switch_expression': convert_switch_stmt,
+        'try_statement': convert_try_stmt,
     }
 
     return stmt_convertors[node.type](node)
@@ -259,13 +262,20 @@ def convert_expression_stmt(node: tree_sitter.Node) -> ExpressionStatement:
     return node_factory.create_expression_stmt(expr)
 
 
-def convert_variable_declarator(node: tree_sitter.Node) -> VariableDeclarator:
+def convert_variable_declartor_id(
+        node: tree_sitter.Node) -> Tuple[Expression, DimensionSpecifier]:
     name_node = node.child_by_field_name('name')
     dim_node = node.child_by_field_name('dimensions')
+
+    name = convert_expression(name_node)
+    dim = convert_dimension(dim_node) if dim_node is not None else None
+    return name, dim
+
+
+def convert_variable_declarator(node: tree_sitter.Node) -> VariableDeclarator:
     value_node = node.child_by_field_name('value')
 
-    name_expr = convert_expression(name_node)
-    dim_expr = convert_dimension(dim_node) if dim_node is not None else None
+    name_expr, dim_expr = convert_variable_declartor_id(node)
     value_expr = convert_expression(value_node) if value_node is not None else None
     return node_factory.create_variable_declarator(name_expr, dim_expr, value_expr)
 
@@ -391,7 +401,6 @@ def convert_enhanced_for_stmt(node: tree_sitter.Node) -> ForInStatement:
 
         ty = convert_type(type_node)
         # NOTE: should be variable declarator according to grammar specification
-        # but the tree-sitter parser returns an identifier here
         var_decl = convert_identifier(var_decl_node)
         value = convert_expression(value_node)
         body = convert_statement(body_node)
@@ -481,3 +490,69 @@ def convert_switch_stmt(node: tree_sitter.Node) -> SwitchStatement:
     body = convert_switch_block(body_node)
 
     return node_factory.create_switch_stmt(cond, body)
+
+
+def convert_throw_stmt(node: tree_sitter.Node) -> ThrowStatement:
+    assert node.child_count == 3
+    expr_node = node.children[1]
+
+    expr = convert_expression(expr_node)
+    return node_factory.create_throw_stmt(expr)
+
+
+def convert_catch_handler(node: tree_sitter.Node) -> CatchClause:
+    assert node.child_count == 5
+    param_node = node.children[2]
+    body_node = node.child_by_field_name('body')
+    body = convert_block_stmt(body_node)
+
+    # catch param list
+    if param_node.child_count == 3:
+        raise NotImplementedError('catch param list with modifiers')
+    else:
+        assert param_node.child_count == 2
+        catch_type_node = param_node.children[0]
+        decl_node = param_node.children[1]
+        param_types = []
+        for ty in catch_type_node.children:
+            # skip sep
+            if ty.type == '|':
+                continue
+            param_types.append(convert_type(ty))
+        param_types = node_factory.create_type_identifier_list(param_types)
+
+        # NOTE: should be variable declarator according to grammar specification
+        decl = convert_identifier(decl_node)
+
+        return node_factory.create_catch_clause(param_types, decl, body)
+
+
+def convert_try_finalizer(node: tree_sitter.Node) -> FinallyClause:
+    assert node.child_count == 2
+    body_node = node.children[1]
+    body = convert_block_stmt(body_node)
+    return node_factory.create_finally_clause(body)
+
+
+def convert_try_stmt(node: tree_sitter.Node) -> TryStatement:
+    assert node.child_count >= 3
+
+    # try body
+    body_node = node.child_by_field_name('body')
+    body = convert_block_stmt(body_node)
+
+    # handlers and finalizer
+    handler_nodes = node.children[2:]
+    if handler_nodes[-1].type == 'finally_clause':
+        finally_node = handler_nodes[-1]
+        handler_nodes = handler_nodes[:-1]
+        finalizer = convert_try_finalizer(finally_node)
+    else:
+        finalizer = None
+
+    handlers = []
+    for handler_node in handler_nodes:
+        handlers.append(convert_catch_handler(handler_node))
+    handlers = node_factory.create_try_handlers(handlers)
+
+    return node_factory.create_try_stmt(body, handlers, finalizer)
