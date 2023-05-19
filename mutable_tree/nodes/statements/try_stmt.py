@@ -3,18 +3,24 @@ from .statement import Statement
 from .block_stmt import BlockStatement
 from ..expressions import Identifier
 from ..types import TypeIdentifierList
+from ..miscs import ModifierList
 from ..utils import throw_invalid_type
 from typing import List, Optional
 
 
 class CatchClause(Node):
 
-    def __init__(self, node_type: NodeType, catch_types: TypeIdentifierList,
-                 exception: Identifier, body: BlockStatement):
+    def __init__(self,
+                 node_type: NodeType,
+                 catch_types: TypeIdentifierList,
+                 exception: Identifier,
+                 body: BlockStatement,
+                 modifiers: Optional[ModifierList] = None):
         super().__init__(node_type)
         self.catch_types = catch_types
         self.exception = exception
         self.body = body
+        self.modifiers = modifiers
         self._check_types()
 
     def _check_types(self):
@@ -26,19 +32,29 @@ class CatchClause(Node):
             throw_invalid_type(self.body.node_type, self, attr='body')
         if self.catch_types.node_type != NodeType.TYPE_IDENTIFIER_LIST:
             throw_invalid_type(self.catch_types.node_type, self, attr='catch_types')
+        if (self.modifiers is not None
+                and self.modifiers.node_type != NodeType.MODIFIER_LIST):
+            throw_invalid_type(self.modifiers.node_type, self, attr='modifiers')
 
     def to_string(self) -> str:
         catch_types_str = ' | '.join(
             [ty.to_string() for ty in self.catch_types.get_children()])
         exception_str = self.exception.to_string()
         body_str = self.body.to_string()
-        return f'catch ({catch_types_str} {exception_str}) {body_str}'
+        if self.modifiers is not None:
+            modifiers_str = self.modifiers.to_string()
+            return f'catch ({modifiers_str} {catch_types_str} {exception_str}) {body_str}'
+        else:
+            return f'catch ({catch_types_str} {exception_str}) {body_str}'
 
     def get_children(self) -> List[Node]:
-        return [self.catch_types, self.exception, self.body]
+        if self.modifiers is not None:
+            return [self.modifiers, self.catch_types, self.exception, self.body]
+        else:
+            return [self.catch_types, self.exception, self.body]
 
     def get_children_names(self) -> List[str]:
-        return ['catch_types', 'exception', 'body']
+        return ['modifiers', 'catch_types', 'exception', 'body']
 
 
 class TryHandlers(NodeList):

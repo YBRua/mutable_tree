@@ -466,6 +466,7 @@ def convert_enhanced_for_stmt(node: tree_sitter.Node) -> ForInStatement:
     body = convert_statement(body_node)
     return node_factory.create_for_in_stmt(ty, var_decl, value, body, modifiers)
 
+
 def convert_if_stmt(node: tree_sitter.Node) -> IfStatement:
     cond_node = node.child_by_field_name('condition')
     consequence_node = node.child_by_field_name('consequence')
@@ -563,23 +564,27 @@ def convert_catch_handler(node: tree_sitter.Node) -> CatchClause:
 
     # catch param list
     if param_node.child_count == 3:
-        raise NotImplementedError('catch param list with modifiers')
+        modifiers = convert_modifier_list(param_node.children[0])
+        catch_type_node = param_node.children[1]
+        decl_node = param_node.children[2]
     else:
         assert param_node.child_count == 2
+        modifiers = None
         catch_type_node = param_node.children[0]
         decl_node = param_node.children[1]
-        param_types = []
-        for ty in catch_type_node.children:
-            # skip sep
-            if ty.type == '|':
-                continue
-            param_types.append(convert_type(ty))
-        param_types = node_factory.create_type_identifier_list(param_types)
 
-        # NOTE: should be variable declarator according to grammar specification
-        decl = convert_identifier(decl_node)
+    param_types = []
+    for ty in catch_type_node.children:
+        # skip sep
+        if ty.type == '|':
+            continue
+        param_types.append(convert_type(ty))
+    param_types = node_factory.create_type_identifier_list(param_types)
 
-        return node_factory.create_catch_clause(param_types, decl, body)
+    # NOTE: should be variable declarator according to grammar specification
+    decl = convert_identifier(decl_node)
+
+    return node_factory.create_catch_clause(param_types, decl, body, modifiers)
 
 
 def convert_try_finalizer(node: tree_sitter.Node) -> FinallyClause:

@@ -203,7 +203,8 @@ def create_for_in_stmt(
     body: Statement,
     modifiers: Optional[ModifierList] = None,
 ) -> ForInStatement:
-    return ForInStatement(NodeType.FOR_IN_STMT, type_id, iterator, iterable, body, modifiers)
+    return ForInStatement(NodeType.FOR_IN_STMT, type_id, iterator, iterable, body,
+                          modifiers)
 
 
 def create_if_stmt(
@@ -248,12 +249,10 @@ def create_yield_stmt(expr: Expression) -> YieldStatement:
     return YieldStatement(NodeType.YIELD_STMT, expr)
 
 
-def create_catch_clause(
-    exception_types: TypeIdentifierList,
-    exception: Identifier,
-    body: BlockStatement,
-) -> CatchClause:
-    return CatchClause(NodeType.CATCH_CLAUSE, exception_types, exception, body)
+def create_catch_clause(exception_types: TypeIdentifierList, exception: Identifier,
+                        body: BlockStatement,
+                        modifiers: Optional[ModifierList]) -> CatchClause:
+    return CatchClause(NodeType.CATCH_CLAUSE, exception_types, exception, body, modifiers)
 
 
 def create_finally_clause(body: BlockStatement) -> FinallyClause:

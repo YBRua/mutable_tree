@@ -254,6 +254,16 @@ class TestJavaTryStmt(JavaSnippetTestBase):
         """
         self._stmt_round_trip(code)
 
+    def test_try_with_modifiers(self):
+        code = """
+        try {
+            somethingExplosive();
+        } catch (final Exception e) {
+            ohNo(e);
+        }
+        """
+        self._stmt_round_trip(code)
+
     def test_finally(self):
         code = """
         try {
