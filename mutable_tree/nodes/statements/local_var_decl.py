@@ -1,7 +1,7 @@
 from ..node import Node, NodeType, NodeList
 from .statement import Statement
 from ..expressions import Expression, Identifier
-from ..types import TypeIdentifier, DimensionSpecifier
+from ..types import TypeIdentifier, Dimensions
 from ..expressions import is_expression
 from ..utils import throw_invalid_type
 from typing import List, Optional
@@ -12,7 +12,7 @@ class VariableDeclarator(Node):
     def __init__(self,
                  node_type: NodeType,
                  name: Identifier,
-                 dimensions: Optional[DimensionSpecifier] = None,
+                 dimensions: Optional[Dimensions] = None,
                  value: Optional[Expression] = None):
         super().__init__(node_type)
         self.name = name
@@ -24,7 +24,7 @@ class VariableDeclarator(Node):
         if self.node_type != NodeType.VARIABLE_DECLARATOR:
             throw_invalid_type(self.node_type, self)
         if (self.dimensions is not None
-                and self.dimensions.node_type != NodeType.DIMENSION_SPECIFIER):
+                and self.dimensions.node_type != NodeType.DIMENSIONS):
             throw_invalid_type(self.dimensions.node_type, self, attr='dimensions')
         if self.value is not None and not is_expression(self.value):
             throw_invalid_type(self.value.node_type, self, attr='value')

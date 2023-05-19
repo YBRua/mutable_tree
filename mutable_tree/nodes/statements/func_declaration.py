@@ -1,7 +1,7 @@
 from ..node import Node, NodeType, NodeList
 from ..miscs import ModifierList
 from ..expressions import Identifier
-from ..types import TypeIdentifier, DimensionSpecifier
+from ..types import TypeIdentifier, Dimensions, TypeIdentifierList
 from ..utils import throw_invalid_type
 from .statement import Statement
 from .block_stmt import BlockStatement
@@ -15,7 +15,7 @@ class FormalParameter(Node):
                  node_type: NodeType,
                  type_id: TypeIdentifier,
                  name: Identifier,
-                 dimensions: Optional[DimensionSpecifier] = None,
+                 dimensions: Optional[Dimensions] = None,
                  modifiers: Optional[ModifierList] = None):
         super().__init__(node_type)
         self.type_id = type_id
@@ -32,7 +32,7 @@ class FormalParameter(Node):
         if self.name.node_type != NodeType.IDENTIFIER:
             throw_invalid_type(self.name.node_type, self, attr='name')
         if (self.dimensions is not None
-                and self.dimensions.node_type != NodeType.DIMENSION_SPECIFIER):
+                and self.dimensions.node_type != NodeType.DIMENSIONS):
             throw_invalid_type(self.dimensions.node_type, self, attr='dimensions')
         if (self.modifiers is not None
                 and self.modifiers.node_type != NodeType.MODIFIER_LIST):
@@ -90,13 +90,15 @@ class FunctionDeclarator(Node):
                  return_type: TypeIdentifier,
                  name: Identifier,
                  parameters: FormalParameterList,
-                 dimensions: Optional[DimensionSpecifier] = None,
+                 dimensions: Optional[Dimensions] = None,
+                 throws: Optional[TypeIdentifierList] = None,
                  modifiers: Optional[ModifierList] = None):
         super().__init__(node_type)
         self.return_type = return_type
         self.name = name
         self.parameters = parameters
         self.dimensions = dimensions
+        self.throws = throws
         self.modifiers = modifiers
         # TODO: dimensions for functions?
         if dimensions is not None:
@@ -113,8 +115,11 @@ class FunctionDeclarator(Node):
         if self.parameters.node_type != NodeType.FORMAL_PARAMETER_LIST:
             throw_invalid_type(self.parameters.node_type, self, attr='parameters')
         if (self.dimensions is not None
-                and self.dimensions.node_type != NodeType.DIMENSION_SPECIFIER):
+                and self.dimensions.node_type != NodeType.DIMENSIONS):
             throw_invalid_type(self.dimensions.node_type, self, attr='dimensions')
+        if (self.throws is not None
+                and self.throws.node_type != NodeType.TYPE_IDENTIFIER_LIST):
+            throw_invalid_type(self.throws.node_type, self, attr='throws')
         if (self.modifiers is not None
                 and self.modifiers.node_type != NodeType.MODIFIER_LIST):
             throw_invalid_type(self.modifiers.node_type, self, attr='modifiers')
@@ -130,6 +135,11 @@ class FunctionDeclarator(Node):
             modifiers_str = ' '.join(modifier.to_string()
                                      for modifier in self.modifiers.get_children())
             res = f'{modifiers_str} {res}'
+
+        if self.throws is not None:
+            throws_str = ', '.join(throw.to_string()
+                                   for throw in self.throws.get_children())
+            res = f'{res} throws {throws_str}'
 
         return res
 

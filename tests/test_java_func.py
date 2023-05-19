@@ -21,6 +21,11 @@ class TestJavaMethodDeclaration(JavaFunctionTestBase):
         self._function_round_trip('int foo() { return 1; }')
         self._function_round_trip('public int[] foo() { return someArray(); }')
 
+    def test_throws(self):
+        self._function_round_trip('void foo() throws Exception { gogogo(); }')
+        self._function_round_trip(
+            'void foo() throws Exception, IOException { gogogo(); }')
+
 
 if __name__ == '__main__':
     unittest.main()
