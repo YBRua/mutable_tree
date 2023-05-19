@@ -73,6 +73,7 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'do_statement': convert_do_stmt,
         'enhanced_for_statement': convert_enhanced_for_stmt,
         'if_statement': convert_if_stmt,
+        'labeled_statement': convert_labeled_stmt,
     }
 
     return stmt_convertors[node.type](node)
@@ -407,3 +408,13 @@ def convert_if_stmt(node: tree_sitter.Node) -> IfStatement:
         alternative = convert_statement(alternative_node)
 
     return node_factory.create_if_stmt(condition, consequence, alternative)
+
+
+def convert_labeled_stmt(node: tree_sitter.Node) -> LabeledStatement:
+    assert node.child_count == 3
+    label_node = node.children[0]
+    stmt_node = node.children[2]
+
+    label = convert_identifier(label_node)
+    stmt = convert_statement(stmt_node)
+    return node_factory.create_labeled_stmt(label, stmt)

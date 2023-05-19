@@ -170,5 +170,10 @@ class TestJavaIfStmt(JavaSnippetTestBase):
         self._stmt_round_trip(code)
 
 
+class TestJavaLabeledStmt(JavaSnippetTestBase):
+    def test_labeled(self):
+        self._stmt_round_trip('label: while (true) { break label; }')
+
+
 if __name__ == '__main__':
     unittest.main()
