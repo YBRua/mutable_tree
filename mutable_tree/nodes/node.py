@@ -51,6 +51,10 @@ class NodeType(Enum):
     WHILE_STMT = 'WhileStatement'
     YIELD_STMT = 'YieldStatement'
 
+    # declarations & definitions (are also statements)
+    FUNC_DECLARATOR = 'FunctionDeclarator'
+    FUNC_DECLARATION = 'FunctionDeclaration'
+
     # miscs
     DIMENSION_SPECIFIER = 'DimensionSpecifier'
     VARIABLE_DECLARATOR = 'VariableDeclarator'
@@ -69,6 +73,8 @@ class NodeType(Enum):
 
     MODIFIER = 'Modifier'
     MODIFIER_LIST = 'ModifierList'
+    FORMAL_PARAMETER = 'FormalParameter'
+    FORMAL_PARAMETER_LIST = 'FormalParameterList'
 
 
 class Node:

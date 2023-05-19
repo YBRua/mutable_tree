@@ -14,6 +14,9 @@ class Modifier(Node):
         if self.node_type != NodeType.MODIFIER:
             throw_invalid_type(self.node_type, NodeType.MODIFIER)
 
+    def to_string(self) -> str:
+        return self.modifier
+
 
 class ModifierList(NodeList):
     node_list: List[Modifier]
