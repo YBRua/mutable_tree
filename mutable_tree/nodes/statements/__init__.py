@@ -23,5 +23,5 @@ from .statement_list import StatementList
 from .try_with_resources_stmt import (TryResource, TryResourceList,
                                       TryWithResourcesStatement)
 
-from .func_declaration import (FormalParameter, FormalParameterList, FunctionDeclarator,
-                               FunctionDeclaration)
+from .func_declaration import (FormalParameter, SpreadParameter, FormalParameterList,
+                               FunctionDeclarator, FunctionDeclaration)

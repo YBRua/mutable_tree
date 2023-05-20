@@ -56,9 +56,15 @@ class NodeType(Enum):
     FUNC_DECLARATOR = 'FunctionDeclarator'
     FUNC_DECLARATION = 'FunctionDeclaration'
 
-    # miscs
+    # types
+    TYPE_IDENTIFIER = 'TypeIdentifier'
+    TYPE_IDENTIFIER_LIST = 'TypeIdentifierList'
+    TYPE_PARAMETER = 'TypeParameter'
+    TYPE_PARAMETER_LIST = 'TypeParameterList'
     DIMENSION_SPECIFIER = 'DimensionSpecifier'
     DIMENSIONS = 'Dimensions'
+
+    # miscs
     VARIABLE_DECLARATOR = 'VariableDeclarator'
     SWITCH_CASE = 'SwitchCase'
     CATCH_CLAUSE = 'CatchClause'
@@ -67,8 +73,6 @@ class NodeType(Enum):
     STATEMENT_LIST = 'StatementList'
     VARIABLE_DECLARATOR_LIST = 'VariableDeclaratorList'
     SWITCH_CASE_LIST = 'SwitchCaseList'
-    TYPE_IDENTIFIER = 'TypeIdentifier'
-    TYPE_IDENTIFIER_LIST = 'TypeIdentifierList'
     TRY_HANDLERS = 'TryHandlers'
     TRY_RESOURCE = 'TryResource'
     TRY_RESOURCE_LIST = 'TryResourceList'
@@ -77,6 +81,7 @@ class NodeType(Enum):
     MODIFIER_LIST = 'ModifierList'
     FORMAL_PARAMETER = 'FormalParameter'
     FORMAL_PARAMETER_LIST = 'FormalParameterList'
+    SPREAD_PARAMETER = 'SpreadParameter'
 
 
 class Node:

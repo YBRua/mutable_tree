@@ -18,8 +18,8 @@ from .statements import (AssertStatement, BlockStatement, BreakStatement,
                          FinallyClause, WhileStatement, YieldStatement, StatementList,
                          VariableDeclaratorList, TryResource, TryResourceList,
                          TryWithResourcesStatement, SynchronizedStatement)
-from .statements import (FormalParameter, FormalParameterList, FunctionDeclarator,
-                         FunctionDeclaration)
+from .statements import (FormalParameter, SpreadParameter, FormalParameterList,
+                         FunctionDeclarator, FunctionDeclaration)
 from .miscs import Modifier, ModifierList
 from .statements.for_stmt import ForInit
 from .types import (TypeIdentifier, TypeIdentifierList, DimensionSpecifier, Dimensions,
@@ -316,6 +316,14 @@ def create_formal_param(type_id: TypeIdentifier,
                         dimensions: Optional[Dimensions] = None,
                         modifiers: Optional[ModifierList] = None) -> FormalParameter:
     return FormalParameter(NodeType.FORMAL_PARAMETER, type_id, name, dimensions,
+                           modifiers)
+
+
+def create_spread_param(type_id: TypeIdentifier,
+                        name: Identifier,
+                        dimensions: Optional[Dimensions] = None,
+                        modifiers: Optional[ModifierList] = None) -> SpreadParameter:
+    return SpreadParameter(NodeType.SPREAD_PARAMETER, type_id, name, dimensions,
                            modifiers)
 
 
