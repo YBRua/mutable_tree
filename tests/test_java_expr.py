@@ -185,5 +185,20 @@ class TestJavaParenthesizedExpr(JavaSnippetTestBase):
         self._stmt_round_trip('(a + b).bar();')
 
 
+class TestJavaLambdaExpr(JavaSnippetTestBase):
+
+    def test_identifier_lambda(self):
+        self._stmt_round_trip('a -> a + 42;')
+        self._stmt_round_trip('a -> { int b = a + 42; return b; };')
+
+    def test_typed_lambda(self):
+        self._stmt_round_trip('(int a) -> a + 42;')
+        self._stmt_round_trip('(int a, int b) -> { int c = a + b; return c; };')
+
+    def test_inferred_lambda(self):
+        self._stmt_round_trip('(a) -> a + 42;')
+        self._stmt_round_trip('(a, b) -> { int c = a + b; return c; };')
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -9,15 +9,14 @@ from .expressions import (ArrayAccess, ArrayExpression, ArrayCreationExpression,
                           UnaryExpression, UpdateExpression, PrimaryExpression,
                           ParenthesizedExpression, ExpressionList)
 from .statements import Statement
-from .statements import (AssertStatement, BlockStatement, BreakStatement,
-                         ContinueStatement, DoStatement, EmptyStatement,
-                         ExpressionStatement, ForInStatement, ForStatement, IfStatement,
-                         LabeledStatement, LocalVariableDeclaration, VariableDeclarator,
-                         ReturnStatement, SwitchCase, SwitchCaseList, SwitchStatement,
-                         ThrowStatement, TryStatement, TryHandlers, CatchClause,
-                         FinallyClause, WhileStatement, YieldStatement, StatementList,
-                         VariableDeclaratorList, TryResource, TryResourceList,
-                         TryWithResourcesStatement, SynchronizedStatement)
+from .statements import (
+    AssertStatement, BlockStatement, BreakStatement, ContinueStatement, DoStatement,
+    EmptyStatement, ExpressionStatement, ForInStatement, ForStatement, IfStatement,
+    LabeledStatement, LocalVariableDeclaration, VariableDeclarator, ReturnStatement,
+    SwitchCase, SwitchCaseList, SwitchStatement, ThrowStatement, TryStatement,
+    TryHandlers, CatchClause, FinallyClause, WhileStatement, YieldStatement,
+    StatementList, VariableDeclaratorList, TryResource, TryResourceList,
+    TryWithResourcesStatement, SynchronizedStatement, LambdaExpression)
 from .statements import (FormalParameter, SpreadParameter, FormalParameterList,
                          FunctionDeclarator, FunctionDeclaration)
 from .miscs import Modifier, ModifierList
@@ -147,6 +146,14 @@ def create_this_expr() -> ThisExpression:
 
 def create_parenthesized_expr(expr: Expression) -> Expression:
     return ParenthesizedExpression(NodeType.PARENTHESIZED_EXPR, expr)
+
+
+def create_lambda_expr(
+    params: FormalParameterList,
+    body: Union[Expression, BlockStatement],
+    parenthesized: bool = False,
+) -> LambdaExpression:
+    return LambdaExpression(NodeType.LAMBDA_EXPR, params, body, parenthesized)
 
 
 # STATEMENTS

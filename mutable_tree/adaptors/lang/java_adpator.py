@@ -6,7 +6,7 @@ from ...nodes import (ArrayAccess, ArrayCreationExpression, ArrayExpression,
                       CastExpression, FieldAccess, Identifier, InstanceofExpression,
                       Literal, NewExpression, TernaryExpression, ThisExpression,
                       UnaryExpression, UpdateExpression, ParenthesizedExpression,
-                      ExpressionList)
+                      ExpressionList, LambdaExpression)
 from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueStatement,
                       DoStatement, EmptyStatement, ExpressionStatement, ForInStatement,
                       ForStatement, IfStatement, LabeledStatement,
@@ -68,6 +68,7 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         'array_creation_expression': convert_array_creation_expr,
         # NOTE: array_initializer is not an expression, but we treat it as one
         'array_initializer': convert_array_expr,
+        'lambda_expression': convert_lambda_expr,
     }
 
     return expr_convertors[node.type](node)
@@ -290,6 +291,37 @@ def convert_parenthesized_expr(node: tree_sitter.Node) -> ParenthesizedExpressio
     assert node.child_count == 3, 'parenthesized expr with != 3 children'
     expr = convert_expression(node.children[1])
     return node_factory.create_parenthesized_expr(expr)
+
+
+def convert_lambda_expr(node: tree_sitter.Node) -> LambdaExpression:
+    # params
+    param_node = node.child_by_field_name('parameters')
+
+    parenthesized = False
+    if param_node.type == 'identifier':
+        param = convert_identifier(param_node)
+        param = node_factory.create_formal_param(param)
+        params = node_factory.create_formal_param_list([param])
+    elif param_node.type == 'formal_parameters':
+        parenthesized = True
+        params = convert_formal_parameters(param_node)
+    elif param_node.type == 'inferred_parameters':
+        parenthesized = True
+        params = []
+        for ch in param_node.children[1:-1]:
+            if ch.type == ',':
+                continue
+            params.append(node_factory.create_formal_param(convert_identifier(ch)))
+        params = node_factory.create_formal_param_list(params)
+
+    # body
+    body_node = node.child_by_field_name('body')
+    if body_node.type == 'block':
+        body = convert_block_stmt(body_node)
+    else:
+        body = convert_expression(body_node)
+
+    return node_factory.create_lambda_expr(params, body, parenthesized)
 
 
 def convert_dimensions(node: tree_sitter.Node) -> Dimensions:

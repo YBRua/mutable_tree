@@ -25,3 +25,6 @@ from .try_with_resources_stmt import (TryResource, TryResourceList,
 
 from .func_declaration import (FormalParameter, SpreadParameter, FormalParameterList,
                                FunctionDeclarator, FunctionDeclaration)
+
+# NOTE: have to put an expression in the statements folder due to circular imports
+from .lambda_expr import LambdaExpression

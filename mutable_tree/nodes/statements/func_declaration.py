@@ -61,8 +61,10 @@ class FormalParameter(Node):
                             for modifier in self.modifiers.get_children())
             res += ' '
 
-        res += self.type_id.to_string()
-        res += ' '
+        if self.type_id is not None:
+            res += self.type_id.to_string()
+            res += ' '
+
         res += self.name.to_string()
         if self.dimensions is not None:
             res += self.dimensions.to_string()
