@@ -8,7 +8,7 @@ from .expression import is_expression
 
 
 class BinaryOps(Enum):
-    ADD = '+'
+    PLUS = '+'
     MINUS = '-'
     MULTIPLY = '*'
     DIVIDE = '/'
@@ -30,7 +30,7 @@ class BinaryOps(Enum):
 
 
 _binary_op_map = {
-    '+': BinaryOps.ADD,
+    '+': BinaryOps.PLUS,
     '-': BinaryOps.MINUS,
     '*': BinaryOps.MULTIPLY,
     '/': BinaryOps.DIVIDE,

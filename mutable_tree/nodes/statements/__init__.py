@@ -1,4 +1,4 @@
-from .statement import Statement
+from .statement import Statement, is_statement
 from .assert_stmt import AssertStatement
 from .block_stmt import BlockStatement
 from .break_stmt import BreakStatement

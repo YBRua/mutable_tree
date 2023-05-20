@@ -36,6 +36,7 @@ def convert_program(node: tree_sitter.Node) -> Program:
 def convert_expression(node: tree_sitter.Node) -> Expression:
     expr_convertors = {
         'identifier': convert_identifier,
+        # FIXME: (ybrua) values for literals are currently always strings
         'decimal_integer_literal': convert_literal,
         'hex_integer_literal': convert_literal,
         'octal_integer_literal': convert_literal,
