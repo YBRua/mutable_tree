@@ -22,7 +22,8 @@ from .statements import (FormalParameter, FormalParameterList, FunctionDeclarato
                          FunctionDeclaration)
 from .miscs import Modifier, ModifierList
 from .statements.for_stmt import ForInit
-from .types import TypeIdentifier, TypeIdentifierList, DimensionSpecifier, Dimensions
+from .types import (TypeIdentifier, TypeIdentifierList, DimensionSpecifier, Dimensions,
+                    TypeParameter, TypeParameterList)
 
 from typing import Union, Optional, List
 
@@ -55,6 +56,17 @@ def create_dimension_specifier(expr: Optional[Expression] = None) -> DimensionSp
 
 def create_dimensions(dims: List[DimensionSpecifier]) -> Dimensions:
     return Dimensions(NodeType.DIMENSIONS, dims)
+
+
+def create_type_parameter(
+    name: str,
+    extends: Optional[TypeIdentifierList] = None,
+) -> TypeParameter:
+    return TypeParameter(NodeType.TYPE_PARAMETER, name, extends)
+
+
+def create_type_parameter_list(type_params: List[TypeParameter]) -> TypeParameterList:
+    return TypeParameterList(NodeType.TYPE_PARAMETER_LIST, type_params)
 
 
 # EXPRESSIONS
