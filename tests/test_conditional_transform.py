@@ -1,6 +1,6 @@
 import unittest
 from .transform_test_base import TransformTestBase
-from mutable_tree.tree_manip.transforms import (TernaryToIfVisitor)
+from mutable_tree.tree_manip.transforms import (TernaryToIfVisitor, SwitchToIfVisitor)
 
 
 class TestConditionalTransform(TransformTestBase):
@@ -23,6 +23,55 @@ class TestConditionalTransform(TransformTestBase):
         code = """
         for (int i = 0; i < 10; i++) {
             some.thing = x > 0 ? positive() : notPositive();
+        }
+        """
+        self.check_transform(code, visitor, verbose=verbose)
+
+    def test_switch_to_if(self):
+        visitor = SwitchToIfVisitor()
+        verbose = False
+        code = """
+        switch (some.thing) {
+            case 1:
+                doSomething();
+                break;
+            case 2:
+                doSomethingElse();
+                break;
+            default:
+                doNothing();
+                break;
+        }
+        """
+        self.check_transform(code, visitor, verbose=verbose)
+
+        code = """
+        switch (some.thing) {
+            case 1:
+            {
+                doSomething();
+                break;
+            }
+            case 2:
+            {
+                doSomethingElse();
+                break;
+            }
+        }
+        """
+        self.check_transform(code, visitor, verbose=verbose)
+
+        # should not transform
+        code = """
+        switch (some.thing) {
+            case 1:
+                doSomething();
+            case 2:
+            case 3:
+                doSomethingElse();
+            default:
+                doNothing();
+                break;
         }
         """
         self.check_transform(code, visitor, verbose=verbose)
