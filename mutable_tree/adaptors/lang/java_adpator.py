@@ -723,7 +723,7 @@ def convert_formal_param(node: tree_sitter.Node) -> FormalParameter:
 
     name, dim = convert_variable_declartor_id(node)
 
-    return node_factory.create_formal_param(type_id, name, dim, modifiers)
+    return node_factory.create_formal_param(name, type_id, dim, modifiers)
 
 
 def convert_spread_param(node: tree_sitter.Node) -> SpreadParameter:

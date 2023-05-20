@@ -311,11 +311,11 @@ def create_synchronized_stmt(expr: ParenthesizedExpression,
 # DECLARATIONS & DEFINITIONS
 
 
-def create_formal_param(type_id: TypeIdentifier,
-                        name: Identifier,
+def create_formal_param(name: Identifier,
+                        type_id: Optional[TypeIdentifier] = None,
                         dimensions: Optional[Dimensions] = None,
                         modifiers: Optional[ModifierList] = None) -> FormalParameter:
-    return FormalParameter(NodeType.FORMAL_PARAMETER, type_id, name, dimensions,
+    return FormalParameter(NodeType.FORMAL_PARAMETER, name, type_id, dimensions,
                            modifiers)
 
 

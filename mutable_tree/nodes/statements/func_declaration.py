@@ -13,8 +13,8 @@ class FormalParameter(Node):
 
     def __init__(self,
                  node_type: NodeType,
-                 type_id: TypeIdentifier,
                  name: Identifier,
+                 type_id: Optional[TypeIdentifier] = None,
                  dimensions: Optional[Dimensions] = None,
                  modifiers: Optional[ModifierList] = None):
         super().__init__(node_type)
@@ -27,10 +27,11 @@ class FormalParameter(Node):
     def _check_types(self):
         if self.node_type != NodeType.FORMAL_PARAMETER:
             throw_invalid_type(self.node_type, self)
-        if self.type_id.node_type != NodeType.TYPE_IDENTIFIER:
-            throw_invalid_type(self.type_id.node_type, self, attr='type_id')
         if self.name.node_type != NodeType.IDENTIFIER:
             throw_invalid_type(self.name.node_type, self, attr='name')
+        if (self.type_id is not None
+                and self.type_id.node_type != NodeType.TYPE_IDENTIFIER):
+            throw_invalid_type(self.type_id.node_type, self, attr='type_id')
         if (self.dimensions is not None
                 and self.dimensions.node_type != NodeType.DIMENSIONS):
             throw_invalid_type(self.dimensions.node_type, self, attr='dimensions')
@@ -42,7 +43,8 @@ class FormalParameter(Node):
         children = []
         if self.modifiers is not None:
             children.append(self.modifiers)
-        children.append(self.type_id)
+        if self.type_id is not None:
+            children.append(self.type_id)
         children.append(self.name)
         if self.dimensions is not None:
             children.append(self.dimensions)
