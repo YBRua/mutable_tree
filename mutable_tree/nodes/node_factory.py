@@ -338,9 +338,10 @@ def create_func_declarator(
     dimensions: Optional[Dimensions] = None,
     throws: Optional[TypeIdentifierList] = None,
     modifiers: Optional[ModifierList] = None,
+    type_params: Optional[TypeParameterList] = None,
 ) -> FunctionDeclarator:
     return FunctionDeclarator(NodeType.FUNC_DECLARATOR, return_type, name, params,
-                              dimensions, throws, modifiers)
+                              dimensions, throws, modifiers, type_params)
 
 
 def create_func_declaration(

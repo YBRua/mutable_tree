@@ -26,6 +26,10 @@ class TestJavaMethodDeclaration(JavaFunctionTestBase):
         self._function_round_trip(
             'void foo() throws Exception, IOException { gogogo(); }')
 
+    def test_type_params(self):
+        self._function_round_trip('public <T> T foo() { return null; }')
+        self._function_round_trip('public <T extends Number> T foo() { return null; }')
+
 
 if __name__ == '__main__':
     unittest.main()

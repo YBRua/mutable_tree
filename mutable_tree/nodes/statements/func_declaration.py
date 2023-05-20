@@ -1,11 +1,7 @@
-from mutable_tree.nodes.expressions import Identifier
-from mutable_tree.nodes.miscs import ModifierList
-from mutable_tree.nodes.node import NodeType
-from mutable_tree.nodes.types import Dimensions, TypeIdentifier
 from ..node import Node, NodeType, NodeList
 from ..miscs import ModifierList
 from ..expressions import Identifier
-from ..types import TypeIdentifier, Dimensions, TypeIdentifierList
+from ..types import TypeIdentifier, Dimensions, TypeIdentifierList, TypeParameterList
 from ..utils import throw_invalid_type
 from .statement import Statement
 from .block_stmt import BlockStatement
@@ -155,7 +151,8 @@ class FunctionDeclarator(Node):
                  parameters: FormalParameterList,
                  dimensions: Optional[Dimensions] = None,
                  throws: Optional[TypeIdentifierList] = None,
-                 modifiers: Optional[ModifierList] = None):
+                 modifiers: Optional[ModifierList] = None,
+                 type_params: Optional[TypeParameterList] = None):
         super().__init__(node_type)
         self.return_type = return_type
         self.name = name
@@ -163,6 +160,7 @@ class FunctionDeclarator(Node):
         self.dimensions = dimensions
         self.throws = throws
         self.modifiers = modifiers
+        self.type_params = type_params
         # TODO: dimensions for functions?
         if dimensions is not None:
             raise NotImplementedError('dimensions for functions are not supported yet')
@@ -186,6 +184,9 @@ class FunctionDeclarator(Node):
         if (self.modifiers is not None
                 and self.modifiers.node_type != NodeType.MODIFIER_LIST):
             throw_invalid_type(self.modifiers.node_type, self, attr='modifiers')
+        if (self.type_params is not None
+                and self.type_params.node_type != NodeType.TYPE_PARAMETER_LIST):
+            throw_invalid_type(self.type_params.node_type, self, attr='type_params')
 
     def to_string(self) -> str:
         ret_type_str = self.return_type.to_string()
@@ -193,6 +194,10 @@ class FunctionDeclarator(Node):
         params_str = ', '.join(param.to_string()
                                for param in self.parameters.get_children())
         res = f'{ret_type_str} {name_str}({params_str})'
+
+        if self.type_params is not None:
+            type_param_str = self.type_params.to_string()
+            res = f'{type_param_str} {res}'
 
         if self.modifiers is not None:
             modifiers_str = ' '.join(modifier.to_string()
@@ -210,6 +215,8 @@ class FunctionDeclarator(Node):
         children = []
         if self.modifiers is not None:
             children.append(self.modifiers)
+        if self.type_params is not None:
+            children.append(self.type_params)
         children.append(self.return_type)
         children.append(self.name)
         children.append(self.parameters)
@@ -221,7 +228,10 @@ class FunctionDeclarator(Node):
         return children
 
     def get_children_names(self) -> List[str]:
-        return ['modifiers', 'return_type', 'name', 'parameters', 'dimensions', 'throws']
+        return [
+            'modifiers', 'type_parameters', 'return_type', 'name', 'parameters',
+            'dimensions', 'throws'
+        ]
 
 
 class FunctionDeclaration(Statement):

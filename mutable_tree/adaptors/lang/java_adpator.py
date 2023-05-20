@@ -15,11 +15,11 @@ from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueS
                       TryStatement, CatchClause, FinallyClause, TryHandlers,
                       WhileStatement, YieldStatement, TryResource, TryResourceList,
                       TryWithResourcesStatement, SynchronizedStatement)
-from ...nodes import (FormalParameter, FormalParameterList, FunctionDeclarator,
-                      FunctionDeclaration)
+from ...nodes import (FormalParameter, SpreadParameter, FormalParameterList,
+                      FunctionDeclarator, FunctionDeclaration)
 from ...nodes import (Modifier, ModifierList)
 from ...nodes import Program
-from ...nodes import TypeIdentifier, Dimensions
+from ...nodes import TypeIdentifier, Dimensions, TypeParameter, TypeParameterList
 from ...nodes import get_assignment_op, get_binary_op, get_unary_op, get_update_op
 from ...nodes import node_factory
 from typing import Tuple, Optional, List
@@ -735,16 +735,56 @@ def convert_formal_parameters(node: tree_sitter.Node) -> FormalParameterList:
     return node_factory.create_formal_param_list(params)
 
 
+def convert_type_param(node: tree_sitter.Node) -> TypeParameter:
+    if (node.children[0].type != 'identifier'
+            and node.children[0].type != 'type_identifier'):
+        raise NotImplementedError('type parameter with annotataions')
+
+    # name
+    name = node.children[0].text.decode()
+
+    # bounds
+    bounds = None
+    if node.children[-1].type == 'type_bound':
+        bounds = []
+        bound_node = node.children[-1]
+        for child in bound_node.children[1:]:
+            if child.type == '&':
+                continue
+            bounds.append(convert_type(child))
+        bounds = node_factory.create_type_identifier_list(bounds)
+
+    return node_factory.create_type_parameter(name, bounds)
+
+
+def convert_type_params(node: tree_sitter.Node) -> TypeParameterList:
+    params = []
+    for child in node.children[1:-1]:
+        if child.type == ',':
+            continue
+        params.append(convert_type_param(child))
+    return node_factory.create_type_parameter_list(params)
+
+
 def convert_function_declarator(node: tree_sitter.Node) -> FunctionDeclarator:
     # NOTE: the node should be method_declaration
     assert node.type == 'method_declaration', node.type
 
     # modifiers
-    if node.children[0].type == 'modifiers':
-        modifiers_node = node.children[0]
+    idx = 0
+    if node.children[idx].type == 'modifiers':
+        modifiers_node = node.children[idx]
         modifiers = convert_modifier_list(modifiers_node)
+        idx += 1
     else:
         modifiers = None
+
+    # type parameter list
+    type_params_node = node.child_by_field_name('type_parameters')
+    if type_params_node is not None:
+        type_params = convert_type_params(type_params_node)
+    else:
+        type_params = None
 
     # header
     type_node = node.child_by_field_name('type')
@@ -772,7 +812,7 @@ def convert_function_declarator(node: tree_sitter.Node) -> FunctionDeclarator:
             throws = node_factory.create_type_identifier_list(throws)
 
     return node_factory.create_func_declarator(type_id, name, params, dim, throws,
-                                               modifiers)
+                                               modifiers, type_params)
 
 
 def convert_function_declaration(node: tree_sitter.Node) -> FunctionDeclaration:
