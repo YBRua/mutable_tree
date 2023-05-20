@@ -726,12 +726,36 @@ def convert_formal_param(node: tree_sitter.Node) -> FormalParameter:
     return node_factory.create_formal_param(type_id, name, dim, modifiers)
 
 
+def convert_spread_param(node: tree_sitter.Node) -> SpreadParameter:
+    assert node.type == 'spread_parameter', node.type
+    idx = 0
+    if node.children[idx].type == 'modifiers':
+        modifiers_node = node.children[idx]
+        modifiers = convert_modifier_list(modifiers_node)
+        idx += 1
+    else:
+        modifiers = None
+
+    type_node = node.children[idx]
+    type_id = convert_type(type_node)
+    idx += 2  # skip '...'
+
+    # spread parameter uses variable declarator, which is a independent node
+    name, dim = convert_variable_declartor_id(node.children[idx])
+
+    return node_factory.create_spread_param(type_id, name, dim, modifiers)
+
+
 def convert_formal_parameters(node: tree_sitter.Node) -> FormalParameterList:
     params = []
     for child in node.children[1:-1]:
         if child.type == ',':
             continue
-        params.append(convert_formal_param(child))
+        if child.type == 'spread_parameter':
+            params.append(convert_spread_param(child))
+        else:
+            # formal parameter
+            params.append(convert_formal_param(child))
     return node_factory.create_formal_param_list(params)
 
 

@@ -126,9 +126,13 @@ class SpreadParameter(Node):
 
 
 class FormalParameterList(NodeList):
-    node_list: List[FormalParameter]
+    node_list: List[Union[FormalParameter, SpreadParameter]]
 
-    def __init__(self, node_type: NodeType, parameters: List[FormalParameter]):
+    def __init__(
+        self,
+        node_type: NodeType,
+        parameters: List[Union[FormalParameter, SpreadParameter]],
+    ):
         super().__init__(node_type)
         self.node_list = parameters
         self._check_types()

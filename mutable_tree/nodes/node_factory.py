@@ -327,7 +327,8 @@ def create_spread_param(type_id: TypeIdentifier,
                            modifiers)
 
 
-def create_formal_param_list(params: List[FormalParameter]) -> FormalParameterList:
+def create_formal_param_list(
+        params: List[Union[FormalParameter, SpreadParameter]]) -> FormalParameterList:
     return FormalParameterList(NodeType.FORMAL_PARAMETER_LIST, params)
 
 
