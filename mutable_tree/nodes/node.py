@@ -57,8 +57,9 @@ class NodeType(Enum):
     YIELD_STMT = 'YieldStatement'
 
     # declarations & definitions (are also statements)
-    FUNC_DECLARATOR = 'FunctionDeclarator'
-    FUNC_DECLARATION = 'FunctionDeclaration'
+    FUNCTION_DECLARATOR = 'FunctionDeclarator'
+    FUNCTION_HEADER = 'FunctionHeader'
+    FUNCTION_DEFINITION = 'FunctionDefinition'
 
     DECLARATOR_TYPE = 'DeclaratorType'
     VARIABLE_DECLARATOR = 'VariableDeclarator'
@@ -90,10 +91,11 @@ class NodeType(Enum):
 
     MODIFIER = 'Modifier'
     MODIFIER_LIST = 'ModifierList'
-    UNTYPED_PARAMETER = 'UntypedParameter'
+    INFERRED_PARAMETER = 'UntypedParameter'
     FORMAL_PARAMETER = 'FormalParameter'
     FORMAL_PARAMETER_LIST = 'FormalParameterList'
     SPREAD_PARAMETER = 'SpreadParameter'
+    VARIADIC_PARAMETER = 'VariadicParameter'
 
 
 class Node:

@@ -17,7 +17,7 @@ from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueS
 from ...nodes import (Declarator, VariableDeclarator, ArrayDeclarator,
                       InitializingDeclarator, DeclaratorType, LocalVariableDeclaration)
 from ...nodes import (FormalParameter, InferredParameter, TypedFormalParameter,
-                      SpreadParameter, FormalParameterList, FunctionDeclarator,
+                      SpreadParameter, FormalParameterList, FunctionHeader,
                       FunctionDeclaration)
 from ...nodes import (Modifier, ModifierList)
 from ...nodes import Program
@@ -824,8 +824,8 @@ def convert_formal_parameters(node: tree_sitter.Node) -> FormalParameterList:
 
 
 def convert_type_param(node: tree_sitter.Node) -> TypeParameter:
-    if (node.children[0].type != 'identifier' and
-            node.children[0].type != 'type_identifier'):
+    if (node.children[0].type != 'identifier'
+            and node.children[0].type != 'type_identifier'):
         raise NotImplementedError('type parameter with annotataions')
 
     # name
@@ -854,7 +854,7 @@ def convert_type_params(node: tree_sitter.Node) -> TypeParameterList:
     return node_factory.create_type_parameter_list(params)
 
 
-def convert_function_declarator(node: tree_sitter.Node) -> FunctionDeclarator:
+def convert_function_header(node: tree_sitter.Node) -> FunctionHeader:
     # NOTE: the node should be method_declaration
     assert node.type == 'method_declaration', node.type
 
@@ -877,6 +877,7 @@ def convert_function_declarator(node: tree_sitter.Node) -> FunctionDeclarator:
     # header
     type_node = node.child_by_field_name('type')
     type_id = convert_type(type_node)
+    return_type = node_factory.create_declarator_type(type_id)
     name_node = node.child_by_field_name('name')
     name = convert_identifier(name_node)
     params_node = node.child_by_field_name('parameters')
@@ -899,12 +900,15 @@ def convert_function_declarator(node: tree_sitter.Node) -> FunctionDeclarator:
                 throws.append(convert_type(child))
             throws = node_factory.create_type_identifier_list(throws)
 
-    return node_factory.create_func_declarator(type_id, name, params, dim, throws,
-                                               modifiers, type_params)
+    name = node_factory.create_variable_declarator(name)
+    func_decl = node_factory.create_func_declarator(name, params)
+
+    return node_factory.create_func_header(return_type, func_decl, dim, throws, modifiers,
+                                           type_params)
 
 
 def convert_function_declaration(node: tree_sitter.Node) -> FunctionDeclaration:
-    declarator = convert_function_declarator(node)
+    declarator = convert_function_header(node)
     body_node = node.child_by_field_name('body')
     if body_node is not None:
         body = convert_block_stmt(body_node)

@@ -22,8 +22,8 @@ from .statements import (Declarator, VariableDeclarator, ArrayDeclarator,
                          PointerDeclarator, ReferenceDeclarator, InitializingDeclarator,
                          DeclaratorList, DeclaratorType, LocalVariableDeclaration)
 from .statements import (FormalParameter, InferredParameter, TypedFormalParameter,
-                         SpreadParameter, FormalParameterList, FunctionDeclarator,
-                         FunctionDeclaration)
+                         SpreadParameter, VariadicParameter, FormalParameterList,
+                         FunctionDeclarator, FunctionHeader, FunctionDeclaration)
 from .miscs import Modifier, ModifierList
 from .statements.for_stmt import ForInit
 from .types import (TypeIdentifier, TypeIdentifierList, DimensionSpecifier, Dimensions,
@@ -370,7 +370,7 @@ def wrap_block_stmt(stmt: Statement) -> BlockStatement:
 
 
 def create_inferred_parameter(decl: Declarator) -> InferredParameter:
-    return InferredParameter(NodeType.UNTYPED_PARAMETER, decl)
+    return InferredParameter(NodeType.INFERRED_PARAMETER, decl)
 
 
 def create_formal_param(decl: Declarator,
@@ -386,23 +386,32 @@ def create_formal_parameter_list(params: List[FormalParameter]) -> FormalParamet
     return FormalParameterList(NodeType.FORMAL_PARAMETER_LIST, params)
 
 
-def create_func_declarator(
-    return_type: TypeIdentifier,
-    name: Identifier,
-    params: FormalParameterList,
+def create_variadic_parameter() -> VariadicParameter:
+    return VariadicParameter(NodeType.VARIADIC_PARAMETER)
+
+
+def create_func_declarator(decl: Declarator,
+                           params: FormalParameterList) -> FunctionDeclarator:
+    return FunctionDeclarator(NodeType.FUNCTION_DECLARATOR, decl, params)
+
+
+def create_func_header(
+    return_type: DeclaratorType,
+    func_decl: FunctionDeclarator,
     dimensions: Optional[Dimensions] = None,
     throws: Optional[TypeIdentifierList] = None,
     modifiers: Optional[ModifierList] = None,
     type_params: Optional[TypeParameterList] = None,
-) -> FunctionDeclarator:
-    return FunctionDeclarator(NodeType.FUNC_DECLARATOR, return_type, name, params,
-                              dimensions, throws, modifiers, type_params)
+) -> FunctionHeader:
+    return FunctionHeader(NodeType.FUNCTION_HEADER, return_type, func_decl, dimensions,
+                          throws, modifiers, type_params)
 
 
 def create_func_declaration(
-        declarator: FunctionDeclarator,
-        body: Union[BlockStatement, EmptyStatement]) -> FunctionDeclaration:
-    return FunctionDeclaration(NodeType.FUNC_DECLARATION, declarator, body)
+    header: FunctionHeader,
+    body: Union[BlockStatement, EmptyStatement],
+) -> FunctionDeclaration:
+    return FunctionDeclaration(NodeType.FUNCTION_DEFINITION, header, body)
 
 
 # MISCS

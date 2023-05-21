@@ -18,8 +18,8 @@ from ...nodes import (Declarator, VariableDeclarator, ArrayDeclarator, PointerDe
                       ReferenceDeclarator, InitializingDeclarator, DeclaratorType,
                       LocalVariableDeclaration)
 from ...nodes import (FormalParameter, InferredParameter, TypedFormalParameter,
-                      SpreadParameter, FormalParameterList, FunctionDeclarator,
-                      FunctionDeclaration)
+                      SpreadParameter, VariadicParameter, FormalParameterList,
+                      FunctionDeclarator, FunctionHeader, FunctionDeclaration)
 from ...nodes import (Modifier, ModifierList)
 from ...nodes import Program
 from ...nodes import (TypeIdentifier, Dimensions, DimensionSpecifier, TypeParameter,
@@ -89,6 +89,7 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'labeled_statement': convert_labeled_stmt,
         'return_statement': convert_return_stmt,
         'switch_statement': convert_switch_stmt,
+        'function_definition': convert_function_definition,
     }
 
     return stmt_convertors[node.type](node)
@@ -391,6 +392,16 @@ def convert_reference_declarator(node: tree_sitter.Node) -> ReferenceDeclarator:
     return node_factory.create_reference_declarator(declarator, r_ref)
 
 
+def convert_function_declarator(node: tree_sitter.Node) -> FunctionDeclarator:
+    declarator = convert_declarator(node.child_by_field_name('declarator'))
+    params_node = node.child_by_field_name('parameters')
+    if params_node is not None:
+        params = convert_formal_parameters(params_node)
+    else:
+        params = None
+    return node_factory.create_func_declarator(declarator, params)
+
+
 def convert_declarator(node: tree_sitter.Node):
     decl_convertors = {
         'identifier': convert_variable_declarator,
@@ -398,8 +409,35 @@ def convert_declarator(node: tree_sitter.Node):
         'array_declarator': convert_array_declarator,
         'init_declarator': convert_init_declarator,
         'reference_declarator': convert_reference_declarator,
+        'function_declarator': convert_function_declarator
     }
     return decl_convertors[node.type](node)
+
+
+def convert_formal_param(node: tree_sitter.Node) -> TypedFormalParameter:
+    decl_type = _convert_declaration_specifiers(node)
+    decl_node = node.child_by_field_name('declarator')
+    assert decl_node is not None
+    decl = convert_declarator(decl_node)
+
+    return node_factory.create_formal_param(decl, decl_type)
+
+
+def convert_variadic_parameter(node: tree_sitter.Node) -> VariadicParameter:
+    return node_factory.create_variadic_parameter()
+
+
+def convert_formal_parameters(node: tree_sitter.Node) -> FormalParameterList:
+    params = []
+    for child in node.children[1:-1]:
+        if child.type == ',':
+            continue
+        if child.type == 'variadic_parameter':
+            params.append(convert_variadic_parameter(child))
+        else:
+            # formal parameter
+            params.append(convert_formal_param(child))
+    return node_factory.create_formal_parameter_list(params)
 
 
 def _convert_declaration_specifiers(node: tree_sitter.Node, start_idx: int = 0):
@@ -431,10 +469,12 @@ def _convert_declaration_specifiers(node: tree_sitter.Node, start_idx: int = 0):
 
     if len(prefix_specifier_nodes):
         prefixes = [convert_modifier(n) for n in prefix_specifier_nodes]
+        prefixes = node_factory.create_modifier_list(prefixes)
     else:
         prefixes = None
     if len(postfix_specifier_nodes):
         postfixes = [convert_modifier(n) for n in postfix_specifier_nodes]
+        postfixes = node_factory.create_modifier_list(postfixes)
     else:
         postfixes = None
     ty = convert_type(type_node)
@@ -608,3 +648,12 @@ def convert_try_stmt(node: tree_sitter.Node) -> TryStatement:
     handlers = convert_try_handlers(handler_nodes)
 
     return node_factory.create_try_stmt(body, handlers)
+
+
+def convert_function_definition(node: tree_sitter.Node) -> FunctionDeclaration:
+    decl_type = _convert_declaration_specifiers(node, start_idx=0)
+    decl = convert_declarator(node.child_by_field_name('declarator'))
+    body = convert_block_stmt(node.child_by_field_name('body'))
+
+    header = node_factory.create_func_header(decl_type, decl)
+    return node_factory.create_func_declaration(header, body)
