@@ -11,3 +11,4 @@ from .update_binop import BinopUpdateVisitor
 # condition transformers
 from .ternary_to_if import TernaryToIfVisitor
 from .switch_to_if import SwitchToIfVisitor
+from .compound_if import CompoundIfVisitor

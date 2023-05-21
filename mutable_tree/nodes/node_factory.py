@@ -315,6 +315,11 @@ def create_synchronized_stmt(expr: ParenthesizedExpression,
     return SynchronizedStatement(NodeType.SYNCHRONIZED_STMT, expr, body)
 
 
+def wrap_block_stmt(stmt: Statement) -> BlockStatement:
+    return BlockStatement(NodeType.BLOCK_STMT,
+                          StatementList(NodeType.STATEMENT_LIST, [stmt]))
+
+
 # DECLARATIONS & DEFINITIONS
 
 
