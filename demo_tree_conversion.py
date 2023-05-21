@@ -51,6 +51,7 @@ def pprint_mutable_ast(root: Node):
 
 def main():
     code = """
+    int a = 10, b = 11;
     for (int i = 0; i < 10; i++) {
         for (int j = 0; j < 10; j++) {
             System.out.println("Hello World");
