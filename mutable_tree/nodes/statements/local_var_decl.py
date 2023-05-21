@@ -23,15 +23,16 @@ class DeclaratorType(Node):
     def _check_types(self):
         if self.node_type != NodeType.DECLARATOR_TYPE:
             throw_invalid_type(self.node_type, self)
-        if self.type_id.node_type != NodeType.TYPE_IDENTIFIER:
+        if (self.type_id.node_type != NodeType.TYPE_IDENTIFIER
+                and self.type_id.node_type != NodeType.QUALIFIED_IDENTIFIER):
             throw_invalid_type(self.type_id.node_type, self, attr='type_id')
-        if (self.prefix_modifiers is not None and
-                self.prefix_modifiers.node_type != NodeType.MODIFIER_LIST):
+        if (self.prefix_modifiers is not None
+                and self.prefix_modifiers.node_type != NodeType.MODIFIER_LIST):
             throw_invalid_type(self.prefix_modifiers.node_type,
                                self,
                                attr='prefix_modifiers')
-        if (self.postfix_modifiers is not None and
-                self.postfix_modifiers.node_type != NodeType.MODIFIER_LIST):
+        if (self.postfix_modifiers is not None
+                and self.postfix_modifiers.node_type != NodeType.MODIFIER_LIST):
             throw_invalid_type(self.postfix_modifiers.node_type,
                                self,
                                attr='postfix_modifiers')
@@ -91,8 +92,8 @@ class LocalVariableDeclaration(Statement):
             throw_invalid_type(self.declarators.node_type, self, attr='declarators')
 
     def to_string(self) -> str:
-        decl_strs = ', '.join(
-            decl.to_string() for decl in self.declarators.get_children())
+        decl_strs = ', '.join(decl.to_string()
+                              for decl in self.declarators.get_children())
         res = f'{self.type.to_string()} {decl_strs};'
         return res
 

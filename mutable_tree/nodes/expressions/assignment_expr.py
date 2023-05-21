@@ -55,7 +55,13 @@ class AssignmentExpression(Expression):
         if self.node_type != NodeType.ASSIGNMENT_EXPR:
             raise TypeError(f'Invalid type: {self.node_type} for AssignmentExpression')
         lt = self.left.node_type
-        if lt not in {NodeType.IDENTIFIER, NodeType.FIELD_ACCESS, NodeType.ARRAY_ACCESS}:
+        if lt not in {
+                NodeType.IDENTIFIER,
+                NodeType.FIELD_ACCESS,
+                NodeType.ARRAY_ACCESS,
+                NodeType.CALL_EXPR,
+                NodeType.POINTER_EXPR,
+        }:
             raise TypeError(f'Invalid type: {lt} for Assignment LHS')
         if not is_expression(self.right):
             raise TypeError(f'Invalid type: {self.right.node_type} for Assignment RHS')

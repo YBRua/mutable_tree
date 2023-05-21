@@ -9,7 +9,8 @@ from .expressions import (ArrayAccess, ArrayExpression, ArrayCreationExpression,
                           Literal, NewExpression, TernaryExpression, ThisExpression,
                           UnaryExpression, UpdateExpression, PrimaryExpression,
                           ParenthesizedExpression, ExpressionList, CommaExpression,
-                          SizeofExpression, PointerExpression, DeleteExpression)
+                          SizeofExpression, PointerExpression, DeleteExpression,
+                          ScopeResolution, QualifiedIdentifier, CompoundLiteralExpression)
 from .statements import Statement
 from .statements import (
     AssertStatement, BlockStatement, BreakStatement, ContinueStatement, DoStatement,
@@ -17,7 +18,7 @@ from .statements import (
     LabeledStatement, ReturnStatement, SwitchCase, SwitchCaseList, SwitchStatement,
     ThrowStatement, TryStatement, TryHandlers, CatchClause, FinallyClause, WhileStatement,
     YieldStatement, StatementList, TryResource, TryResourceList,
-    TryWithResourcesStatement, SynchronizedStatement, LambdaExpression)
+    TryWithResourcesStatement, SynchronizedStatement, LambdaExpression, GotoStatement)
 from .statements import (Declarator, VariableDeclarator, ArrayDeclarator,
                          PointerDeclarator, ReferenceDeclarator, InitializingDeclarator,
                          DeclaratorList, DeclaratorType, LocalVariableDeclaration)
@@ -180,6 +181,25 @@ def create_pointer_expr(operand: Expression, op: PointerOps) -> PointerExpressio
 
 def create_delete_expr(operand: Expression, is_array: bool = False) -> DeleteExpression:
     return DeleteExpression(NodeType.DELETE_EXPR, operand, is_array)
+
+
+def create_scope_resolution(
+        scope: Optional[Union[Identifier, TypeIdentifier]] = None) -> ScopeResolution:
+    return ScopeResolution(NodeType.SCOPE_RESOLUTION, scope)
+
+
+def create_qualified_identifier(
+    scope: ScopeResolution,
+    name: Union[Identifier, QualifiedIdentifier, TypeIdentifier],
+) -> QualifiedIdentifier:
+    return QualifiedIdentifier(NodeType.QUALIFIED_IDENTIFIER, scope, name)
+
+
+def create_compound_literal_expr(
+    type_id: TypeIdentifier,
+    value: ArrayExpression,
+) -> CompoundLiteralExpression:
+    return CompoundLiteralExpression(NodeType.COMPOUND_LITERAL_EXPR, type_id, value)
 
 
 # DECLARATIONS
@@ -366,6 +386,10 @@ def create_synchronized_stmt(expr: ParenthesizedExpression,
 def wrap_block_stmt(stmt: Statement) -> BlockStatement:
     return BlockStatement(NodeType.BLOCK_STMT,
                           StatementList(NodeType.STATEMENT_LIST, [stmt]))
+
+
+def create_goto_stmt(label: Identifier) -> GotoStatement:
+    return GotoStatement(NodeType.GOTO_STMT, label)
 
 
 # DECLARATIONS & DEFINITIONS

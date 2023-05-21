@@ -1,11 +1,9 @@
 from ..node import Node, NodeType
-from .statement import Statement
-from ..miscs import ModifierList
-from ..expressions import Expression, Identifier
-from ..types import TypeIdentifier, Dimensions, DimensionSpecifier
+from ..expressions import Expression, ExpressionList, Identifier
+from ..types import DimensionSpecifier
 from ..expressions import is_expression
 from ..utils import throw_invalid_type
-from typing import List, Optional, Union
+from typing import List, Union
 
 
 class Declarator(Node):
@@ -18,7 +16,12 @@ def is_declarator(node: Node) -> bool:
 
 class InitializingDeclarator(Declarator):
 
-    def __init__(self, node_type: NodeType, declarator: Declarator, value: Expression):
+    def __init__(
+        self,
+        node_type: NodeType,
+        declarator: Declarator,
+        value: Union[Expression, ExpressionList],
+    ):
         super().__init__(node_type)
         self.declarator = declarator
         self.value = value
@@ -29,11 +32,16 @@ class InitializingDeclarator(Declarator):
             throw_invalid_type(self.node_type, self)
         if not is_declarator(self.declarator):
             throw_invalid_type(self.declarator.node_type, self, attr='declarator')
-        if not is_expression(self.value):
+        if (not is_expression(self.value)
+                and self.value.node_type != NodeType.EXPRESSION_LIST):
             throw_invalid_type(self.value.node_type, self, attr='value')
 
     def to_string(self) -> str:
-        return f'{self.declarator.to_string()} = {self.value.to_string()}'
+        if is_expression(self.value):
+            return f'{self.declarator.to_string()} = {self.value.to_string()}'
+        else:
+            arg_list = ', '.join(arg.to_string() for arg in self.value.get_children())
+            return f'{self.declarator.to_string()}({arg_list})'
 
     def get_children(self) -> List[Node]:
         return [self.declarator, self.value]

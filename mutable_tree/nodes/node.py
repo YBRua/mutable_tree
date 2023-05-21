@@ -21,10 +21,12 @@ class NodeType(Enum):
     COMMA_EXPR = 'CommaExpression'  # NOTE: not quite an expr
     POINTER_EXPR = 'PointerExpression'
     DELETE_EXPR = 'DeleteExpression'
+    COMPOUND_LITERAL_EXPR = 'CompoundLiteralExpression'
 
     # primary expressions
     LITERAL = 'Literal'
     IDENTIFIER = 'Identifier'
+    QUALIFIED_IDENTIFIER = 'QualifiedIdentifier'
     ARRAY_EXPR = 'ArrayExpression'
     THIS_EXPR = 'ThisExpression'
     PARENTHESIZED_EXPR = 'ParenthesizedExpression'
@@ -55,6 +57,7 @@ class NodeType(Enum):
     TRY_WITH_RESOURCES_STMT = 'TryWithResourcesStatement'
     WHILE_STMT = 'WhileStatement'
     YIELD_STMT = 'YieldStatement'
+    GOTO_STMT = 'GotoStatement'
 
     # declarations & definitions (are also statements)
     FUNCTION_DECLARATOR = 'FunctionDeclarator'
@@ -91,6 +94,7 @@ class NodeType(Enum):
     TRY_HANDLERS = 'TryHandlers'
     TRY_RESOURCE = 'TryResource'
     TRY_RESOURCE_LIST = 'TryResourceList'
+    SCOPE_RESOLUTION = 'ScopeResolution'
 
     MODIFIER = 'Modifier'
     MODIFIER_LIST = 'ModifierList'

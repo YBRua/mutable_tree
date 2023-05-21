@@ -34,3 +34,4 @@ from .template_declaration import (TemplateDeclaration, TemplateParameter,
 
 # NOTE: have to put an expression in the statements folder due to circular imports
 from .lambda_expr import LambdaExpression
+from .goto_stmt import GotoStatement

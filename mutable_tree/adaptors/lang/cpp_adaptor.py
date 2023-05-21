@@ -2,39 +2,35 @@
 # https://github.com/tree-sitter/tree-sitter-cpp/blob/master/grammar.js
 import tree_sitter
 from ...nodes import Expression, Statement
-from ...nodes import (ArrayAccess, ArrayCreationExpression, ArrayExpression,
-                      AssignmentExpression, BinaryExpression, CallExpression,
-                      CastExpression, FieldAccess, Identifier, InstanceofExpression,
-                      Literal, NewExpression, TernaryExpression, ThisExpression,
-                      UnaryExpression, UpdateExpression, ParenthesizedExpression,
-                      ExpressionList, LambdaExpression, CommaExpression, SizeofExpression,
-                      PointerExpression, DeleteExpression)
+from ...nodes import (ArrayAccess, ArrayExpression, AssignmentExpression,
+                      BinaryExpression, CallExpression, CastExpression, FieldAccess,
+                      Identifier, Literal, NewExpression, TernaryExpression,
+                      ThisExpression, UnaryExpression, UpdateExpression,
+                      ParenthesizedExpression, ExpressionList, CommaExpression,
+                      SizeofExpression, PointerExpression, DeleteExpression,
+                      ScopeResolution, QualifiedIdentifier, CompoundLiteralExpression)
 from ...nodes import (BlockStatement, BreakStatement, ContinueStatement, DoStatement,
                       EmptyStatement, ExpressionStatement, ForInStatement, ForStatement,
                       IfStatement, LabeledStatement, ReturnStatement, SwitchStatement,
-                      SwitchCase, SwitchCaseList, ThrowStatement, TryStatement,
-                      CatchClause, FinallyClause, TryHandlers, WhileStatement)
-from ...nodes import (Declarator, VariableDeclarator, ArrayDeclarator, PointerDeclarator,
-                      ReferenceDeclarator, InitializingDeclarator, DeclaratorType,
+                      SwitchCase, SwitchCaseList, TryStatement, CatchClause, TryHandlers,
+                      WhileStatement, GotoStatement)
+from ...nodes import (VariableDeclarator, ArrayDeclarator, PointerDeclarator,
+                      ReferenceDeclarator, InitializingDeclarator,
                       LocalVariableDeclaration)
-from ...nodes import (FormalParameter, InferredParameter, TypedFormalParameter,
-                      SpreadParameter, VariadicParameter, FormalParameterList,
-                      FunctionDeclarator, FunctionHeader, FunctionDeclaration)
+from ...nodes import (TypedFormalParameter, VariadicParameter, FormalParameterList,
+                      FunctionDeclarator, FunctionDeclaration)
 from ...nodes import (
     TemplateDeclaration,
-    TemplateParameter,
     TemplateParameterList,
     TypeParameterDeclaration,
-    TypenameOpts,
 )
 from ...nodes import (Modifier, ModifierList)
 from ...nodes import Program
-from ...nodes import (TypeIdentifier, Dimensions, DimensionSpecifier, TypeParameter,
-                      TypeParameterList)
+from ...nodes import (TypeIdentifier, Dimensions, DimensionSpecifier)
 from ...nodes import (get_assignment_op, get_binary_op, get_unary_op, get_update_op,
                       get_field_access_op, get_pointer_op, get_typename_opts)
 from ...nodes import node_factory
-from typing import Tuple, Optional, List
+from typing import List
 
 
 def convert_program(node: tree_sitter.Node) -> Program:
@@ -75,6 +71,10 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         'this': convert_this_expr,
         'new_expression': convert_new_expr,
         'delete_expression': convert_delete_expr,
+        'initializer_list': convert_array_expr,
+        'qualified_identifier': convert_qualified_identifier,
+        'compound_literal_expression': convert_compound_literal_expr,
+        'template_function': convert_identifier,  # FIXME: replace with actual conversion
     }
 
     return expr_convertors[node.type](node)
@@ -98,6 +98,7 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'switch_statement': convert_switch_stmt,
         'function_definition': convert_function_definition,
         'template_declaration': convert_template_declaration,
+        'goto_statement': convert_goto_stmt,
     }
 
     return stmt_convertors[node.type](node)
@@ -111,6 +112,8 @@ def convert_type(node: tree_sitter.Node) -> TypeIdentifier:
         'placeholder_type_specifier': convert_simple_type,
         'sized_type_specifier': convert_simple_type,
         'template_type': convert_simple_type,
+        'qualified_identifier': convert_qualified_type_identifier,
+        'struct_specifier': convert_simple_type,  # FIXME: replace with actual conversion
     }
 
     return type_convertors[node.type](node)
@@ -135,6 +138,29 @@ def convert_simple_type(node: tree_sitter.Node) -> TypeIdentifier:
 def convert_identifier(node: tree_sitter.Node) -> Identifier:
     name = node.text.decode()
     return node_factory.create_identifier(name)
+
+
+def convert_scope_resolution(node: tree_sitter.Node) -> ScopeResolution:
+    scope_node = node.child_by_field_name('scope')
+    if scope_node is None:
+        scope = None
+    else:
+        scope = convert_identifier(scope_node)
+    return node_factory.create_scope_resolution(scope)
+
+
+def convert_qualified_identifier(node: tree_sitter.Node) -> QualifiedIdentifier:
+    scope_resolution = convert_scope_resolution(node)
+    name = convert_expression(node.child_by_field_name('name'))
+
+    return node_factory.create_qualified_identifier(scope_resolution, name)
+
+
+def convert_qualified_type_identifier(node: tree_sitter.Node) -> QualifiedIdentifier:
+    scope_resolution = convert_scope_resolution(node)
+    name = convert_type(node.child_by_field_name('name'))
+
+    return node_factory.create_qualified_identifier(scope_resolution, name)
 
 
 def convert_literal(node: tree_sitter.Node) -> Literal:
@@ -267,6 +293,22 @@ def convert_this_expr(node: tree_sitter.Node) -> ThisExpression:
     return node_factory.create_this_expr()
 
 
+def convert_array_expr(node: tree_sitter.Node) -> ArrayExpression:
+    elements = []
+    for ch in node.children[1:-1]:
+        if ch.type == ',':
+            continue
+        elements.append(convert_expression(ch))
+    return node_factory.create_array_expr(node_factory.create_expression_list(elements))
+
+
+def convert_compound_literal_expr(node: tree_sitter.Node) -> CompoundLiteralExpression:
+    type_id = convert_type(node.child_by_field_name('type'))
+    value = convert_array_expr(node.child_by_field_name('value'))
+    
+    return node_factory.create_compound_literal_expr(type_id, value)
+
+
 def convert_new_declarator(node: tree_sitter.Node) -> Dimensions:
 
     def _convert_child_declarator(node: tree_sitter.Node) -> List[DimensionSpecifier]:
@@ -370,6 +412,11 @@ def convert_do_stmt(node: tree_sitter.Node) -> DoStatement:
     return node_factory.create_do_stmt(cond, body)
 
 
+def convert_goto_stmt(node: tree_sitter.Node) -> GotoStatement:
+    target = convert_identifier(node.child_by_field_name('label'))
+    return node_factory.create_goto_stmt(target)
+
+
 def convert_variable_declarator(node: tree_sitter.Node) -> VariableDeclarator:
     return node_factory.create_variable_declarator(convert_identifier(node))
 
@@ -392,7 +439,12 @@ def convert_pointer_declarator(node: tree_sitter.Node) -> PointerDeclarator:
 
 def convert_init_declarator(node: tree_sitter.Node) -> InitializingDeclarator:
     declarator = convert_declarator(node.child_by_field_name('declarator'))
-    value = convert_expression(node.child_by_field_name('value'))
+
+    value_node = node.child_by_field_name('value')
+    if value_node.type == 'argument_list':
+        value = convert_argument_list(value_node)
+    else:
+        value = convert_expression(node.child_by_field_name('value'))
     return node_factory.create_initializing_declarator(declarator, value)
 
 
@@ -419,7 +471,8 @@ def convert_declarator(node: tree_sitter.Node):
         'array_declarator': convert_array_declarator,
         'init_declarator': convert_init_declarator,
         'reference_declarator': convert_reference_declarator,
-        'function_declarator': convert_function_declarator
+        'function_declarator': convert_function_declarator,
+        'operator_name': convert_variable_declarator,  # FIXME: replace with operator name
     }
     return decl_convertors[node.type](node)
 
@@ -427,7 +480,7 @@ def convert_declarator(node: tree_sitter.Node):
 def convert_formal_param(node: tree_sitter.Node) -> TypedFormalParameter:
     decl_type = _convert_declaration_specifiers(node)
     decl_node = node.child_by_field_name('declarator')
-    assert decl_node is not None
+    assert decl_node is not None, 'formal parameter without declarator'
     decl = convert_declarator(decl_node)
 
     return node_factory.create_formal_param(decl, decl_type)
