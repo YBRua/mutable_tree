@@ -4,6 +4,7 @@ cd tree-sitter
 
 # currently only Java is supported
 git clone https://github.com/tree-sitter/tree-sitter-java.git
+git clone https://github.com/tree-sitter/tree-sitter-cpp.git
 
 # return to base directory
 cd ..
