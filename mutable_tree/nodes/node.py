@@ -11,6 +11,7 @@ class NodeType(Enum):
     ASSIGNMENT_EXPR = 'AssignmentExpression'
     BINARY_EXPR = 'BinaryExpression'
     INSTANCEOF_EXPR = 'InstanceofExpression'
+    SIZEOF_EXPR = 'SizeofExpression'
     LAMBDA_EXPR = 'LambdaExpression'
     TERNARY_EXPR = 'TernaryExpression'
     UPDATE_EXPR = 'UpdateExpression'

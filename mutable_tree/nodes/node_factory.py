@@ -7,7 +7,8 @@ from .expressions import (ArrayAccess, ArrayExpression, ArrayCreationExpression,
                           CastExpression, FieldAccess, Identifier, InstanceofExpression,
                           Literal, NewExpression, TernaryExpression, ThisExpression,
                           UnaryExpression, UpdateExpression, PrimaryExpression,
-                          ParenthesizedExpression, ExpressionList, CommaExpression)
+                          ParenthesizedExpression, ExpressionList, CommaExpression,
+                          SizeofExpression)
 from .statements import Statement
 from .statements import (
     AssertStatement, BlockStatement, BreakStatement, ContinueStatement, DoStatement,
@@ -160,6 +161,10 @@ def create_lambda_expr(
 
 def create_comma_expr(left: Expression, right: Expression) -> CommaExpression:
     return CommaExpression(NodeType.COMMA_EXPR, left, right)
+
+
+def create_sizeof_expr(operand: Union[Expression, TypeIdentifier]) -> SizeofExpression:
+    return SizeofExpression(NodeType.SIZEOF_EXPR, operand)
 
 
 # STATEMENTS

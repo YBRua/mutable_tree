@@ -20,3 +20,4 @@ from .parenthesized_expr import ParenthesizedExpression
 from .expression_list import ExpressionList
 
 from .comma_expr import CommaExpression
+from .sizeof_expr import SizeofExpression

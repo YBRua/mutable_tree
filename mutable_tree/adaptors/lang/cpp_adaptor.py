@@ -7,7 +7,7 @@ from ...nodes import (ArrayAccess, ArrayCreationExpression, ArrayExpression,
                       CastExpression, FieldAccess, Identifier, InstanceofExpression,
                       Literal, NewExpression, TernaryExpression, ThisExpression,
                       UnaryExpression, UpdateExpression, ParenthesizedExpression,
-                      ExpressionList, LambdaExpression, CommaExpression)
+                      ExpressionList, LambdaExpression, CommaExpression, SizeofExpression)
 from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueStatement,
                       DoStatement, EmptyStatement, ExpressionStatement, ForInStatement,
                       ForStatement, IfStatement, LabeledStatement,
@@ -172,3 +172,15 @@ def convert_comma_expr(node: tree_sitter.Node) -> CommaExpression:
     left = convert_expression(node.child_by_field_name('left'))
     right = convert_expression(node.child_by_field_name('right'))
     return node_factory.create_comma_expr(left, right)
+
+
+def convert_sizeof_expr(node: tree_sitter.Node) -> SizeofExpression:
+    value_node = node.child_by_field_name('value')
+    if value_node is not None:
+        value = convert_expression(value_node)
+        return node_factory.create_sizeof_expr(value)
+
+    # must be a type
+    type_node = node.child_by_field_name('type')
+    type_id = convert_type(type_node)
+    return node_factory.create_sizeof_expr(type_id)
