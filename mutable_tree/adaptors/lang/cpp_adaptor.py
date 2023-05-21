@@ -45,6 +45,8 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         'conditional_expression': convert_ternary_expr,
         'subscription_expression': convert_array_access,
         'call_expression': convert_call_expr,
+        'field_expression': convert_field_access,
+        'parenthesized_expression': convert_parenthesized_expr,
     }
 
     return expr_convertors[node.type](node)
@@ -157,3 +159,9 @@ def convert_field_access(node: tree_sitter.Node) -> FieldAccess:
     op = get_field_access_op(node.child_by_field_name('operator').text.decode())
 
     return node_factory.create_field_access(obj_expr, name_expr, op)
+
+
+def convert_parenthesized_expr(node: tree_sitter.Node) -> ParenthesizedExpression:
+    assert node.child_count == 3, 'parenthesized expr with != 3 children'
+    expr = convert_expression(node.children[1])
+    return node_factory.create_parenthesized_expr(expr)
