@@ -4,10 +4,13 @@
 
 ## TODO
 
-- CI/CD
 - Perhaps a Python package
-- Function-level support for Java and perhaps C/C++
-- Refactor transformation visitors
+- Java Language Features
+  - Method reference
+  - Anonymous class
+  - Call expressions with type arguments
+  - ...
+- Function-level support for perhaps C/C++
 
 ## Getting Started
 
