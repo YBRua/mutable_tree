@@ -786,7 +786,7 @@ def convert_formal_param(node: tree_sitter.Node) -> TypedFormalParameter:
     decl_type = node_factory.create_declarator_type(type_id, modifiers)
     decl = convert_variable_declarator_id(node)
 
-    return node_factory.create_formal_param(decl, decl_type)
+    return node_factory.create_formal_param(decl_type, decl)
 
 
 def convert_spread_param(node: tree_sitter.Node) -> SpreadParameter:

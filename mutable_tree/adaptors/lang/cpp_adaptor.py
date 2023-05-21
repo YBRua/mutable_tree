@@ -305,7 +305,7 @@ def convert_array_expr(node: tree_sitter.Node) -> ArrayExpression:
 def convert_compound_literal_expr(node: tree_sitter.Node) -> CompoundLiteralExpression:
     type_id = convert_type(node.child_by_field_name('type'))
     value = convert_array_expr(node.child_by_field_name('value'))
-    
+
     return node_factory.create_compound_literal_expr(type_id, value)
 
 
@@ -480,10 +480,14 @@ def convert_declarator(node: tree_sitter.Node):
 def convert_formal_param(node: tree_sitter.Node) -> TypedFormalParameter:
     decl_type = _convert_declaration_specifiers(node)
     decl_node = node.child_by_field_name('declarator')
-    assert decl_node is not None, 'formal parameter without declarator'
-    decl = convert_declarator(decl_node)
+    # NOTE: cpp parser somehow treats variable declarations like std::vector v(size);
+    # as function declarations, where size is a TypeIdentfier with no declarator node.
+    if decl_node is not None:
+        decl = convert_declarator(decl_node)
+    else:
+        decl = None
 
-    return node_factory.create_formal_param(decl, decl_type)
+    return node_factory.create_formal_param(decl_type, decl)
 
 
 def convert_variadic_parameter(node: tree_sitter.Node) -> VariadicParameter:

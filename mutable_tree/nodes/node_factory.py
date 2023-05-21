@@ -399,9 +399,9 @@ def create_inferred_parameter(decl: Declarator) -> InferredParameter:
     return InferredParameter(NodeType.INFERRED_PARAMETER, decl)
 
 
-def create_formal_param(decl: Declarator,
-                        decl_type: DeclaratorType) -> TypedFormalParameter:
-    return TypedFormalParameter(NodeType.FORMAL_PARAMETER, decl, decl_type)
+def create_formal_param(decl_type: DeclaratorType,
+                        decl: Optional[Declarator] = None) -> TypedFormalParameter:
+    return TypedFormalParameter(NodeType.FORMAL_PARAMETER, decl_type, decl)
 
 
 def create_spread_param(decl: Declarator, decl_type: DeclaratorType) -> SpreadParameter:

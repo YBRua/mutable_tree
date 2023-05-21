@@ -57,7 +57,10 @@ class InferredParameter(FormalParameter):
 
 class TypedFormalParameter(FormalParameter):
 
-    def __init__(self, node_type: NodeType, decl: Declarator, decl_type: DeclaratorType):
+    def __init__(self,
+                 node_type: NodeType,
+                 decl_type: DeclaratorType,
+                 decl: Optional[Declarator] = None):
         super().__init__(node_type)
         self.declarator = decl
         self.decl_type = decl_type
@@ -68,17 +71,23 @@ class TypedFormalParameter(FormalParameter):
             throw_invalid_type(self.node_type, self)
         if self.decl_type.node_type != NodeType.DECLARATOR_TYPE:
             throw_invalid_type(self.decl_type.node_type, self, attr='decl_type')
-        if not is_declarator(self.declarator):
+        if self.declarator is not None and not is_declarator(self.declarator):
             throw_invalid_type(self.declarator, self, attr='declarator')
 
     def get_children(self) -> List[Node]:
-        return [self.decl_type, self.declarator]
+        if self.declarator is not None:
+            return [self.decl_type, self.declarator]
+        else:
+            return [self.decl_type]
 
     def get_children_names(self) -> List[str]:
         return ['decl_type', 'declarator']
 
     def to_string(self) -> str:
-        return f'{self.decl_type.to_string()} {self.declarator.to_string()}'
+        if self.declarator is not None:
+            return f'{self.decl_type.to_string()} {self.declarator.to_string()}'
+        else:
+            return self.decl_type.to_string()
 
 
 class SpreadParameter(FormalParameter):
