@@ -11,14 +11,16 @@ from ...nodes import (ArrayAccess, ArrayCreationExpression, ArrayExpression,
                       PointerExpression, DeleteExpression)
 from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueStatement,
                       DoStatement, EmptyStatement, ExpressionStatement, ForInStatement,
-                      ForStatement, IfStatement, LabeledStatement,
-                      LocalVariableDeclaration, VariableDeclarator, ReturnStatement,
+                      ForStatement, IfStatement, LabeledStatement, ReturnStatement,
                       SwitchStatement, SwitchCase, SwitchCaseList, ThrowStatement,
                       TryStatement, CatchClause, FinallyClause, TryHandlers,
                       WhileStatement, YieldStatement, TryResource, TryResourceList,
                       TryWithResourcesStatement, SynchronizedStatement)
-from ...nodes import (FormalParameter, SpreadParameter, FormalParameterList,
-                      FunctionDeclarator, FunctionDeclaration)
+from ...nodes import (Declarator, VariableDeclarator, ArrayDeclarator, PointerDeclarator,
+                      InitializingDeclarator, DeclaratorType, LocalVariableDeclaration)
+from ...nodes import (FormalParameter, InferredParameter, TypedFormalParameter,
+                      SpreadParameter, FormalParameterList, FunctionDeclarator,
+                      FunctionDeclaration)
 from ...nodes import (Modifier, ModifierList)
 from ...nodes import Program
 from ...nodes import (TypeIdentifier, Dimensions, DimensionSpecifier, TypeParameter,
@@ -77,6 +79,7 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'expression_statement': convert_expression_stmt,
         'labeled_statement': convert_labeled_stmt,
         'compound_statement': convert_block_stmt,
+        'declaration': convert_local_variable_declaration,
     }
 
     return stmt_convertors[node.type](node)
@@ -85,10 +88,23 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
 def convert_type(node: tree_sitter.Node) -> TypeIdentifier:
     type_convertors = {
         'type_descriptor': convert_simple_type,
+        'type_identifier': convert_simple_type,
         'primitive_type': convert_simple_type,
     }
 
     return type_convertors[node.type](node)
+
+
+def convert_modifier(node: tree_sitter.Node) -> Modifier:
+    modifier = node.text.decode()
+    return node_factory.create_modifier(modifier)
+
+
+def convert_modifier_list(node: tree_sitter.Node) -> ModifierList:
+    modifiers = []
+    for child in node.children:
+        modifiers.append(convert_modifier(child))
+    return node_factory.create_modifier_list(modifiers)
 
 
 def convert_simple_type(node: tree_sitter.Node) -> TypeIdentifier:
@@ -332,28 +348,88 @@ def convert_do_stmt(node: tree_sitter.Node) -> DoStatement:
 
 
 def convert_variable_declarator(node: tree_sitter.Node) -> VariableDeclarator:
-    assert node.type == 'identifier'
     return node_factory.create_variable_declarator(convert_identifier(node))
 
 
-def _convert_declarator(node: tree_sitter.Node):
-    if node.type == 'declarator':
-        return
-    if node.type == 'init_declarator':
-        decl = _convert_declarator(node.children[0])
-        value = convert_expression(node.children[2])
+def convert_array_declarator(node: tree_sitter.Node) -> ArrayDeclarator:
+    declarator = convert_declarator(node.child_by_field_name('declarator'))
+    dim_node = node.child_by_field_name('size')
+    if dim_node is not None:
+        dim = convert_expression(dim_node)
+    else:
+        dim = None
+    dim = node_factory.create_dimension_specifier(dim)
+    return node_factory.create_array_declarator(declarator, dim)
+
+
+def convert_pointer_declarator(node: tree_sitter.Node) -> PointerDeclarator:
+    declarator = convert_declarator(node.child_by_field_name('declarator'))
+    return node_factory.create_pointer_declarator(declarator)
+
+
+def convert_init_declarator(node: tree_sitter.Node) -> InitializingDeclarator:
+    declarator = convert_declarator(node.child_by_field_name('declarator'))
+    value = convert_expression(node.child_by_field_name('value'))
+    return node_factory.create_initializing_declarator(declarator, value)
+
+
+def convert_declarator(node: tree_sitter.Node):
+    decl_convertors = {
+        'identifier': convert_variable_declarator,
+        'pointer_declarator': convert_pointer_declarator,
+        'array_declarator': convert_array_declarator,
+        'init_declarator': convert_init_declarator,
+    }
+    return decl_convertors[node.type](node)
+
+
+def _convert_declaration_specifiers(node: tree_sitter.Node):
+
+    def _is_decl_modifier(node: tree_sitter.Node) -> bool:
+        modifier_types = {
+            'storage_class_specifier', 'type_qualifier', 'attribute_specifier',
+            'attribute_declaration', 'ms_declspec_modifier'
+        }
+        return node.type in modifier_types
+
+    prefix_specifier_nodes = []
+    postfix_specifier_nodes = []
+
+    idx = 0
+    for child in node.children:
+        if not _is_decl_modifier(child):
+            break
+        idx += 1
+        prefix_specifier_nodes.append(child)
+
+    type_node = node.children[idx]
+
+    idx += 1
+    for child in node.children[idx:]:
+        if not _is_decl_modifier(child):
+            break
+        postfix_specifier_nodes.append(child)
+
+    if len(prefix_specifier_nodes):
+        prefixes = [convert_modifier(n) for n in prefix_specifier_nodes]
+    else:
+        prefixes = None
+    if len(postfix_specifier_nodes):
+        postfixes = [convert_modifier(n) for n in postfix_specifier_nodes]
+    else:
+        postfixes = None
+    ty = convert_type(type_node)
+
+    return node_factory.create_declarator_type(ty, prefixes, postfixes)
 
 
 def convert_local_variable_declaration(
         node: tree_sitter.Node) -> LocalVariableDeclaration:
-    # TODO: [modifier], type, [modifier]
-    decl_specifiers = []
-    idx = 0
+    decl_type = _convert_declaration_specifiers(node)
 
-    ty = convert_type(node.child_by_field_name('type'))
     declarators = []
     for decl_node in node.children_by_field_name('declarator'):
-        declarators.append(convert_variable_declarator(decl_node))
-    declarators = node_factory.create_variable_declarator_list(declarators)
+        declarators.append(convert_declarator(decl_node))
+    declarators = node_factory.create_declarator_list(declarators)
 
-    return node_factory.create_local_var_decl(ty, declarators, modifiers)
+    return node_factory.create_local_variable_declaration(decl_type, declarators)

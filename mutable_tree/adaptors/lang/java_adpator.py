@@ -377,7 +377,7 @@ def convert_variable_declarator(node: tree_sitter.Node) -> Declarator:
 
     decl = convert_variable_declarator_id(node)
     if value is not None:
-        decl = node_factory.create_intializing_declarator(decl, value)
+        decl = node_factory.create_initializing_declarator(decl, value)
 
     return decl
 
@@ -702,7 +702,7 @@ def convert_resource(node: tree_sitter.Node) -> TryResource:
 
         declarator = convert_variable_declarator_id(node)
         value = convert_expression(node.child_by_field_name('value'))
-        declarator = node_factory.create_intializing_declarator(declarator, value)
+        declarator = node_factory.create_initializing_declarator(declarator, value)
         declarators = node_factory.create_declarator_list([declarator])
 
         resource = node_factory.create_local_variable_declaration(decl_type, declarators)

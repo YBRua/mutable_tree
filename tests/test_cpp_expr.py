@@ -68,6 +68,11 @@ class TestCppFieldAccess(CppSnippetTestBase):
         self._stmt_round_trip('foo.bar.baz[1].thonk;')
         self._stmt_round_trip('foo.bar.baz[idx].thonk[2];')
 
+    def test_ptr_access(self):
+        self._stmt_round_trip('foo->bar;')
+        self._stmt_round_trip('foo->bar->baz;')
+        self._stmt_round_trip('foo->bar->baz[1];')
+
 
 class TestCppCallExpr(CppSnippetTestBase):
 
@@ -164,6 +169,19 @@ class TestCppParenthesizedExpr(CppSnippetTestBase):
 
     def test_parenthesized_call(self):
         self._stmt_round_trip('(a + b).bar();')
+
+
+class TestCppPointerExpr(CppSnippetTestBase):
+
+    def test_dereference(self):
+        self._stmt_round_trip('*a;')
+        self._stmt_round_trip('*a.b;')
+        self._stmt_round_trip('c + *a;')
+
+    def test_addressing(self):
+        self._stmt_round_trip('&a;')
+        self._stmt_round_trip('&a.b;')
+        self._stmt_round_trip('c + &a;')
 
 
 if __name__ == '__main__':

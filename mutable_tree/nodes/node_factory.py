@@ -195,7 +195,7 @@ def create_pointer_declarator(decl: Declarator) -> PointerDeclarator:
     return PointerDeclarator(NodeType.POINTER_DECLARATOR, decl)
 
 
-def create_intializing_declarator(decl: Declarator,
+def create_initializing_declarator(decl: Declarator,
                                   value: Expression) -> InitializingDeclarator:
     return InitializingDeclarator(NodeType.INITIALIZING_DECLARATOR, decl, value)
 

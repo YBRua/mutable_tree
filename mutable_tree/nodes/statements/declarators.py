@@ -66,7 +66,7 @@ class VariableDeclarator(Declarator):
 class PointerDeclarator(Declarator):
 
     def __init__(self, node_type: NodeType, declarator: Declarator):
-        super().__init__(node_type, declarator)
+        super().__init__(node_type)
         self.declarator = declarator
         self._check_types()
 

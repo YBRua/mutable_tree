@@ -30,7 +30,7 @@ class PointerExpression(Expression):
         self._check_types()
 
     def _check_types(self):
-        if self.node_type != NodeType.UNARY_EXPR:
+        if self.node_type != NodeType.POINTER_EXPR:
             throw_invalid_type(self.node_type, self)
         if not is_expression(self.operand):
             throw_invalid_type(self.operand.node_type, self, attr='operand')
