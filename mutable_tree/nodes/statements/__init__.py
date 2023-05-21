@@ -10,8 +10,9 @@ from .for_in_stmt import ForInStatement
 from .for_stmt import ForStatement
 from .if_stmt import IfStatement
 from .labeled_stmt import LabeledStatement
-from .local_var_decl import (LocalVariableDeclaration, VariableDeclarator,
-                             PointerDeclarator, VariableDeclaratorList)
+from .declarators import (Declarator, VariableDeclarator, ArrayDeclarator,
+                          PointerDeclarator, InitializingDeclarator)
+from .local_var_decl import (LocalVariableDeclaration, DeclaratorList, DeclaratorType)
 from .return_stmt import ReturnStatement
 from .switch_stmt import SwitchStatement, SwitchCase, SwitchCaseList
 from .synchronized_stmt import SynchronizedStatement
@@ -23,7 +24,8 @@ from .statement_list import StatementList
 from .try_with_resources_stmt import (TryResource, TryResourceList,
                                       TryWithResourcesStatement)
 
-from .func_declaration import (FormalParameter, SpreadParameter, FormalParameterList,
+from .func_declaration import (is_formal_parameter, FormalParameter, InferredParameter,
+                               TypedFormalParameter, SpreadParameter, FormalParameterList,
                                FunctionDeclarator, FunctionDeclaration)
 
 # NOTE: have to put an expression in the statements folder due to circular imports

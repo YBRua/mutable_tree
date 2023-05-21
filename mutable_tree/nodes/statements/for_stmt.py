@@ -32,7 +32,8 @@ class ForStatement(Statement):
             throw_invalid_type(self.node_type, self)
 
         if self.init is not None:
-            if self.is_init_decl and self.init.node_type != NodeType.LOCAL_VAR_DECL:
+            if (self.is_init_decl and
+                    self.init.node_type != NodeType.LOCAL_VARIABLE_DECLARATION):
                 throw_invalid_type(self.init.node_type, self, attr='init')
             if not self.is_init_decl and self.init.node_type != NodeType.EXPRESSION_LIST:
                 throw_invalid_type(self.init.node_type, self, attr='init')
@@ -54,8 +55,8 @@ class ForStatement(Statement):
         elif self.is_init_decl:
             init_str = self.init.to_string()
         else:
-            init_str = ', '.join(init.to_string()
-                                 for init in self.init.get_children()) + ';'
+            init_str = ', '.join(
+                init.to_string() for init in self.init.get_children()) + ';'
 
         if self.condition is None:
             cond_str = ';'
@@ -65,8 +66,8 @@ class ForStatement(Statement):
         if self.update is None:
             update_str = ''
         else:
-            update_str = ' ' + ', '.join(u.to_string()
-                                         for u in self.update.get_children())
+            update_str = ' ' + ', '.join(
+                u.to_string() for u in self.update.get_children())
 
         body_str = self.body.to_string()
         return f'for ({init_str}{cond_str}{update_str}) {body_str}'

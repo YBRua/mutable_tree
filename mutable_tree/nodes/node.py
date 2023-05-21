@@ -46,7 +46,7 @@ class NodeType(Enum):
     FOR_IN_STMT = 'ForInStatement'
     IF_STMT = 'IfStatement'
     LABELED_STMT = 'LabeledStatement'
-    LOCAL_VAR_DECL = 'LocalVariableDeclaration'
+    LOCAL_VARIABLE_DECLARATION = 'LocalVariableDeclaration'
     RETURN_STMT = 'ReturnStatement'
     SWITCH_STMT = 'SwitchStatement'
     SYNCHRONIZED_STMT = 'SynchronizedStatement'
@@ -59,7 +59,14 @@ class NodeType(Enum):
     # declarations & definitions (are also statements)
     FUNC_DECLARATOR = 'FunctionDeclarator'
     FUNC_DECLARATION = 'FunctionDeclaration'
+
+    DECLARATOR_TYPE = 'DeclaratorType'
+    VARIABLE_DECLARATOR = 'VariableDeclarator'
     POINTER_DECLARATOR = 'PointerDeclarator'
+    ARRAY_DECLARATOR = 'ArrayDeclarator'
+    INITIALIZING_DECLARATOR = 'InitializingDeclarator'
+
+    DECLARATOR_LIST = 'DeclaratorList'
 
     # types
     TYPE_IDENTIFIER = 'TypeIdentifier'
@@ -70,13 +77,11 @@ class NodeType(Enum):
     DIMENSIONS = 'Dimensions'
 
     # miscs
-    VARIABLE_DECLARATOR = 'VariableDeclarator'
     SWITCH_CASE = 'SwitchCase'
     CATCH_CLAUSE = 'CatchClause'
     FINALLY_CLAUSE = 'FinallyClause'
     EXPRESSION_LIST = 'ExpressionList'
     STATEMENT_LIST = 'StatementList'
-    VARIABLE_DECLARATOR_LIST = 'VariableDeclaratorList'
     SWITCH_CASE_LIST = 'SwitchCaseList'
     TRY_HANDLERS = 'TryHandlers'
     TRY_RESOURCE = 'TryResource'
@@ -84,6 +89,7 @@ class NodeType(Enum):
 
     MODIFIER = 'Modifier'
     MODIFIER_LIST = 'ModifierList'
+    UNTYPED_PARAMETER = 'UntypedParameter'
     FORMAL_PARAMETER = 'FormalParameter'
     FORMAL_PARAMETER_LIST = 'FormalParameterList'
     SPREAD_PARAMETER = 'SpreadParameter'

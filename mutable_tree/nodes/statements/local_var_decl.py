@@ -1,89 +1,63 @@
 from ..node import Node, NodeType, NodeList
 from .statement import Statement
+from .declarators import Declarator, is_declarator
 from ..miscs import ModifierList
-from ..expressions import Expression, Identifier
-from ..types import TypeIdentifier, Dimensions
-from ..expressions import is_expression
+from ..types import TypeIdentifier
 from ..utils import throw_invalid_type
-from typing import List, Optional, Union
+from typing import List, Optional
 
 
-class VariableDeclarator(Node):
+class DeclaratorType(Node):
 
     def __init__(self,
                  node_type: NodeType,
-                 name: Identifier,
-                 dimensions: Optional[Dimensions] = None,
-                 value: Optional[Expression] = None):
+                 type_id: TypeIdentifier,
+                 prefix_modifiers: Optional[ModifierList] = None,
+                 postfix_modifiers: Optional[ModifierList] = None):
         super().__init__(node_type)
-        self.name = name
-        self.dimensions = dimensions
-        self.value = value
+        self.type_id = type_id
+        self.prefix_modifiers = prefix_modifiers
+        self.postfix_modifiers = postfix_modifiers
         self._check_types()
 
     def _check_types(self):
-        if self.node_type != NodeType.VARIABLE_DECLARATOR:
+        if self.node_type != NodeType.DECLARATOR_TYPE:
             throw_invalid_type(self.node_type, self)
-        if (self.dimensions is not None
-                and self.dimensions.node_type != NodeType.DIMENSIONS):
-            throw_invalid_type(self.dimensions.node_type, self, attr='dimensions')
-        if self.value is not None and not is_expression(self.value):
-            throw_invalid_type(self.value.node_type, self, attr='value')
+        if self.type_id.node_type != NodeType.TYPE_IDENTIFIER:
+            throw_invalid_type(self.type_id.node_type, self, attr='type_id')
+        if (self.prefix_modifiers is not None and
+                self.prefix_modifiers.node_type != NodeType.MODIFIER_LIST):
+            throw_invalid_type(self.prefix_modifiers.node_type,
+                               self,
+                               attr='prefix_modifiers')
+        if (self.postfix_modifiers is not None and
+                self.postfix_modifiers.node_type != NodeType.MODIFIER_LIST):
+            throw_invalid_type(self.postfix_modifiers.node_type,
+                               self,
+                               attr='postfix_modifiers')
 
     def to_string(self) -> str:
-        declarator_id = self.name.to_string()
-        if self.dimensions is not None:
-            declarator_id += self.dimensions.to_string()
-
-        if self.value is not None:
-            return f'{declarator_id} = {self.value.to_string()}'
+        if self.prefix_modifiers is not None:
+            prefix = self.prefix_modifiers.to_string() + ' '
         else:
-            return declarator_id
+            prefix = ''
+        if self.postfix_modifiers is not None:
+            postfix = ' ' + self.postfix_modifiers.to_string()
+        else:
+            postfix = ''
+
+        return f'{prefix}{self.type_id.to_string()}{postfix}'
 
     def get_children(self) -> List[Node]:
-        children = [self.name]
-        if self.dimensions is not None:
-            children.append(self.dimensions)
-        if self.value is not None:
-            children.append(self.value)
+        children = [self.prefix_modifiers, self.type_id, self.postfix_modifiers]
+        children = [child for child in children if child is not None]
         return children
 
     def get_children_names(self) -> List[str]:
-        return ['name', 'dimensions', 'value']
+        return ['prefix_modifiers', 'type_id', 'postfix_modifiers']
 
 
-class PointerDeclarator(Node):
-
-    def __init__(
-        self,
-        node_type: NodeType,
-        declarator: Union[VariableDeclarator, 'PointerDeclarator'],
-    ):
-        super().__init__(node_type)
-        self.declarator = declarator
-        self._check_types()
-
-    def _check_types(self):
-        if self.node_type != NodeType.POINTER_DECLARATOR:
-            throw_invalid_type(self.node_type, self)
-        if (self.declarator.node_type != NodeType.VARIABLE_DECLARATOR
-                and self.declarator.node_type != NodeType.POINTER_DECLARATOR):
-            throw_invalid_type(self.declarator.node_type, self, attr='declarator')
-
-    def to_string(self) -> str:
-        return f'*{self.declarator.to_string()}'
-
-    def get_children(self) -> List[Node]:
-        return [self.declarator]
-
-    def get_children_names(self) -> List[str]:
-        return ['declarator']
-
-
-Declarator = Union[VariableDeclarator, PointerDeclarator]
-
-
-class VariableDeclaratorList(NodeList):
+class DeclaratorList(NodeList):
     node_list: List[Declarator]
 
     def __init__(self, node_type: NodeType, declarators: List[Declarator]):
@@ -92,49 +66,38 @@ class VariableDeclaratorList(NodeList):
         self._check_types()
 
     def _check_types(self):
-        if self.node_type != NodeType.VARIABLE_DECLARATOR_LIST:
+        if self.node_type != NodeType.DECLARATOR_LIST:
             throw_invalid_type(self.node_type, self)
         for i, decl in enumerate(self.node_list):
-            if (decl.node_type != NodeType.VARIABLE_DECLARATOR
-                    and decl.node_type != NodeType.POINTER_DECLARATOR):
+            if not is_declarator(decl):
                 throw_invalid_type(decl.node_type, self, attr=f'declarator#{i}')
 
 
 class LocalVariableDeclaration(Statement):
 
-    def __init__(self,
-                 node_type: NodeType,
-                 type_identifier: TypeIdentifier,
-                 declarators: VariableDeclaratorList,
-                 modifiers: Optional[ModifierList] = None):
+    def __init__(self, node_type: NodeType, decl_type: DeclaratorType,
+                 declarators: DeclaratorList):
         super().__init__(node_type)
-        self.type = type_identifier
+        self.type = decl_type
         self.declarators = declarators
-        self.modifiers = modifiers
         self._check_types()
 
     def _check_types(self):
-        if self.node_type != NodeType.LOCAL_VAR_DECL:
+        if self.node_type != NodeType.LOCAL_VARIABLE_DECLARATION:
             throw_invalid_type(self.node_type, self)
-        if self.declarators.node_type != NodeType.VARIABLE_DECLARATOR_LIST:
+        if self.type.node_type != NodeType.DECLARATOR_TYPE:
+            throw_invalid_type(self.type.node_type, self, attr='type')
+        if self.declarators.node_type != NodeType.DECLARATOR_LIST:
             throw_invalid_type(self.declarators.node_type, self, attr='declarators')
-        if (self.modifiers is not None
-                and self.modifiers.node_type != NodeType.MODIFIER_LIST):
-            throw_invalid_type(self.modifiers.node_type, self, attr='modifiers')
 
     def to_string(self) -> str:
-        decl_strs = ', '.join(decl.to_string()
-                              for decl in self.declarators.get_children())
+        decl_strs = ', '.join(
+            decl.to_string() for decl in self.declarators.get_children())
         res = f'{self.type.to_string()} {decl_strs};'
-        if self.modifiers is not None:
-            res = f'{self.modifiers.to_string()} {res}'
         return res
 
     def get_children(self) -> List[Node]:
-        if self.modifiers is not None:
-            return [self.modifiers, self.type, self.declarators]
-        else:
-            return [self.type, self.declarators]
+        return [self.type, self.declarators]
 
     def get_children_names(self) -> List[str]:
-        return ['modifiers', 'type', 'declarators']
+        return ['type', 'declarators']

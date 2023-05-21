@@ -9,14 +9,16 @@ from ...nodes import (ArrayAccess, ArrayCreationExpression, ArrayExpression,
                       ExpressionList, LambdaExpression)
 from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueStatement,
                       DoStatement, EmptyStatement, ExpressionStatement, ForInStatement,
-                      ForStatement, IfStatement, LabeledStatement,
-                      LocalVariableDeclaration, VariableDeclarator, ReturnStatement,
+                      ForStatement, IfStatement, LabeledStatement, ReturnStatement,
                       SwitchStatement, SwitchCase, SwitchCaseList, ThrowStatement,
                       TryStatement, CatchClause, FinallyClause, TryHandlers,
                       WhileStatement, YieldStatement, TryResource, TryResourceList,
                       TryWithResourcesStatement, SynchronizedStatement)
-from ...nodes import (FormalParameter, SpreadParameter, FormalParameterList,
-                      FunctionDeclarator, FunctionDeclaration)
+from ...nodes import (Declarator, VariableDeclarator, ArrayDeclarator,
+                      InitializingDeclarator, DeclaratorType, LocalVariableDeclaration)
+from ...nodes import (FormalParameter, InferredParameter, TypedFormalParameter,
+                      SpreadParameter, FormalParameterList, FunctionDeclarator,
+                      FunctionDeclaration)
 from ...nodes import (Modifier, ModifierList)
 from ...nodes import Program
 from ...nodes import TypeIdentifier, Dimensions, TypeParameter, TypeParameterList
@@ -301,8 +303,9 @@ def convert_lambda_expr(node: tree_sitter.Node) -> LambdaExpression:
     parenthesized = False
     if param_node.type == 'identifier':
         param = convert_identifier(param_node)
-        param = node_factory.create_formal_param(param)
-        params = node_factory.create_formal_param_list([param])
+        param = node_factory.create_variable_declarator(param)
+        param = node_factory.create_inferred_parameter(param)
+        params = node_factory.create_formal_parameter_list([param])
     elif param_node.type == 'formal_parameters':
         parenthesized = True
         params = convert_formal_parameters(param_node)
@@ -312,8 +315,10 @@ def convert_lambda_expr(node: tree_sitter.Node) -> LambdaExpression:
         for ch in param_node.children[1:-1]:
             if ch.type == ',':
                 continue
-            params.append(node_factory.create_formal_param(convert_identifier(ch)))
-        params = node_factory.create_formal_param_list(params)
+            param = convert_identifier(ch)
+            param = node_factory.create_variable_declarator(param)
+            params.append(node_factory.create_inferred_parameter(param))
+        params = node_factory.create_formal_parameter_list(params)
 
     # body
     body_node = node.child_by_field_name('body')
@@ -348,22 +353,33 @@ def convert_expression_stmt(node: tree_sitter.Node) -> ExpressionStatement:
     return node_factory.create_expression_stmt(expr)
 
 
-def convert_variable_declartor_id(
-        node: tree_sitter.Node) -> Tuple[Expression, Dimensions]:
+def convert_variable_declarator_id(node: tree_sitter.Node) -> Declarator:
+    """Performs conversion on _variable_declarator_id.
+
+    Returns a VariableDeclarator or an ArrayDeclarator
+    """
     name_node = node.child_by_field_name('name')
+    name = convert_identifier(name_node)
+    decl = node_factory.create_variable_declarator(name)
+
     dim_node = node.child_by_field_name('dimensions')
+    if dim_node is not None:
+        n_dims = dim_node.text.decode().count('[')
+        for _ in range(n_dims):
+            dim = node_factory.create_dimension_specifier()
+            decl = node_factory.create_array_declarator(decl, dim)
+    return decl
 
-    name = convert_expression(name_node)
-    dim = convert_dimensions(dim_node) if dim_node is not None else None
-    return name, dim
 
-
-def convert_variable_declarator(node: tree_sitter.Node) -> VariableDeclarator:
+def convert_variable_declarator(node: tree_sitter.Node) -> Declarator:
     value_node = node.child_by_field_name('value')
-
-    name, dim = convert_variable_declartor_id(node)
     value = convert_expression(value_node) if value_node is not None else None
-    return node_factory.create_variable_declarator(name, dim, value)
+
+    decl = convert_variable_declarator_id(node)
+    if value is not None:
+        decl = node_factory.create_intializing_declarator(decl, value)
+
+    return decl
 
 
 def convert_local_variable_declaration(
@@ -374,12 +390,14 @@ def convert_local_variable_declaration(
         modifiers = None
 
     ty = convert_type(node.child_by_field_name('type'))
+    decl_type = node_factory.create_declarator_type(ty, prefixes=modifiers)
+
     declarators = []
     for decl_node in node.children_by_field_name('declarator'):
         declarators.append(convert_variable_declarator(decl_node))
-    declarators = node_factory.create_variable_declarator_list(declarators)
+    declarators = node_factory.create_declarator_list(declarators)
 
-    return node_factory.create_local_var_decl(ty, declarators, modifiers)
+    return node_factory.create_local_variable_declaration(decl_type, declarators)
 
 
 def convert_empty_stmt(node: tree_sitter.Node) -> EmptyStatement:
@@ -670,20 +688,29 @@ def convert_resource(node: tree_sitter.Node) -> TryResource:
         resource = convert_expression(node.children[0])
     else:
         if node.child_count != 4:
-            raise NotImplementedError('try resource with modifiers')
+            modifier_nodes = node.children[:-4]
+        else:
+            modifier_nodes = None
+        if modifier_nodes is not None:
+            modifiers = [convert_modifier(n) for n in modifier_nodes]
+            modifiers = node_factory.create_modifier_list(modifiers)
+        else:
+            modifiers = None
+
         ty = convert_type(node.child_by_field_name('type'))
-        name, dim = convert_variable_declartor_id(node)
+        decl_type = node_factory.create_declarator_type(ty, modifiers)
+
+        declarator = convert_variable_declarator_id(node)
         value = convert_expression(node.child_by_field_name('value'))
+        declarator = node_factory.create_intializing_declarator(declarator, value)
+        declarators = node_factory.create_declarator_list([declarator])
 
-        declarator = node_factory.create_variable_declarator_list(
-            [node_factory.create_variable_declarator(name, dim, value)])
-
-        resource = node_factory.create_local_var_decl(ty, declarator)
+        resource = node_factory.create_local_variable_declaration(decl_type, declarators)
 
     return node_factory.create_try_resource(resource)
 
 
-def convert_try_resources(node: tree_sitter.Node) -> TryResourceList:
+def convert_resource_specification(node: tree_sitter.Node) -> TryResourceList:
     resources = []
     # skip parentheses
     for resource in node.children[1:-1]:
@@ -699,7 +726,7 @@ def convert_try_with_resources_stmt(node: tree_sitter.Node) -> TryWithResourcesS
 
     # resources
     resource_nodes = node.child_by_field_name('resources')
-    resources = convert_try_resources(resource_nodes)
+    resources = convert_resource_specification(resource_nodes)
 
     # body
     body_node = node.child_by_field_name('body')
@@ -743,7 +770,7 @@ def convert_modifier_list(node: tree_sitter.Node) -> ModifierList:
     return node_factory.create_modifier_list(modifiers)
 
 
-def convert_formal_param(node: tree_sitter.Node) -> FormalParameter:
+def convert_formal_param(node: tree_sitter.Node) -> TypedFormalParameter:
     assert node.type == 'formal_parameter', node.type
     if node.children[0].type == 'modifiers':
         modifiers_node = node.children[0]
@@ -753,10 +780,10 @@ def convert_formal_param(node: tree_sitter.Node) -> FormalParameter:
 
     type_node = node.child_by_field_name('type')
     type_id = convert_type(type_node)
+    decl_type = node_factory.create_declarator_type(type_id, modifiers)
+    decl = convert_variable_declarator_id(node)
 
-    name, dim = convert_variable_declartor_id(node)
-
-    return node_factory.create_formal_param(name, type_id, dim, modifiers)
+    return node_factory.create_formal_param(decl, decl_type)
 
 
 def convert_spread_param(node: tree_sitter.Node) -> SpreadParameter:
@@ -771,12 +798,13 @@ def convert_spread_param(node: tree_sitter.Node) -> SpreadParameter:
 
     type_node = node.children[idx]
     type_id = convert_type(type_node)
+    decl_type = node_factory.create_declarator_type(type_id, modifiers)
     idx += 2  # skip '...'
 
     # spread parameter uses variable declarator, which is a independent node
-    name, dim = convert_variable_declartor_id(node.children[idx])
+    decl = convert_variable_declarator_id(node.children[idx])
 
-    return node_factory.create_spread_param(type_id, name, dim, modifiers)
+    return node_factory.create_spread_param(decl, decl_type)
 
 
 def convert_formal_parameters(node: tree_sitter.Node) -> FormalParameterList:
@@ -789,12 +817,12 @@ def convert_formal_parameters(node: tree_sitter.Node) -> FormalParameterList:
         else:
             # formal parameter
             params.append(convert_formal_param(child))
-    return node_factory.create_formal_param_list(params)
+    return node_factory.create_formal_parameter_list(params)
 
 
 def convert_type_param(node: tree_sitter.Node) -> TypeParameter:
-    if (node.children[0].type != 'identifier'
-            and node.children[0].type != 'type_identifier'):
+    if (node.children[0].type != 'identifier' and
+            node.children[0].type != 'type_identifier'):
         raise NotImplementedError('type parameter with annotataions')
 
     # name

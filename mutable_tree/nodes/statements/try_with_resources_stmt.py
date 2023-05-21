@@ -26,7 +26,7 @@ class TryResource(Node):
 
         res_type = self.resource.node_type
         if res_type not in {
-                NodeType.IDENTIFIER, NodeType.FIELD_ACCESS, NodeType.LOCAL_VAR_DECL
+                NodeType.IDENTIFIER, NodeType.FIELD_ACCESS, NodeType.LOCAL_VARIABLE_DECLARATION
         }:
             throw_invalid_type(res_type, self, attr='resource')
 

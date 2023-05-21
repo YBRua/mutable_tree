@@ -14,13 +14,16 @@ from .statements import Statement
 from .statements import (
     AssertStatement, BlockStatement, BreakStatement, ContinueStatement, DoStatement,
     EmptyStatement, ExpressionStatement, ForInStatement, ForStatement, IfStatement,
-    LabeledStatement, LocalVariableDeclaration, VariableDeclarator, ReturnStatement,
-    SwitchCase, SwitchCaseList, SwitchStatement, ThrowStatement, TryStatement,
-    TryHandlers, CatchClause, FinallyClause, WhileStatement, YieldStatement,
-    StatementList, VariableDeclaratorList, TryResource, TryResourceList,
+    LabeledStatement, ReturnStatement, SwitchCase, SwitchCaseList, SwitchStatement,
+    ThrowStatement, TryStatement, TryHandlers, CatchClause, FinallyClause, WhileStatement,
+    YieldStatement, StatementList, TryResource, TryResourceList,
     TryWithResourcesStatement, SynchronizedStatement, LambdaExpression)
-from .statements import (FormalParameter, SpreadParameter, FormalParameterList,
-                         FunctionDeclarator, FunctionDeclaration)
+from .statements import (Declarator, VariableDeclarator, ArrayDeclarator,
+                         PointerDeclarator, InitializingDeclarator, DeclaratorList,
+                         DeclaratorType, LocalVariableDeclaration)
+from .statements import (FormalParameter, InferredParameter, TypedFormalParameter,
+                         SpreadParameter, FormalParameterList, FunctionDeclarator,
+                         FunctionDeclaration)
 from .miscs import Modifier, ModifierList
 from .statements.for_stmt import ForInit
 from .types import (TypeIdentifier, TypeIdentifierList, DimensionSpecifier, Dimensions,
@@ -177,6 +180,39 @@ def create_delete_expr(operand: Expression, is_array: bool = False) -> DeleteExp
     return DeleteExpression(NodeType.DELETE_EXPR, operand, is_array)
 
 
+# DECLARATIONS
+
+
+def create_variable_declarator(decl_id: Identifier) -> VariableDeclarator:
+    return VariableDeclarator(NodeType.VARIABLE_DECLARATOR, decl_id)
+
+
+def create_array_declarator(decl: Declarator, dim: DimensionSpecifier) -> ArrayDeclarator:
+    return ArrayDeclarator(NodeType.ARRAY_DECLARATOR, decl, dim)
+
+
+def create_pointer_declarator(decl: Declarator) -> PointerDeclarator:
+    return PointerDeclarator(NodeType.POINTER_DECLARATOR, decl)
+
+
+def create_intializing_declarator(decl: Declarator,
+                                  value: Expression) -> InitializingDeclarator:
+    return InitializingDeclarator(NodeType.INITIALIZING_DECLARATOR, decl, value)
+
+
+def create_declarator_type(type_id: TypeIdentifier,
+                           prefixes: Optional[ModifierList] = None,
+                           postfixes: Optional[ModifierList] = None) -> DeclaratorType:
+    return DeclaratorType(NodeType.DECLARATOR_TYPE, type_id, prefixes, postfixes)
+
+
+def create_local_variable_declaration(
+        decl_type: DeclaratorType,
+        declarators: DeclaratorList) -> LocalVariableDeclaration:
+    return LocalVariableDeclaration(NodeType.LOCAL_VARIABLE_DECLARATION, decl_type,
+                                    declarators)
+
+
 # STATEMENTS
 
 
@@ -203,20 +239,6 @@ def create_while_stmt(condition: Expression, body: Statement) -> WhileStatement:
 
 def create_block_stmt(statements: StatementList) -> BlockStatement:
     return BlockStatement(NodeType.BLOCK_STMT, statements)
-
-
-def create_variable_declarator(name: Identifier,
-                               dimension: Optional[Dimensions] = None,
-                               value: Optional[Expression] = None) -> VariableDeclarator:
-    return VariableDeclarator(NodeType.VARIABLE_DECLARATOR, name, dimension, value)
-
-
-def create_local_var_decl(
-        type_name: TypeIdentifier,
-        declarators: VariableDeclaratorList,
-        modifiers: Optional[ModifierList] = None) -> LocalVariableDeclaration:
-    return LocalVariableDeclaration(NodeType.LOCAL_VAR_DECL, type_name, declarators,
-                                    modifiers)
 
 
 def create_assert_stmt(condition: Expression,
@@ -344,24 +366,20 @@ def wrap_block_stmt(stmt: Statement) -> BlockStatement:
 # DECLARATIONS & DEFINITIONS
 
 
-def create_formal_param(name: Identifier,
-                        type_id: Optional[TypeIdentifier] = None,
-                        dimensions: Optional[Dimensions] = None,
-                        modifiers: Optional[ModifierList] = None) -> FormalParameter:
-    return FormalParameter(NodeType.FORMAL_PARAMETER, name, type_id, dimensions,
-                           modifiers)
+def create_inferred_parameter(decl: Declarator) -> InferredParameter:
+    return InferredParameter(NodeType.UNTYPED_PARAMETER, decl)
 
 
-def create_spread_param(type_id: TypeIdentifier,
-                        name: Identifier,
-                        dimensions: Optional[Dimensions] = None,
-                        modifiers: Optional[ModifierList] = None) -> SpreadParameter:
-    return SpreadParameter(NodeType.SPREAD_PARAMETER, type_id, name, dimensions,
-                           modifiers)
+def create_formal_param(decl: Declarator,
+                        decl_type: DeclaratorType) -> TypedFormalParameter:
+    return TypedFormalParameter(NodeType.FORMAL_PARAMETER, decl, decl_type)
 
 
-def create_formal_param_list(
-        params: List[Union[FormalParameter, SpreadParameter]]) -> FormalParameterList:
+def create_spread_param(decl: Declarator, decl_type: DeclaratorType) -> SpreadParameter:
+    return SpreadParameter(NodeType.SPREAD_PARAMETER, decl, decl_type)
+
+
+def create_formal_parameter_list(params: List[FormalParameter]) -> FormalParameterList:
     return FormalParameterList(NodeType.FORMAL_PARAMETER_LIST, params)
 
 
@@ -399,9 +417,8 @@ def create_statement_list(stmts: List[Statement]) -> StatementList:
     return StatementList(NodeType.STATEMENT_LIST, stmts)
 
 
-def create_variable_declarator_list(
-        declarators: List[VariableDeclarator]) -> VariableDeclaratorList:
-    return VariableDeclaratorList(NodeType.VARIABLE_DECLARATOR_LIST, declarators)
+def create_declarator_list(declarators: List[Declarator]) -> DeclaratorList:
+    return DeclaratorList(NodeType.DECLARATOR_LIST, declarators)
 
 
 def create_modifier(name: str) -> Modifier:
