@@ -9,7 +9,7 @@ from .expressions import (ArrayAccess, ArrayExpression, ArrayCreationExpression,
                           Literal, NewExpression, TernaryExpression, ThisExpression,
                           UnaryExpression, UpdateExpression, PrimaryExpression,
                           ParenthesizedExpression, ExpressionList, CommaExpression,
-                          SizeofExpression, PointerExpression)
+                          SizeofExpression, PointerExpression, DeleteExpression)
 from .statements import Statement
 from .statements import (
     AssertStatement, BlockStatement, BreakStatement, ContinueStatement, DoStatement,
@@ -127,7 +127,8 @@ def create_instanceof_expr(expr: Expression,
     return InstanceofExpression(NodeType.INSTANCEOF_EXPR, expr, type_name)
 
 
-def create_new_expr(type_name: TypeIdentifier, args: ExpressionList) -> NewExpression:
+def create_new_expr(type_name: TypeIdentifier,
+                    args: Optional[ExpressionList] = None) -> NewExpression:
     return NewExpression(NodeType.NEW_EXPR, type_name, args)
 
 
@@ -170,6 +171,10 @@ def create_sizeof_expr(operand: Union[Expression, TypeIdentifier]) -> SizeofExpr
 
 def create_pointer_expr(operand: Expression, op: PointerOps) -> PointerExpression:
     return PointerExpression(NodeType.POINTER_EXPR, operand, op)
+
+
+def create_delete_expr(operand: Expression, is_array: bool = False) -> DeleteExpression:
+    return DeleteExpression(NodeType.DELETE_EXPR, operand, is_array)
 
 
 # STATEMENTS

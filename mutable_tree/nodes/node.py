@@ -20,6 +20,7 @@ class NodeType(Enum):
     ARRAY_CREATION_EXPR = 'ArrayCreationExpression'
     COMMA_EXPR = 'CommaExpression'  # NOTE: not quite an expr
     POINTER_EXPR = 'PointerExpression'
+    DELETE_EXPR = 'DeleteExpression'
 
     # primary expressions
     LITERAL = 'Literal'
