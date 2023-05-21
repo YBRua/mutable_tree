@@ -12,3 +12,4 @@ from .update_binop import BinopUpdateVisitor
 from .ternary_to_if import TernaryToIfVisitor
 from .switch_to_if import SwitchToIfVisitor
 from .compound_if import CompoundIfVisitor
+from .nested_if import NestedIfVisitor

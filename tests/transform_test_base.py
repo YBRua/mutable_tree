@@ -41,5 +41,6 @@ class TransformTestBase(unittest.TestCase):
 
         if verbose:
             print(new_code)
+            print()
 
         return root
