@@ -21,3 +21,4 @@ from .expression_list import ExpressionList
 
 from .comma_expr import CommaExpression
 from .sizeof_expr import SizeofExpression
+from .pointer_expr import PointerExpression, PointerOps, get_pointer_op

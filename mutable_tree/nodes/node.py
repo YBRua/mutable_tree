@@ -19,6 +19,7 @@ class NodeType(Enum):
     CAST_EXPR = 'CastExpression'
     ARRAY_CREATION_EXPR = 'ArrayCreationExpression'
     COMMA_EXPR = 'CommaExpression'  # NOTE: not quite an expr
+    POINTER_EXPR = 'PointerExpression'
 
     # primary expressions
     LITERAL = 'Literal'

@@ -1,14 +1,15 @@
 from .node import NodeType
 from .program import Program
 from .expressions import Expression
-from .expressions import BinaryOps, UnaryOps, UpdateOps, AssignmentOps, FieldAccessOps
+from .expressions import (BinaryOps, UnaryOps, UpdateOps, AssignmentOps, FieldAccessOps,
+                          PointerOps)
 from .expressions import (ArrayAccess, ArrayExpression, ArrayCreationExpression,
                           AssignmentExpression, BinaryExpression, CallExpression,
                           CastExpression, FieldAccess, Identifier, InstanceofExpression,
                           Literal, NewExpression, TernaryExpression, ThisExpression,
                           UnaryExpression, UpdateExpression, PrimaryExpression,
                           ParenthesizedExpression, ExpressionList, CommaExpression,
-                          SizeofExpression)
+                          SizeofExpression, PointerExpression)
 from .statements import Statement
 from .statements import (
     AssertStatement, BlockStatement, BreakStatement, ContinueStatement, DoStatement,
@@ -165,6 +166,10 @@ def create_comma_expr(left: Expression, right: Expression) -> CommaExpression:
 
 def create_sizeof_expr(operand: Union[Expression, TypeIdentifier]) -> SizeofExpression:
     return SizeofExpression(NodeType.SIZEOF_EXPR, operand)
+
+
+def create_pointer_expr(operand: Expression, op: PointerOps) -> PointerExpression:
+    return PointerExpression(NodeType.POINTER_EXPR, operand, op)
 
 
 # STATEMENTS

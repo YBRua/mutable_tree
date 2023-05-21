@@ -7,7 +7,8 @@ from ...nodes import (ArrayAccess, ArrayCreationExpression, ArrayExpression,
                       CastExpression, FieldAccess, Identifier, InstanceofExpression,
                       Literal, NewExpression, TernaryExpression, ThisExpression,
                       UnaryExpression, UpdateExpression, ParenthesizedExpression,
-                      ExpressionList, LambdaExpression, CommaExpression, SizeofExpression)
+                      ExpressionList, LambdaExpression, CommaExpression, SizeofExpression,
+                      PointerExpression)
 from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueStatement,
                       DoStatement, EmptyStatement, ExpressionStatement, ForInStatement,
                       ForStatement, IfStatement, LabeledStatement,
@@ -22,7 +23,7 @@ from ...nodes import (Modifier, ModifierList)
 from ...nodes import Program
 from ...nodes import TypeIdentifier, Dimensions, TypeParameter, TypeParameterList
 from ...nodes import (get_assignment_op, get_binary_op, get_unary_op, get_update_op,
-                      get_field_access_op)
+                      get_field_access_op, get_pointer_op)
 from ...nodes import node_factory
 from typing import Tuple, Optional, List
 
@@ -184,3 +185,9 @@ def convert_sizeof_expr(node: tree_sitter.Node) -> SizeofExpression:
     type_node = node.child_by_field_name('type')
     type_id = convert_type(type_node)
     return node_factory.create_sizeof_expr(type_id)
+
+
+def convert_pointer_expr(node: tree_sitter.Node) -> PointerExpression:
+    expr = convert_expression(node.child_by_field_name('argument'))
+    op = get_pointer_op(node.child_by_field_name('operator').text.decode())
+    return node_factory.create_pointer_expr(expr, op)
