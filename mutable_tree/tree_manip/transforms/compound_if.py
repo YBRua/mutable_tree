@@ -1,5 +1,5 @@
 from ..visitor import TransformingVisitor
-from mutable_tree.nodes import Node, node_factory
+from mutable_tree.nodes import Node, NodeType, node_factory
 from mutable_tree.nodes import IfStatement, BlockStatement
 from mutable_tree.nodes import Expression, BinaryExpression, BinaryOps
 from typing import Optional
@@ -8,9 +8,13 @@ from typing import Optional
 class CompoundIfVisitor(TransformingVisitor):
 
     def _create_logical_and(self, lhs: Expression, rhs: Expression) -> BinaryExpression:
-        if len(lhs.get_children()) > 1:
+        singleton_types = {
+            NodeType.LITERAL, NodeType.IDENTIFIER, NodeType.CALL_EXPR,
+            NodeType.PARENTHESIZED_EXPR
+        }
+        if lhs.node_type not in singleton_types:
             lhs = node_factory.create_parenthesized_expr(lhs)
-        if len(rhs.get_children()) > 1:
+        if rhs.node_type not in singleton_types:
             rhs = node_factory.create_parenthesized_expr(rhs)
         return node_factory.create_binary_expr(lhs, rhs, BinaryOps.AND)
 

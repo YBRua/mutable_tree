@@ -38,6 +38,17 @@ class TestIfTransform(TransformTestBase):
         """
         self.check_transform(code, visitor, verbose=verbose)
 
+        code = """
+        if (x > 0) {
+            if (y > 0) {
+                if (whoWritesCodeLikeThis()) {
+                    beatHim();
+                }
+            }
+        }
+        """
+        self.check_transform(code, visitor, verbose=verbose)
+
         # should not transform in these cases
         code = """
         if (x > 0) {
