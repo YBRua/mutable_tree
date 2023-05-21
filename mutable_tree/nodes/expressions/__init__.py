@@ -6,7 +6,7 @@ from .assignment_expr import AssignmentExpression, get_assignment_op, Assignment
 from .binary_expr import BinaryExpression, get_binary_op, BinaryOps
 from .call_expr import CallExpression
 from .cast_expr import CastExpression
-from .field_access import FieldAccess
+from .field_access import FieldAccess, FieldAccessOps, get_field_access_op
 from .identifier import Identifier
 from .instanceof_expr import InstanceofExpression
 from .literal import Literal

@@ -1,7 +1,7 @@
 from .node import NodeType
 from .program import Program
 from .expressions import Expression
-from .expressions import BinaryOps, UnaryOps, UpdateOps, AssignmentOps
+from .expressions import BinaryOps, UnaryOps, UpdateOps, AssignmentOps, FieldAccessOps
 from .expressions import (ArrayAccess, ArrayExpression, ArrayCreationExpression,
                           AssignmentExpression, BinaryExpression, CallExpression,
                           CastExpression, FieldAccess, Identifier, InstanceofExpression,
@@ -114,8 +114,10 @@ def create_cast_expr(type_name: TypeIdentifier, expr: Expression) -> CastExpress
     return CastExpression(NodeType.CAST_EXPR, type_name, expr)
 
 
-def create_field_access(obj: PrimaryExpression, field: Identifier) -> FieldAccess:
-    return FieldAccess(NodeType.FIELD_ACCESS, obj, field)
+def create_field_access(obj: PrimaryExpression,
+                        field: Identifier,
+                        op: FieldAccessOps = FieldAccessOps.DOT) -> FieldAccess:
+    return FieldAccess(NodeType.FIELD_ACCESS, obj, field, op)
 
 
 def create_instanceof_expr(expr: Expression,
