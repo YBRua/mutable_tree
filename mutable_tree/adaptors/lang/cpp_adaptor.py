@@ -7,7 +7,7 @@ from ...nodes import (ArrayAccess, ArrayCreationExpression, ArrayExpression,
                       CastExpression, FieldAccess, Identifier, InstanceofExpression,
                       Literal, NewExpression, TernaryExpression, ThisExpression,
                       UnaryExpression, UpdateExpression, ParenthesizedExpression,
-                      ExpressionList, LambdaExpression)
+                      ExpressionList, LambdaExpression, CommaExpression)
 from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueStatement,
                       DoStatement, EmptyStatement, ExpressionStatement, ForInStatement,
                       ForStatement, IfStatement, LabeledStatement,
@@ -47,6 +47,7 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         'call_expression': convert_call_expr,
         'field_expression': convert_field_access,
         'parenthesized_expression': convert_parenthesized_expr,
+        'comma_expression': convert_comma_expr,
     }
 
     return expr_convertors[node.type](node)
@@ -165,3 +166,9 @@ def convert_parenthesized_expr(node: tree_sitter.Node) -> ParenthesizedExpressio
     assert node.child_count == 3, 'parenthesized expr with != 3 children'
     expr = convert_expression(node.children[1])
     return node_factory.create_parenthesized_expr(expr)
+
+
+def convert_comma_expr(node: tree_sitter.Node) -> CommaExpression:
+    left = convert_expression(node.child_by_field_name('left'))
+    right = convert_expression(node.child_by_field_name('right'))
+    return node_factory.create_comma_expr(left, right)

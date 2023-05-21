@@ -15,8 +15,9 @@ class NodeType(Enum):
     TERNARY_EXPR = 'TernaryExpression'
     UPDATE_EXPR = 'UpdateExpression'
     UNARY_EXPR = 'UnaryExpression'
-    CAST_EXPR = 'CastExpression'  # NOT IMPLEMENTED
+    CAST_EXPR = 'CastExpression'
     ARRAY_CREATION_EXPR = 'ArrayCreationExpression'
+    COMMA_EXPR = 'CommaExpression'  # NOTE: not quite an expr
 
     # primary expressions
     LITERAL = 'Literal'
