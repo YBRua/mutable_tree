@@ -60,6 +60,7 @@ class NodeType(Enum):
     FUNCTION_DECLARATOR = 'FunctionDeclarator'
     FUNCTION_HEADER = 'FunctionHeader'
     FUNCTION_DEFINITION = 'FunctionDefinition'
+    TEMPLATE_DECLARATION = 'TemplateDeclaration'
 
     DECLARATOR_TYPE = 'DeclaratorType'
     VARIABLE_DECLARATOR = 'VariableDeclarator'
@@ -75,6 +76,8 @@ class NodeType(Enum):
     TYPE_IDENTIFIER_LIST = 'TypeIdentifierList'
     TYPE_PARAMETER = 'TypeParameter'
     TYPE_PARAMETER_LIST = 'TypeParameterList'
+    TYPE_PARAMETER_DECLARATION = 'TypeParameterDeclaration'
+    TEMPLATE_PARAMETER_LIST = 'TemplateParameterList'
     DIMENSION_SPECIFIER = 'DimensionSpecifier'
     DIMENSIONS = 'Dimensions'
 

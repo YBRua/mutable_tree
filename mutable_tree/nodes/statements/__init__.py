@@ -28,6 +28,9 @@ from .func_declaration import (is_formal_parameter, FormalParameter, InferredPar
                                TypedFormalParameter, SpreadParameter, VariadicParameter,
                                FormalParameterList, FunctionDeclarator, FunctionHeader,
                                FunctionDeclaration)
+from .template_declaration import (TemplateDeclaration, TemplateParameter,
+                                   TemplateParameterList, TypeParameterDeclaration,
+                                   TypenameOpts, get_typename_opts)
 
 # NOTE: have to put an expression in the statements folder due to circular imports
 from .lambda_expr import LambdaExpression

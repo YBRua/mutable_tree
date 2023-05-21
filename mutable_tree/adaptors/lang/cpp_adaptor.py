@@ -20,12 +20,19 @@ from ...nodes import (Declarator, VariableDeclarator, ArrayDeclarator, PointerDe
 from ...nodes import (FormalParameter, InferredParameter, TypedFormalParameter,
                       SpreadParameter, VariadicParameter, FormalParameterList,
                       FunctionDeclarator, FunctionHeader, FunctionDeclaration)
+from ...nodes import (
+    TemplateDeclaration,
+    TemplateParameter,
+    TemplateParameterList,
+    TypeParameterDeclaration,
+    TypenameOpts,
+)
 from ...nodes import (Modifier, ModifierList)
 from ...nodes import Program
 from ...nodes import (TypeIdentifier, Dimensions, DimensionSpecifier, TypeParameter,
                       TypeParameterList)
 from ...nodes import (get_assignment_op, get_binary_op, get_unary_op, get_update_op,
-                      get_field_access_op, get_pointer_op)
+                      get_field_access_op, get_pointer_op, get_typename_opts)
 from ...nodes import node_factory
 from typing import Tuple, Optional, List
 
@@ -90,6 +97,7 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'return_statement': convert_return_stmt,
         'switch_statement': convert_switch_stmt,
         'function_definition': convert_function_definition,
+        'template_declaration': convert_template_declaration,
     }
 
     return stmt_convertors[node.type](node)
@@ -101,6 +109,8 @@ def convert_type(node: tree_sitter.Node) -> TypeIdentifier:
         'type_identifier': convert_simple_type,
         'primitive_type': convert_simple_type,
         'placeholder_type_specifier': convert_simple_type,
+        'sized_type_specifier': convert_simple_type,
+        'template_type': convert_simple_type,
     }
 
     return type_convertors[node.type](node)
@@ -657,3 +667,35 @@ def convert_function_definition(node: tree_sitter.Node) -> FunctionDeclaration:
 
     header = node_factory.create_func_header(decl_type, decl)
     return node_factory.create_func_declaration(header, body)
+
+
+def convert_type_param_decl(node: tree_sitter.Node) -> TypeParameterDeclaration:
+    assert node.child_count == 2
+    typename_str = node.children[0].text.decode()
+    typename_opt = get_typename_opts(typename_str)
+    name_node = node.children[1]
+    name = convert_type(name_node)
+    return node_factory.create_type_parameter_declaration(name, typename_opt)
+
+
+def convert_template_parameters(node: tree_sitter.Node) -> TemplateParameterList:
+    # skip <>
+    params = []
+    for ch in node.children[1:-1]:
+        if ch.type == ',':
+            continue
+        if ch.type == 'parameter_declaration':
+            params.append(convert_formal_param(ch))
+        if ch.type == 'type_parameter_declaration':
+            params.append(convert_type_param_decl(ch))
+    return node_factory.create_template_parameter_list(params)
+
+
+def convert_template_declaration(node: tree_sitter.Node) -> TemplateDeclaration:
+    params_node = node.child_by_field_name('parameters')
+    params = convert_template_parameters(params_node)
+
+    body_node = node.children[-1]
+    body = convert_function_definition(body_node)
+
+    return node_factory.create_template_declaration(params, body)

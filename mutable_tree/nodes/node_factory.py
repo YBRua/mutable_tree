@@ -24,6 +24,8 @@ from .statements import (Declarator, VariableDeclarator, ArrayDeclarator,
 from .statements import (FormalParameter, InferredParameter, TypedFormalParameter,
                          SpreadParameter, VariadicParameter, FormalParameterList,
                          FunctionDeclarator, FunctionHeader, FunctionDeclaration)
+from .statements import (TemplateDeclaration, TemplateParameter, TemplateParameterList,
+                         TypeParameterDeclaration, TypenameOpts)
 from .miscs import Modifier, ModifierList
 from .statements.for_stmt import ForInit
 from .types import (TypeIdentifier, TypeIdentifierList, DimensionSpecifier, Dimensions,
@@ -412,6 +414,24 @@ def create_func_declaration(
     body: Union[BlockStatement, EmptyStatement],
 ) -> FunctionDeclaration:
     return FunctionDeclaration(NodeType.FUNCTION_DEFINITION, header, body)
+
+
+def create_type_parameter_declaration(
+    type_id: TypeIdentifier,
+    typename_opt: TypenameOpts,
+) -> TypeParameterDeclaration:
+    return TypeParameterDeclaration(NodeType.TYPE_PARAMETER_DECLARATION, type_id,
+                                    typename_opt)
+
+
+def create_template_parameter_list(
+        params: List[TemplateParameter]) -> TemplateParameterList:
+    return TemplateParameterList(NodeType.TEMPLATE_PARAMETER_LIST, params)
+
+
+def create_template_declaration(params: TemplateParameterList,
+                                func: FunctionDeclaration) -> TemplateDeclaration:
+    return TemplateDeclaration(NodeType.TEMPLATE_DECLARATION, params, func)
 
 
 # MISCS
