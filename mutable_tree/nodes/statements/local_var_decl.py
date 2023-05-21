@@ -5,7 +5,7 @@ from ..expressions import Expression, Identifier
 from ..types import TypeIdentifier, Dimensions
 from ..expressions import is_expression
 from ..utils import throw_invalid_type
-from typing import List, Optional
+from typing import List, Optional, Union
 
 
 class VariableDeclarator(Node):
@@ -52,10 +52,41 @@ class VariableDeclarator(Node):
         return ['name', 'dimensions', 'value']
 
 
-class VariableDeclaratorList(NodeList):
-    node_list: List[VariableDeclarator]
+class PointerDeclarator(Node):
 
-    def __init__(self, node_type: NodeType, declarators: List[VariableDeclarator]):
+    def __init__(
+        self,
+        node_type: NodeType,
+        declarator: Union[VariableDeclarator, 'PointerDeclarator'],
+    ):
+        super().__init__(node_type)
+        self.declarator = declarator
+        self._check_types()
+
+    def _check_types(self):
+        if self.node_type != NodeType.POINTER_DECLARATOR:
+            throw_invalid_type(self.node_type, self)
+        if (self.declarator.node_type != NodeType.VARIABLE_DECLARATOR
+                and self.declarator.node_type != NodeType.POINTER_DECLARATOR):
+            throw_invalid_type(self.declarator.node_type, self, attr='declarator')
+
+    def to_string(self) -> str:
+        return f'*{self.declarator.to_string()}'
+
+    def get_children(self) -> List[Node]:
+        return [self.declarator]
+
+    def get_children_names(self) -> List[str]:
+        return ['declarator']
+
+
+Declarator = Union[VariableDeclarator, PointerDeclarator]
+
+
+class VariableDeclaratorList(NodeList):
+    node_list: List[Declarator]
+
+    def __init__(self, node_type: NodeType, declarators: List[Declarator]):
         super().__init__(node_type)
         self.node_list = declarators
         self._check_types()
@@ -64,7 +95,8 @@ class VariableDeclaratorList(NodeList):
         if self.node_type != NodeType.VARIABLE_DECLARATOR_LIST:
             throw_invalid_type(self.node_type, self)
         for i, decl in enumerate(self.node_list):
-            if decl.node_type != NodeType.VARIABLE_DECLARATOR:
+            if (decl.node_type != NodeType.VARIABLE_DECLARATOR
+                    and decl.node_type != NodeType.POINTER_DECLARATOR):
                 throw_invalid_type(decl.node_type, self, attr=f'declarator#{i}')
 
 

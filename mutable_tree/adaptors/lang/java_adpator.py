@@ -361,9 +361,9 @@ def convert_variable_declartor_id(
 def convert_variable_declarator(node: tree_sitter.Node) -> VariableDeclarator:
     value_node = node.child_by_field_name('value')
 
-    name_expr, dim_expr = convert_variable_declartor_id(node)
-    value_expr = convert_expression(value_node) if value_node is not None else None
-    return node_factory.create_variable_declarator(name_expr, dim_expr, value_expr)
+    name, dim = convert_variable_declartor_id(node)
+    value = convert_expression(value_node) if value_node is not None else None
+    return node_factory.create_variable_declarator(name, dim, value)
 
 
 def convert_local_variable_declaration(

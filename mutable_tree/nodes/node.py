@@ -59,6 +59,7 @@ class NodeType(Enum):
     # declarations & definitions (are also statements)
     FUNC_DECLARATOR = 'FunctionDeclarator'
     FUNC_DECLARATION = 'FunctionDeclaration'
+    POINTER_DECLARATOR = 'PointerDeclarator'
 
     # types
     TYPE_IDENTIFIER = 'TypeIdentifier'

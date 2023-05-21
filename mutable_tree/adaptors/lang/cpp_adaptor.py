@@ -75,6 +75,8 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
 def convert_statement(node: tree_sitter.Node) -> Statement:
     stmt_convertors = {
         'expression_statement': convert_expression_stmt,
+        'labeled_statement': convert_labeled_stmt,
+        'compound_statement': convert_block_stmt,
     }
 
     return stmt_convertors[node.type](node)
@@ -278,3 +280,80 @@ def convert_delete_expr(node: tree_sitter.Node) -> DeleteExpression:
 def convert_expression_stmt(node: tree_sitter.Node) -> ExpressionStatement:
     expr = convert_expression(node.children[0])
     return node_factory.create_expression_stmt(expr)
+
+
+def convert_labeled_stmt(node: tree_sitter.Node) -> LabeledStatement:
+    assert node.child_count == 3
+    label_node = node.children[0]
+    stmt_node = node.children[2]
+
+    label = convert_identifier(label_node)
+    stmt = convert_statement(stmt_node)
+    return node_factory.create_labeled_stmt(label, stmt)
+
+
+def convert_block_stmt(node: tree_sitter.Node) -> BlockStatement:
+    stmts = []
+    for stmt_node in node.children[1:-1]:
+        stmts.append(convert_statement(stmt_node))
+    stmts = node_factory.create_statement_list(stmts)
+    return node_factory.create_block_stmt(stmts)
+
+
+def convert_if_stmt(node: tree_sitter.Node) -> IfStatement:
+    cond_node = node.child_by_field_name('condition')
+    consequence_node = node.child_by_field_name('consequence')
+    alternative_node = node.child_by_field_name('alternative')
+
+    assert cond_node.type == 'parenthesized_expression' and cond_node.child_count == 3
+    cond_node = cond_node.children[1]
+
+    condition = convert_expression(cond_node)
+    consequence = convert_statement(consequence_node)
+    if alternative_node is None:
+        alternative = None
+    else:
+        alternative = convert_statement(alternative_node)
+
+    return node_factory.create_if_stmt(condition, consequence, alternative)
+
+
+def convert_do_stmt(node: tree_sitter.Node) -> DoStatement:
+    body_node = node.child_by_field_name('body')
+    cond_node = node.child_by_field_name('condition')
+
+    assert cond_node.type == 'parenthesized_expression'
+    assert cond_node.child_count == 3
+    cond_node = cond_node.children[1]
+
+    body = convert_statement(body_node)
+    cond = convert_expression(cond_node)
+    return node_factory.create_do_stmt(cond, body)
+
+
+def convert_variable_declarator(node: tree_sitter.Node) -> VariableDeclarator:
+    assert node.type == 'identifier'
+    return node_factory.create_variable_declarator(convert_identifier(node))
+
+
+def _convert_declarator(node: tree_sitter.Node):
+    if node.type == 'declarator':
+        return
+    if node.type == 'init_declarator':
+        decl = _convert_declarator(node.children[0])
+        value = convert_expression(node.children[2])
+
+
+def convert_local_variable_declaration(
+        node: tree_sitter.Node) -> LocalVariableDeclaration:
+    # TODO: [modifier], type, [modifier]
+    decl_specifiers = []
+    idx = 0
+
+    ty = convert_type(node.child_by_field_name('type'))
+    declarators = []
+    for decl_node in node.children_by_field_name('declarator'):
+        declarators.append(convert_variable_declarator(decl_node))
+    declarators = node_factory.create_variable_declarator_list(declarators)
+
+    return node_factory.create_local_var_decl(ty, declarators, modifiers)

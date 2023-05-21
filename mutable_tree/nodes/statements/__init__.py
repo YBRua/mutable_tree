@@ -11,7 +11,7 @@ from .for_stmt import ForStatement
 from .if_stmt import IfStatement
 from .labeled_stmt import LabeledStatement
 from .local_var_decl import (LocalVariableDeclaration, VariableDeclarator,
-                             VariableDeclaratorList)
+                             PointerDeclarator, VariableDeclaratorList)
 from .return_stmt import ReturnStatement
 from .switch_stmt import SwitchStatement, SwitchCase, SwitchCaseList
 from .synchronized_stmt import SynchronizedStatement
