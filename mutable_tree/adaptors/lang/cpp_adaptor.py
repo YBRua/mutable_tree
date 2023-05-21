@@ -9,15 +9,14 @@ from ...nodes import (ArrayAccess, ArrayCreationExpression, ArrayExpression,
                       UnaryExpression, UpdateExpression, ParenthesizedExpression,
                       ExpressionList, LambdaExpression, CommaExpression, SizeofExpression,
                       PointerExpression, DeleteExpression)
-from ...nodes import (AssertStatement, BlockStatement, BreakStatement, ContinueStatement,
-                      DoStatement, EmptyStatement, ExpressionStatement, ForInStatement,
-                      ForStatement, IfStatement, LabeledStatement, ReturnStatement,
-                      SwitchStatement, SwitchCase, SwitchCaseList, ThrowStatement,
-                      TryStatement, CatchClause, FinallyClause, TryHandlers,
-                      WhileStatement, YieldStatement, TryResource, TryResourceList,
-                      TryWithResourcesStatement, SynchronizedStatement)
+from ...nodes import (BlockStatement, BreakStatement, ContinueStatement, DoStatement,
+                      EmptyStatement, ExpressionStatement, ForInStatement, ForStatement,
+                      IfStatement, LabeledStatement, ReturnStatement, SwitchStatement,
+                      SwitchCase, SwitchCaseList, ThrowStatement, TryStatement,
+                      CatchClause, FinallyClause, TryHandlers, WhileStatement)
 from ...nodes import (Declarator, VariableDeclarator, ArrayDeclarator, PointerDeclarator,
-                      InitializingDeclarator, DeclaratorType, LocalVariableDeclaration)
+                      ReferenceDeclarator, InitializingDeclarator, DeclaratorType,
+                      LocalVariableDeclaration)
 from ...nodes import (FormalParameter, InferredParameter, TypedFormalParameter,
                       SpreadParameter, FormalParameterList, FunctionDeclarator,
                       FunctionDeclaration)
@@ -80,6 +79,16 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'labeled_statement': convert_labeled_stmt,
         'compound_statement': convert_block_stmt,
         'declaration': convert_local_variable_declaration,
+        'for_statement': convert_for_stmt,
+        'while_statement': convert_while_stmt,
+        'break_statement': convert_break_stmt,
+        'continue_statement': convert_continue_stmt,
+        'do_statement': convert_do_stmt,
+        'if_statement': convert_if_stmt,
+        'for_range_loop': convert_for_range_loop,
+        'labeled_statement': convert_labeled_stmt,
+        'return_statement': convert_return_stmt,
+        'switch_statement': convert_switch_stmt,
     }
 
     return stmt_convertors[node.type](node)
@@ -90,6 +99,7 @@ def convert_type(node: tree_sitter.Node) -> TypeIdentifier:
         'type_descriptor': convert_simple_type,
         'type_identifier': convert_simple_type,
         'primitive_type': convert_simple_type,
+        'placeholder_type_specifier': convert_simple_type,
     }
 
     return type_convertors[node.type](node)
@@ -294,18 +304,11 @@ def convert_delete_expr(node: tree_sitter.Node) -> DeleteExpression:
 
 
 def convert_expression_stmt(node: tree_sitter.Node) -> ExpressionStatement:
+    if node.child_count == 1:
+        # empty statement
+        return node_factory.create_empty_stmt()
     expr = convert_expression(node.children[0])
     return node_factory.create_expression_stmt(expr)
-
-
-def convert_labeled_stmt(node: tree_sitter.Node) -> LabeledStatement:
-    assert node.child_count == 3
-    label_node = node.children[0]
-    stmt_node = node.children[2]
-
-    label = convert_identifier(label_node)
-    stmt = convert_statement(stmt_node)
-    return node_factory.create_labeled_stmt(label, stmt)
 
 
 def convert_block_stmt(node: tree_sitter.Node) -> BlockStatement:
@@ -316,15 +319,24 @@ def convert_block_stmt(node: tree_sitter.Node) -> BlockStatement:
     return node_factory.create_block_stmt(stmts)
 
 
+def convert_condition_clause(node: tree_sitter.Node) -> Expression:
+    initializer_node = node.child_by_field_name('initializer')
+    if initializer_node is not None:
+        raise NotImplementedError('condition clause with initializer')
+
+    value_node = node.child_by_field_name('value')
+    if value_node.type == 'declaration':
+        raise NotImplementedError('condition clause with declaration')
+
+    return convert_expression(value_node)
+
+
 def convert_if_stmt(node: tree_sitter.Node) -> IfStatement:
     cond_node = node.child_by_field_name('condition')
     consequence_node = node.child_by_field_name('consequence')
     alternative_node = node.child_by_field_name('alternative')
 
-    assert cond_node.type == 'parenthesized_expression' and cond_node.child_count == 3
-    cond_node = cond_node.children[1]
-
-    condition = convert_expression(cond_node)
+    condition = convert_condition_clause(cond_node)
     consequence = convert_statement(consequence_node)
     if alternative_node is None:
         alternative = None
@@ -373,17 +385,24 @@ def convert_init_declarator(node: tree_sitter.Node) -> InitializingDeclarator:
     return node_factory.create_initializing_declarator(declarator, value)
 
 
+def convert_reference_declarator(node: tree_sitter.Node) -> ReferenceDeclarator:
+    declarator = convert_declarator(node.children[1])
+    r_ref = node.children[0].type == '&&'
+    return node_factory.create_reference_declarator(declarator, r_ref)
+
+
 def convert_declarator(node: tree_sitter.Node):
     decl_convertors = {
         'identifier': convert_variable_declarator,
         'pointer_declarator': convert_pointer_declarator,
         'array_declarator': convert_array_declarator,
         'init_declarator': convert_init_declarator,
+        'reference_declarator': convert_reference_declarator,
     }
     return decl_convertors[node.type](node)
 
 
-def _convert_declaration_specifiers(node: tree_sitter.Node):
+def _convert_declaration_specifiers(node: tree_sitter.Node, start_idx: int = 0):
 
     def _is_decl_modifier(node: tree_sitter.Node) -> bool:
         modifier_types = {
@@ -395,8 +414,8 @@ def _convert_declaration_specifiers(node: tree_sitter.Node):
     prefix_specifier_nodes = []
     postfix_specifier_nodes = []
 
-    idx = 0
-    for child in node.children:
+    idx = start_idx
+    for child in node.children[idx:]:
         if not _is_decl_modifier(child):
             break
         idx += 1
@@ -433,3 +452,159 @@ def convert_local_variable_declaration(
     declarators = node_factory.create_declarator_list(declarators)
 
     return node_factory.create_local_variable_declaration(decl_type, declarators)
+
+
+def convert_empty_stmt(node: tree_sitter.Node) -> EmptyStatement:
+    return node_factory.create_empty_stmt()
+
+
+def convert_for_stmt(node: tree_sitter.Node) -> ForStatement:
+    init_nodes = node.children_by_field_name('initializer')
+    cond_node = node.child_by_field_name('condition')
+    update_node = node.children_by_field_name('update')
+    body_node = node.child_by_field_name('body')
+
+    body = convert_statement(body_node)
+    if len(init_nodes) == 0:
+        init = None
+    else:
+        if init_nodes[0].type == 'declaration':
+            assert len(init_nodes) == 1
+            init = convert_local_variable_declaration(init_nodes[0])
+        else:
+            init = [convert_expression(init_node) for init_node in init_nodes]
+            init = node_factory.create_expression_list(init)
+    cond = convert_expression(cond_node) if cond_node is not None else None
+    if len(update_node) == 0:
+        update = None
+    else:
+        update = [convert_expression(update) for update in update_node]
+        update = node_factory.create_expression_list(update)
+    return node_factory.create_for_stmt(body, init, cond, update)
+
+
+def convert_while_stmt(node: tree_sitter.Node) -> WhileStatement:
+    cond_node = node.child_by_field_name('condition')
+    assert cond_node.child_count == 3, 'while condition with != 3 children'
+    cond_node = cond_node.children[1]
+    body_node = node.child_by_field_name('body')
+
+    cond = convert_expression(cond_node)  # NOTE: should be condition clause
+    body = convert_statement(body_node)
+    return node_factory.create_while_stmt(cond, body)
+
+
+def convert_break_stmt(node: tree_sitter.Node) -> BreakStatement:
+    assert node.child_count == 2
+    return node_factory.create_break_stmt()
+
+
+def convert_continue_stmt(node: tree_sitter.Node) -> ContinueStatement:
+    assert node.child_count == 2
+    return node_factory.create_continue_stmt()
+
+
+def convert_for_range_loop(node: tree_sitter.Node) -> ForInStatement:
+    init_node = node.child_by_field_name('initializer')
+    if init_node is not None:
+        raise NotImplementedError('for range loop with initializer')
+
+    decl_type = _convert_declaration_specifiers(node, start_idx=2)
+    declarator_node = node.child_by_field_name('declarator')
+    decl = convert_declarator(declarator_node)
+
+    value = convert_expression(node.child_by_field_name('right'))
+    body = convert_statement(node.child_by_field_name('body'))
+
+    return node_factory.create_for_in_stmt(decl_type, decl, value, body)
+
+
+def convert_labeled_stmt(node: tree_sitter.Node) -> LabeledStatement:
+    assert node.child_count == 3
+    label_node = node.children[0]
+    stmt_node = node.children[2]
+
+    label = convert_identifier(label_node)
+    stmt = convert_statement(stmt_node)
+    return node_factory.create_labeled_stmt(label, stmt)
+
+
+def convert_return_stmt(node: tree_sitter.Node) -> ReturnStatement:
+    if node.child_count == 2:
+        expr_node = None
+    else:
+        assert node.child_count == 3
+        expr_node = node.children[1]
+
+    expr = convert_expression(expr_node) if expr_node is not None else None
+    return node_factory.create_return_stmt(expr)
+
+
+def convert_switch_case(node: tree_sitter.Node) -> SwitchCase:
+    assert node.child_count >= 2
+
+    if node.children[0].type == 'default':
+        start_idx = 2
+        label = None
+    else:
+        assert node.children[0].type == 'case'
+        start_idx = 3
+        label = convert_expression(node.child_by_field_name('value'))
+
+    stmt_nodes = node.children[start_idx:]
+
+    # convert body
+    stmts = [convert_statement(stmt_node) for stmt_node in stmt_nodes]
+    stmt_list = node_factory.create_statement_list(stmts)
+
+    return node_factory.create_switch_case(stmt_list, label)
+
+
+def convert_switch_block(node: tree_sitter.Node) -> SwitchCaseList:
+    # ignore curly braces
+    cases = []
+    for child in node.children[1:-1]:
+        cases.append(convert_switch_case(child))
+
+    return node_factory.create_switch_case_list(cases)
+
+
+def convert_switch_stmt(node: tree_sitter.Node) -> SwitchStatement:
+    cond_node = node.child_by_field_name('condition')
+    body_node = node.child_by_field_name('body')
+
+    # NOTE: condition should be a condition clause
+    assert cond_node.child_count == 3
+    cond_node = cond_node.children[1]
+    cond = convert_expression(cond_node)
+
+    body = convert_switch_block(body_node)
+
+    return node_factory.create_switch_stmt(cond, body)
+
+
+def convert_catch_handler(node: tree_sitter.Node) -> CatchClause:
+    raise NotImplementedError('catch handler')
+
+
+def convert_try_handlers(handler_nodes: List[tree_sitter.Node]) -> TryHandlers:
+    handlers = []
+    for handler_node in handler_nodes:
+        handlers.append(convert_catch_handler(handler_node))
+    handlers = node_factory.create_try_handlers(handlers)
+
+    return handlers
+
+
+def convert_try_stmt(node: tree_sitter.Node) -> TryStatement:
+    assert node.child_count >= 3
+
+    # try body
+    body_node = node.child_by_field_name('body')
+    body = convert_block_stmt(body_node)
+
+    # handlers and finalizer
+    handler_nodes = node.children[2:]
+    handlers = convert_try_handlers(handler_nodes)
+
+    return node_factory.create_try_stmt(body, handlers)

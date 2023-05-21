@@ -19,8 +19,8 @@ from .statements import (
     YieldStatement, StatementList, TryResource, TryResourceList,
     TryWithResourcesStatement, SynchronizedStatement, LambdaExpression)
 from .statements import (Declarator, VariableDeclarator, ArrayDeclarator,
-                         PointerDeclarator, InitializingDeclarator, DeclaratorList,
-                         DeclaratorType, LocalVariableDeclaration)
+                         PointerDeclarator, ReferenceDeclarator, InitializingDeclarator,
+                         DeclaratorList, DeclaratorType, LocalVariableDeclaration)
 from .statements import (FormalParameter, InferredParameter, TypedFormalParameter,
                          SpreadParameter, FormalParameterList, FunctionDeclarator,
                          FunctionDeclaration)
@@ -195,8 +195,13 @@ def create_pointer_declarator(decl: Declarator) -> PointerDeclarator:
     return PointerDeclarator(NodeType.POINTER_DECLARATOR, decl)
 
 
+def create_reference_declarator(decl: Declarator,
+                                r_ref: bool = False) -> ReferenceDeclarator:
+    return ReferenceDeclarator(NodeType.REFERENCE_DECLARATOR, decl, r_ref)
+
+
 def create_initializing_declarator(decl: Declarator,
-                                  value: Expression) -> InitializingDeclarator:
+                                   value: Expression) -> InitializingDeclarator:
     return InitializingDeclarator(NodeType.INITIALIZING_DECLARATOR, decl, value)
 
 
@@ -259,14 +264,12 @@ def create_do_stmt(condition: Expression, body: Statement) -> DoStatement:
 
 
 def create_for_in_stmt(
-    type_id: TypeIdentifier,
-    iterator: Identifier,
+    decl_type: DeclaratorType,
+    decl: Declarator,
     iterable: Expression,
     body: Statement,
-    modifiers: Optional[ModifierList] = None,
 ) -> ForInStatement:
-    return ForInStatement(NodeType.FOR_IN_STMT, type_id, iterator, iterable, body,
-                          modifiers)
+    return ForInStatement(NodeType.FOR_IN_STMT, decl_type, decl, iterable, body)
 
 
 def create_if_stmt(

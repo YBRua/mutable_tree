@@ -1,5 +1,4 @@
 import unittest
-import tree_sitter
 from mutable_tree.adaptors import CppAdaptor
 from tree_sitter import Language, Parser
 

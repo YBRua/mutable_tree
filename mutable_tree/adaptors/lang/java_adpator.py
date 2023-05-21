@@ -512,11 +512,14 @@ def convert_enhanced_for_stmt(node: tree_sitter.Node) -> ForInStatement:
     body_node = node.child_by_field_name('body')
 
     ty = convert_type(type_node)
+    decl_ty = node_factory.create_declarator_type(ty, modifiers)
     # NOTE: should be variable declarator according to grammar specification
     var_decl = convert_identifier(var_decl_node)
+    var_decl = node_factory.create_variable_declarator(var_decl)
+
     value = convert_expression(value_node)
     body = convert_statement(body_node)
-    return node_factory.create_for_in_stmt(ty, var_decl, value, body, modifiers)
+    return node_factory.create_for_in_stmt(decl_ty, var_decl, value, body)
 
 
 def convert_if_stmt(node: tree_sitter.Node) -> IfStatement:

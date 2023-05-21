@@ -63,6 +63,7 @@ class NodeType(Enum):
     DECLARATOR_TYPE = 'DeclaratorType'
     VARIABLE_DECLARATOR = 'VariableDeclarator'
     POINTER_DECLARATOR = 'PointerDeclarator'
+    REFERENCE_DECLARATOR = 'ReferenceDeclarator'
     ARRAY_DECLARATOR = 'ArrayDeclarator'
     INITIALIZING_DECLARATOR = 'InitializingDeclarator'
 

@@ -86,6 +86,30 @@ class PointerDeclarator(Declarator):
         return ['declarator']
 
 
+class ReferenceDeclarator(Declarator):
+
+    def __init__(self, node_type: NodeType, declarator: Declarator, r_ref: bool = False):
+        super().__init__(node_type)
+        self.declarator = declarator
+        self.r_ref = r_ref
+        self._check_types()
+
+    def _check_types(self):
+        if self.node_type != NodeType.REFERENCE_DECLARATOR:
+            throw_invalid_type(self.node_type, self)
+        if not is_declarator(self.declarator):
+            throw_invalid_type(self.declarator.node_type, self, attr='declarator')
+
+    def to_string(self) -> str:
+        return f'{"&" if not self.r_ref else "&&"}{self.declarator.to_string()}'
+
+    def get_children(self) -> List[Node]:
+        return [self.declarator]
+
+    def get_children_names(self) -> List[str]:
+        return ['declarator']
+
+
 class ArrayDeclarator(Declarator):
 
     def __init__(self, node_type: NodeType, declarator: Declarator,

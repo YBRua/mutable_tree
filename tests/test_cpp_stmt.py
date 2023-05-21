@@ -38,7 +38,6 @@ class TestCppVarDecl(CppSnippetTestBase):
         self._stmt_round_trip('int a, *b = nullptr, c[10];')
 
 
-@unittest.skip('Not implemented yet')
 class TestCppForStmt(CppSnippetTestBase):
 
     def test_simple_for(self):
@@ -73,12 +72,7 @@ class TestCppForStmt(CppSnippetTestBase):
         code = 'for (i = 0; i < 10; ++i) for (int j = 0; j < 10; ++j) k = i * j;'
         self._stmt_round_trip(code)
 
-    def test_for_while(self):
-        code = 'for (int i = 0; i < 10; ++i) { while (j < 2 * i) { j = 2 * j; } }'
-        self._stmt_round_trip(code)
 
-
-@unittest.skip('Not implemented yet')
 class TestCppWhileStmt(CppSnippetTestBase):
 
     def test_simple_while(self):
@@ -104,20 +98,20 @@ class TestCppWhileStmt(CppSnippetTestBase):
         code = 'while (true) { for (int i = 0; i < 10; ++i) { j = i * 2; } }'
         self._stmt_round_trip(code)
 
+    def test_for_while(self):
+        code = 'for (int i = 0; i < 10; ++i) { while (j < 2 * i) { j = 2 * j; } }'
+        self._stmt_round_trip(code)
 
-@unittest.skip('Not implemented yet')
+
 class TestCppBreakContinue(CppSnippetTestBase):
 
     def test_break(self):
         self._stmt_round_trip('while (true) { break; }')
-        self._stmt_round_trip('while (true) break label;')
 
     def test_continue(self):
         self._stmt_round_trip('while (true) { continue; }')
-        self._stmt_round_trip('while (true) continue label;')
 
 
-@unittest.skip('Not implemented yet')
 class TestCppDoWhileStmt(CppSnippetTestBase):
 
     def test_do_while(self):
@@ -125,21 +119,6 @@ class TestCppDoWhileStmt(CppSnippetTestBase):
         self._stmt_round_trip('do { something(); other.things(); } while (i < 10);')
 
 
-@unittest.skip('Not implemented yet')
-class TestCppEnhancedForStmt(CppSnippetTestBase):
-
-    def test_for_in(self):
-        self._stmt_round_trip('for (int i : array) { doSomethingWith(i); }')
-        self._stmt_round_trip('for (int i : array) doSomethingWith(i);')
-
-        self._stmt_round_trip(
-            'for (MyClass obj : objects.getObjs()) { doSomethingWith(obj); }')
-
-    def test_for_in_modifier(self):
-        self._stmt_round_trip('for (final int i : array) { doSomethingWith(i); }')
-
-
-@unittest.skip('Not implemented yet')
 class TestCppIfStmt(CppSnippetTestBase):
 
     def test_if(self):
@@ -179,14 +158,12 @@ class TestCppIfStmt(CppSnippetTestBase):
         self._stmt_round_trip(code)
 
 
-@unittest.skip('Not implemented yet')
 class TestCppLabeledStmt(CppSnippetTestBase):
 
     def test_labeled(self):
-        self._stmt_round_trip('label: while (true) { break label; }')
+        self._stmt_round_trip('label: while (true) { break; }')
 
 
-@unittest.skip('Not implemented yet')
 class TestCppReturnStmt(CppSnippetTestBase):
 
     def test_return(self):
@@ -195,7 +172,6 @@ class TestCppReturnStmt(CppSnippetTestBase):
         self._stmt_round_trip('if (true) return actuallyFalse;')
 
 
-@unittest.skip('Not implemented yet')
 class TestCppSwitchStmt(CppSnippetTestBase):
 
     def test_switch(self):
@@ -294,6 +270,19 @@ class TestCppTryStmt(CppSnippetTestBase):
         }
         """
         self._stmt_round_trip(code)
+
+
+class TestCppForRangeLoop(CppSnippetTestBase):
+
+    def test_for_in(self):
+        self._stmt_round_trip('for (int i : array) { doSomethingWith(i); }')
+        self._stmt_round_trip('for (auto i : array) doSomethingWith(i);')
+
+        self._stmt_round_trip(
+            'for (MyClass obj : objects.getObjs()) { doSomethingWith(obj); }')
+
+    def test_for_in_modifier(self):
+        self._stmt_round_trip('for (auto& i : array) { doSomethingWith(i); }')
 
 
 if __name__ == '__main__':
