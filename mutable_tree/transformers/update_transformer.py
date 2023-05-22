@@ -1,9 +1,10 @@
-from .code_transformer import AbstractCodeTransformer
+from .code_transformer import CodeTransformer
 from ..tree_manip.visitors import (PrefixUpdateVisitor, PostfixUpdateVisitor,
                                    BinopUpdateVisitor, AssignUpdateVisitor)
 
 
-class UpdateTransformer(AbstractCodeTransformer):
+class UpdateTransformer(CodeTransformer):
+    name = 'UpdateTransformer'
     TRANSFORM_PREFIX_UPDATE = 'UpdateTransformer.prefix_update'
     TRANSFORM_POSTFIX_UPDATE = 'UpdateTransformer.postfix_update'
     TRANSFORM_BINOP_UPDATE = 'UpdateTransformer.binop_update'

@@ -1,8 +1,9 @@
-from .code_transformer import AbstractCodeTransformer
+from .code_transformer import CodeTransformer
 from ..tree_manip.visitors import ForToWhileVisitor, WhileToForVisitor
 
 
-class LoopTransformer(AbstractCodeTransformer):
+class LoopTransformer(CodeTransformer):
+    name = 'LoopTransformer'
     TRANSFORM_LOOP_FOR = 'LoopTransformer.for_loop'
     TRANSFORM_LOOP_WHILE = 'LoopTransformer.while_loop'
 

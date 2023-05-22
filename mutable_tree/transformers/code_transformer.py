@@ -4,7 +4,8 @@ from ..tree_manip.visitors import TransformingVisitor
 from typing import Dict
 
 
-class AbstractCodeTransformer:
+class CodeTransformer:
+    name: str
     visitors: Dict[str, TransformingVisitor]
 
     @abc.abstractmethod
