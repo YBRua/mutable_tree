@@ -8,3 +8,6 @@ parser/
 # logs
 *.txt
 *.log
+
+# temp files for the deadline
+datasets/
