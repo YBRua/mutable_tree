@@ -824,8 +824,8 @@ def convert_formal_parameters(node: tree_sitter.Node) -> FormalParameterList:
 
 
 def convert_type_param(node: tree_sitter.Node) -> TypeParameter:
-    if (node.children[0].type != 'identifier'
-            and node.children[0].type != 'type_identifier'):
+    if (node.children[0].type != 'identifier' and
+            node.children[0].type != 'type_identifier'):
         raise NotImplementedError('type parameter with annotataions')
 
     # name
