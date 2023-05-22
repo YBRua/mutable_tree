@@ -13,5 +13,6 @@ class TransformerPipeline:
 
     def mutable_tree_transform(self, node: Node, keys: Sequence[str]) -> Node:
         for key in keys:
-            node = self.transformers[key].mutable_tree_transform(node, key)
+            name = key.split('.')[0]
+            node = self.transformers[name].mutable_tree_transform(node, key)
         return node
