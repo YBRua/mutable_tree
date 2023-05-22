@@ -1,5 +1,5 @@
 import copy
-from ..visitor import TransformingVisitor
+from .visitor import TransformingVisitor
 from mutable_tree.nodes import Node
 from mutable_tree.nodes import node_factory
 from mutable_tree.nodes import AssignmentOps

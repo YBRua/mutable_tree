@@ -1,3 +1,6 @@
+# base
+from .visitor import Visitor, TransformingVisitor
+
 # loop transformers
 from .loop_while import ForToWhileVisitor
 from .loop_for import WhileToForVisitor

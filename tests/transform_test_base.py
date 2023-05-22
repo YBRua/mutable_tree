@@ -3,7 +3,7 @@ from tree_sitter import Language, Parser
 
 from mutable_tree.adaptors import JavaAdaptor
 from mutable_tree.nodes import Node, NodeType
-from mutable_tree.tree_manip.visitor import TransformingVisitor
+from mutable_tree.tree_manip.visitors import TransformingVisitor
 
 from .utils import LANGUAGES_PATH
 

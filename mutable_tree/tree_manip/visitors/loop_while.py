@@ -1,4 +1,4 @@
-from ..visitor import TransformingVisitor
+from .visitor import TransformingVisitor
 from mutable_tree.nodes import Node, NodeType
 from mutable_tree.nodes import node_factory
 from mutable_tree.nodes import ForStatement, Statement

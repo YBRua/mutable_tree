@@ -1,4 +1,4 @@
-from ..visitor import TransformingVisitor
+from .visitor import TransformingVisitor
 from mutable_tree.nodes import Node, NodeType, node_factory
 from mutable_tree.nodes import IfStatement, BlockStatement
 from mutable_tree.nodes import Expression, BinaryExpression, BinaryOps

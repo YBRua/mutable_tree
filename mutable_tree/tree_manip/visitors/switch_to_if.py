@@ -1,5 +1,5 @@
 import copy
-from ..visitor import TransformingVisitor
+from .visitor import TransformingVisitor
 from mutable_tree.nodes import Node, node_factory
 from mutable_tree.nodes import BinaryOps
 from mutable_tree.nodes import (SwitchStatement, SwitchCaseList, SwitchCase,

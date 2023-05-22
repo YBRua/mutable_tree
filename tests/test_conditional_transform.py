@@ -1,6 +1,6 @@
 import unittest
 from .transform_test_base import TransformTestBase
-from mutable_tree.tree_manip.transforms import (TernaryToIfVisitor, SwitchToIfVisitor)
+from mutable_tree.tree_manip.visitors import TernaryToIfVisitor, SwitchToIfVisitor
 
 
 class TestConditionalTransform(TransformTestBase):

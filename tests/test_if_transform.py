@@ -1,6 +1,6 @@
 import unittest
 from .transform_test_base import TransformTestBase
-from mutable_tree.tree_manip.transforms import (CompoundIfVisitor, NestedIfVisitor)
+from mutable_tree.tree_manip.visitors import CompoundIfVisitor, NestedIfVisitor
 
 
 class TestIfTransform(TransformTestBase):
