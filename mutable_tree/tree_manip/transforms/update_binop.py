@@ -40,7 +40,7 @@ class BinopUpdateVisitor(TransformingVisitor):
         if (expr.op == AssignmentOps.PLUS_EQUAL or expr.op == AssignmentOps.MINUS_EQUAL):
             # i += 1
             rhs = expr.right
-            # FIXME: (ybrua) values for literals are currently always strings
+            # FIXME: values for literals are currently always strings
             if isinstance(rhs, Literal) and rhs.value == '1':
                 new_node = self._create_new_node(expr.left,
                                                  self.assign_op_to_bin_op[expr.op])

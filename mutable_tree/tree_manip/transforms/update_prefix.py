@@ -39,7 +39,7 @@ class PrefixUpdateVisitor(TransformingVisitor):
         if (expr.op == AssignmentOps.PLUS_EQUAL or expr.op == AssignmentOps.MINUS_EQUAL):
             # i += 1
             rhs = expr.right
-            # FIXME: (ybrua) values for literals are currently always strings
+            # FIXME: values for literals are currently always strings
             if isinstance(rhs, Literal) and rhs.value == '1':
                 update_op = self.assign_op_to_update_op[expr.op]
                 new_node = node_factory.create_update_expr(expr.left, update_op, True)
