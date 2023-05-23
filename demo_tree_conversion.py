@@ -3,6 +3,7 @@ import treelib
 import tree_sitter
 from mutable_tree.nodes import Node, NodeType
 from mutable_tree.adaptors import JavaAdaptor
+from os import path
 
 
 def pprint_treesitter(root: tree_sitter.Node):
@@ -61,7 +62,11 @@ def main():
 
     # convert code to tree-sitter AST
     parser = tree_sitter.Parser()
-    parser.set_language(tree_sitter.Language('./parser/languages.so', 'java'))
+    if path.isfile('./parser/languages.so'):
+        LANGUAGES_PATH = './parser/languages.so'
+    else:
+        LANGUAGES_PATH = '/home/liwei/Code-Watermark/variable-watermark/resources/my-languages.so'
+    parser.set_language(tree_sitter.Language(LANGUAGES_PATH, 'java'))
     tree = parser.parse(code.encode())
     pprint_treesitter(tree.root_node)
 

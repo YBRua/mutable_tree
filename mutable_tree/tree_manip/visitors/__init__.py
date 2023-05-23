@@ -16,3 +16,7 @@ from .ternary_to_if import TernaryToIfVisitor
 from .switch_to_if import SwitchToIfVisitor
 from .compound_if import CompoundIfVisitor
 from .nested_if import NestedIfVisitor
+
+# naming transformers
+from .var_naming_style import ToCamelCaseVisitor, ToPascalCaseVisitor, ToSnakeCaseVisitor, ToUnderscoreCaseVisitor
+from .var_same_type import SplitVarWithSameTypeVisitor, MergeVarWithSameTypeVisitor
