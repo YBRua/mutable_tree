@@ -62,7 +62,6 @@ def main():
 
     # convert code to tree-sitter AST
     parser = tree_sitter.Parser()
-    LANGUAGES_PATH = None
     if path.isfile('./parser/languages.so'):
         LANGUAGES_PATH = './parser/languages.so'
     else:

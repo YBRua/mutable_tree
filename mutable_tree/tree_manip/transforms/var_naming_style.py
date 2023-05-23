@@ -1,6 +1,5 @@
 from ..visitor import TransformingVisitor
-from mutable_tree.nodes import Node
-from mutable_tree.nodes import node_factory, VariableDeclarator, Identifier
+from mutable_tree.nodes import Node, node_factory, VariableDeclarator, Identifier
 from typing import Optional
 import inflection
 
