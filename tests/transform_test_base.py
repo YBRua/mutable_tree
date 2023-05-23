@@ -40,6 +40,9 @@ class TransformTestBase(unittest.TestCase):
         self._check_ast(new_code)
 
         if verbose:
+            print('##### before #####')
+            print(code)
+            print('##### after #####')
             print(new_code)
             print()
 
