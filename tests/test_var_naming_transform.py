@@ -1,6 +1,6 @@
 import unittest
 from .transform_test_base import TransformTestBase
-from mutable_tree.tree_manip.transforms import ToCamelCaseVisitor, ToPascalCaseVisitor, ToSnakeCaseVisitor, ToUnderscoreCaseVisitor
+from mutable_tree.tree_manip.visitors import ToCamelCaseVisitor, ToPascalCaseVisitor, ToSnakeCaseVisitor, ToUnderscoreCaseVisitor
 
 
 class TestNamingTransform(TransformTestBase):

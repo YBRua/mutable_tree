@@ -1,4 +1,4 @@
-from ..visitor import TransformingVisitor
+from .visitor import TransformingVisitor
 from mutable_tree.nodes import Node, node_factory, LocalVariableDeclaration, ForStatement, \
     StatementList, DeclaratorList, InitializingDeclarator, Declarator
 from typing import Optional, List

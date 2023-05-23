@@ -1,4 +1,4 @@
-from ..visitor import TransformingVisitor
+from .visitor import TransformingVisitor
 from mutable_tree.nodes import Node, node_factory, VariableDeclarator, Identifier
 from typing import Optional
 import inflection

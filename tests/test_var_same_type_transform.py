@@ -1,6 +1,6 @@
 import unittest
 from .transform_test_base import TransformTestBase
-from mutable_tree.tree_manip.transforms import SplitVarWithSameTypeVisitor, MergeVarWithSameTypeVisitor
+from mutable_tree.tree_manip.visitors import SplitVarWithSameTypeVisitor, MergeVarWithSameTypeVisitor
 
 
 class TestVarSameType(TransformTestBase):
