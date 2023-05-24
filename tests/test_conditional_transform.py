@@ -61,6 +61,21 @@ class TestConditionalTransform(TransformTestBase):
         """
         self.check_transform(code, visitor, verbose=verbose)
 
+        code = """
+        switch (pDirection) {
+            case LEFT:
+            case RIGHT:
+                return pY;
+            case UP:
+                return pY - 1;
+            case DOWN:
+                return pY + 1;
+            default:
+                throw new IllegalArgumentException();
+        }
+        """
+        self.check_transform(code, visitor, verbose=verbose)
+
         # should not transform
         code = """
         switch (some.thing) {

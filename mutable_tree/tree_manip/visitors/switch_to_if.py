@@ -19,7 +19,10 @@ class SwitchToIfVisitor(TransformingVisitor):
                 # last case is default case
                 continue
             # check last statement
-            last_stmt = c.stmts.get_child_at(-1)
+            stmts = c.stmts.get_children()
+            if len(stmts) == 0:
+                return False
+            last_stmt = stmts[-1]
             if isinstance(last_stmt, BlockStatement):
                 # assume at most one block in the case
                 last_stmt = last_stmt.stmts.get_child_at(-1)
@@ -31,10 +34,14 @@ class SwitchToIfVisitor(TransformingVisitor):
         c: SwitchCase
         for c in cases.get_children():
             stmts = c.stmts.get_children()
+
+            if len(stmts) == 0:
+                return
+
             if isinstance(stmts[-1], BreakStatement):
                 stmts.pop()
 
-            if isinstance(stmts[-1], BlockStatement):
+            elif isinstance(stmts[-1], BlockStatement):
                 # assume at most one block in the case
                 stmts = stmts[-1].stmts.get_children()
                 if isinstance(stmts[-1], BreakStatement):
@@ -83,6 +90,10 @@ class SwitchToIfVisitor(TransformingVisitor):
             prev = if_stmt
 
         # add final else
-        prev.alternate = final_else
+        if prev is not None:
+            prev.alternate = final_else
+        else:
+            # some strange people only write a default case in switch
+            initial = node_factory.create_if_stmt(condition, final_else)
 
         return (True, [initial])

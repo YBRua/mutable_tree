@@ -61,6 +61,7 @@ class AssignmentExpression(Expression):
                 NodeType.ARRAY_ACCESS,
                 NodeType.CALL_EXPR,
                 NodeType.POINTER_EXPR,
+                NodeType.PARENTHESIZED_EXPR,
         }:
             raise TypeError(f'Invalid type: {lt} for Assignment LHS')
         if not is_expression(self.right):
