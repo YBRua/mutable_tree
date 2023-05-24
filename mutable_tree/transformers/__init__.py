@@ -7,5 +7,7 @@ from .update_transformer import UpdateTransformer
 from .same_type_decl_transformer import SameTypeDeclarationTransformer
 from .var_name_style_transformer import VarNameStyleTransformer
 from .if_block_swap_transformer import IfBlockSwapTransformer
+from .var_init_transformer import VarInitTransformer
+from .var_decl_pos_transformer import VarDeclLocationTransformer
 
 from .transformer_pipeline import TransformerPipeline

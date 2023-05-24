@@ -1,13 +1,15 @@
 from .visitor import TransformingVisitor
-from mutable_tree.nodes import Node, node_factory, LocalVariableDeclaration, \
-    StatementList, Declarator, InitializingDeclarator, VariableDeclarator, AssignmentOps, \
-    ExpressionStatement, AssignmentExpression, PointerDeclarator, ReferenceDeclarator, \
-    ArrayDeclarator, Identifier
+from mutable_tree.nodes import (Node, node_factory, LocalVariableDeclaration,
+                                StatementList, Declarator, InitializingDeclarator,
+                                VariableDeclarator, AssignmentOps, ExpressionStatement,
+                                AssignmentExpression, PointerDeclarator,
+                                ReferenceDeclarator, ArrayDeclarator, Identifier)
 from typing import Optional, List
 from .var_same_type import split_DeclaratorList_by_Initializing
 
 
 class SplitVarInitAndDeclVisitor(TransformingVisitor):
+
     def visit_StatementList(self,
                             node: StatementList,
                             parent: Optional[Node] = None,
@@ -30,12 +32,14 @@ class SplitVarInitAndDeclVisitor(TransformingVisitor):
                 stmts = []
                 if with_init_declarator_list is not None:
                     for initializing_declarator in with_init_declarator_list.node_list:
-                        variable_declarator, stmt = split_initializing_declarator(initializing_declarator)
+                        variable_declarator, stmt = split_initializing_declarator(
+                            initializing_declarator)
                         declarators.append(variable_declarator)
                         stmts.append(stmt)
                 if len(declarators) > 0:
                     declarator_list = node_factory.create_declarator_list(declarators)
-                    new_child = node_factory.create_local_variable_declaration(child.type, declarator_list)
+                    new_child = node_factory.create_local_variable_declaration(
+                        child.type, declarator_list)
                     new_children_list.append(new_child)
                 for stmt in stmts:
                     new_children_list.append(stmt)
@@ -55,6 +59,7 @@ def split_initializing_declarator(node: InitializingDeclarator):
 
 
 class MergeVarInitAndDeclVisitor(TransformingVisitor):
+
     def visit_StatementList(self,
                             node: StatementList,
                             parent: Optional[Node] = None,
@@ -100,7 +105,8 @@ class MergeVarInitAndDeclVisitor(TransformingVisitor):
                     else:
                         declarator_list.append(declarator)
                 declarators = node_factory.create_declarator_list(declarator_list)
-                new_child = node_factory.create_local_variable_declaration(child.type, declarators)
+                new_child = node_factory.create_local_variable_declaration(
+                    child.type, declarators)
                 new_children_list.append(new_child)
             else:
                 new_children_list.append(child)
@@ -125,13 +131,15 @@ def get_identifier_name_from_declarator(declarator: Declarator) -> str:
 
 
 def is_assignment_used_in_init(node: Node, var_init: {}) -> bool:
-    if isinstance(node, ExpressionStatement) and isinstance(node.expr, AssignmentExpression):
+    if isinstance(node, ExpressionStatement) and isinstance(node.expr,
+                                                            AssignmentExpression):
         assignment_node = node.expr
         left = assignment_node.left
         if isinstance(left, Identifier) and assignment_node.op == AssignmentOps.EQUAL:
             init = var_init.get(left.name, None)
             if init is not None and init[0] == 'un_init':
-                init_declarator = node_factory.create_initializing_declarator(init[1], assignment_node.right)
+                init_declarator = node_factory.create_initializing_declarator(
+                    init[1], assignment_node.right)
                 var_init[left.name] = ('inited', init_declarator)
                 return True
     return False
