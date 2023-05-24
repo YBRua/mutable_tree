@@ -52,21 +52,20 @@ def pprint_mutable_ast(root: Node):
 
 def main():
     code = """
-    int a = 10, b = 11;
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
-            System.out.println("Hello World");
+    if (x > 0) {
+            if (y > 0) {
+                doSomething();
+            }
         }
-    }
+        int[] arr1, arr2;
     """
 
     # convert code to tree-sitter AST
     parser = tree_sitter.Parser()
-    if path.isfile('./parser/languages.so'):
-        LANGUAGES_PATH = './parser/languages.so'
-    else:
-        LANGUAGES_PATH = '/home/liwei/Code-Watermark/variable-watermark/resources/my-languages.so'
+    LANGUAGES_PATH = '/home/borui/code-watermarking/parser/languages.so'
     parser.set_language(tree_sitter.Language(LANGUAGES_PATH, 'java'))
+
+
     tree = parser.parse(code.encode())
     pprint_treesitter(tree.root_node)
 

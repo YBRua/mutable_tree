@@ -62,7 +62,9 @@ class MergeVarWithSameTypeVisitor(TransformingVisitor):
         types = {}
         for child_attr in node.get_children_names():
             child = node.get_child_at(child_attr)
-            if child is not None and isinstance(child, LocalVariableDeclaration):
+            if child is None:
+                continue
+            if isinstance(child, LocalVariableDeclaration):
                 with_init_declarator_list, without_init_declarator_list = \
                     split_DeclaratorList_by_Initializing(child.declarators)
                 if with_init_declarator_list is not None:
@@ -77,7 +79,7 @@ class MergeVarWithSameTypeVisitor(TransformingVisitor):
                         (child.type, decl_list) = types.get(child_type_str)
                         decl_list.node_list += without_init_declarator_list.node_list
                         types[child_type_str] = (child.type, decl_list)
-            elif child is not None:
+            else:
                 new_children_list.append(child)
 
         for child_type_str, (child_type, decl_list) in types.items():
