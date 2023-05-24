@@ -6,7 +6,7 @@ from mutable_tree.tree_manip.visitors import SplitVarWithSameTypeVisitor, MergeV
 class TestVarSameType(TransformTestBase):
     def test_to_split_same_type(self):
         visitor = SplitVarWithSameTypeVisitor()
-        verbose = True
+        verbose = False
         #
 
         code = '''
@@ -22,7 +22,7 @@ class TestVarSameType(TransformTestBase):
 
     def test_to_merge_same_type(self):
         visitor = MergeVarWithSameTypeVisitor()
-        verbose = True
+        verbose = False
 
         code = '''
         int i, a = 10, b;

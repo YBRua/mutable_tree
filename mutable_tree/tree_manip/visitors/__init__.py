@@ -21,3 +21,4 @@ from .nested_if import NestedIfVisitor
 from .var_naming_style import ToCamelCaseVisitor, ToPascalCaseVisitor, ToSnakeCaseVisitor, ToUnderscoreCaseVisitor
 from .var_same_type import SplitVarWithSameTypeVisitor, MergeVarWithSameTypeVisitor
 from .var_pos import MoveVarDeclToHeadVisitor, MoveVarDeclToBeforeUsedVisitor
+from .var_init import SplitVarInitVisitor

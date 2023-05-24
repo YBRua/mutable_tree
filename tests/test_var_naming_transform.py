@@ -7,7 +7,7 @@ class TestNamingTransform(TransformTestBase):
 
     def test_to_camel_case(self):
         visitor = ToCamelCaseVisitor()
-        verbose = True
+        verbose = False
 
         code = '''
         int camelCase, PascalCase; 
@@ -22,7 +22,7 @@ class TestNamingTransform(TransformTestBase):
 
     def test_to_pascal_case(self):
         visitor = ToPascalCaseVisitor()
-        verbose = True
+        verbose = False
 
         code = '''
         int camelCase, PascalCase; 
@@ -37,7 +37,7 @@ class TestNamingTransform(TransformTestBase):
 
     def test_to_snake_case(self):
         visitor = ToSnakeCaseVisitor()
-        verbose = True
+        verbose = False
 
         code = '''
         int camelCase, PascalCase; 
@@ -52,7 +52,7 @@ class TestNamingTransform(TransformTestBase):
 
     def test_to_underscore_case(self):
         visitor = ToUnderscoreCaseVisitor()
-        verbose = True
+        verbose = False
 
         code = '''
         int camelCase, PascalCase; 

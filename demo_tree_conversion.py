@@ -52,12 +52,11 @@ def pprint_mutable_ast(root: Node):
 
 def main():
     code = """
-    if (x > 0) {
-            if (y > 0) {
-                doSomething();
-            }
-        }
-        int[] arr1, arr2;
+int a, b=1, i; 
+    b = 1;
+    int[] arr1, arr2=[1,2];
+        for (i = 0; i < 10; i++) {}
+        for (int j = 0; j < 10; j++) {}
     """
 
     # convert code to tree-sitter AST
