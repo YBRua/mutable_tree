@@ -19,7 +19,7 @@
 Current implementation requires [tree sitter](https://tree-sitter.github.io/) to convert source code to ASTs. ~~because the author is too weak to write a parser.~~
 
 ```sh
-pip install tree-sitter
+pip install tree-sitter inflection
 ```
 
 After installing the `tree_sitter` package, clone and build parsers for programming languages.

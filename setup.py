@@ -23,6 +23,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=['tree_sitter'],
+    install_requires=['tree_sitter', 'inflection'],
     python_requires='~=3.8',
 )

@@ -1,4 +1,4 @@
-# NOTE: treelib is required to run this demo
+# NOTE: treelib is required to run this demo, you will have to MANUALLY install it
 import treelib
 import tree_sitter
 from mutable_tree.nodes import Node, NodeType
