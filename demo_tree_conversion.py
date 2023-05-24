@@ -2,7 +2,7 @@
 import treelib
 import tree_sitter
 from mutable_tree.nodes import Node, NodeType
-from mutable_tree.adaptors import JavaAdaptor
+from mutable_tree.adaptors import JavaAdaptor, CppAdaptor
 from os import path
 
 
@@ -51,27 +51,27 @@ def pprint_mutable_ast(root: Node):
 
 
 def main():
+    # java / cpp
+    LANGUAGE = 'cpp'
     code = """
-    int a = 10, b = 11;
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
-            System.out.println("Hello World");
-        }
-    }
+    int i = 0, *p = nullptr;
     """
 
     # convert code to tree-sitter AST
     parser = tree_sitter.Parser()
-    if path.isfile('./parser/languages.so'):
-        LANGUAGES_PATH = './parser/languages.so'
-    else:
-        LANGUAGES_PATH = '/home/liwei/Code-Watermark/variable-watermark/resources/my-languages.so'
-    parser.set_language(tree_sitter.Language(LANGUAGES_PATH, 'java'))
+    LANGUAGES_PATH = '/home/borui/code-watermarking/parser/languages.so'
+    parser.set_language(tree_sitter.Language(LANGUAGES_PATH, LANGUAGE))
+
     tree = parser.parse(code.encode())
     pprint_treesitter(tree.root_node)
 
     # convert tree-sitter AST to mutable AST
-    mutable_root = JavaAdaptor.convert_program(tree.root_node)
+    if LANGUAGE == 'java':
+        mutable_root = JavaAdaptor.convert_program(tree.root_node)
+    elif LANGUAGE == 'cpp':
+        mutable_root = CppAdaptor.convert_program(tree.root_node)
+    else:
+        raise ValueError('only support java and cpp')
     pprint_mutable_ast(mutable_root)
 
 

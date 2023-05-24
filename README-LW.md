@@ -1,6 +1,38 @@
 # 对通用部分的修改
 - 修改读取language.so路径
-- visitor中generic_visit, 当node是NodeList时, 为了避免一边遍历node.children, 一边修改node.children, 增加了new_node_list来记录未修改的child和修改后的child 
+- 修正更新node的逻辑
+  - 存在的问题: visitor中generic_visit, 一边遍历node.children, 一边修改node.children, 违反了list操作原则
+  - 示例: 同类变量拆分
+    ```java
+    // before:
+    int i,j;
+    int a = 10, b = 11;
+    // after
+    int i;
+    int j;
+    int a = 10, b = 11;
+    ```
+    children开始是2个, int i; int j; 插入后, children变成3个了, 遍历时忽略了最后一个statement
+
+  - update更新放最后的问题是: update需要child_attr,也不太行. 
+  ```Java
+  // before:
+  int i,j;
+  int a = 10, b = 11;
+  // 期望是:
+  int i;
+  int j;
+  int a=10;
+  int b=11;
+  ```
+   update更新放最后的问题是: update需要child_attr, a b 被拆开后, replace_child_at 仍然是从1开始插入, 结果就是把j覆盖了.
+  ```java
+  int i;
+  int a=10;
+  int b=11;
+  ```
+  - 最后修改为: 构造一个new_children, 直接将更新/删除/插入等操作在这里list上做. 全部做完后, 用new_children替换children
+
 - 使用`inflection`库处理命名风格
 
 ## Variable Naming Style Transformers
@@ -54,3 +86,11 @@ for (int i=0;;) {}
     double d2 = b;
     ```
     MergeVarWithSameTypeVisitor 设计原因: 变量声明时如果初始化, 初始化的值可能来自于某行代码, 因此这种有初始化的声明不适合移动到别的位置去合并声明
+
+## Variable definition position
+- 忽略 LocalVariableDeclaration 中的 InitializingDeclarator
+- 定义放到程序开头: 将 LocalVariableDeclaration 放到BlockStatement中前面
+- 定义放到变量使用前: 检查 LocalVariableDeclaration 和当前 BlockStatement 中的每个 statement, 将声明放到第一次使用前
+
+## 
+
