@@ -200,7 +200,7 @@ class TestJavaScriptYieldExpr(JavaScriptSnippetTestBase):
 
 
 class TestJavaScriptAwaitExpr(JavaScriptSnippetTestBase):
-    
+
     def test_await(self):
         self._stmt_round_trip('await a;')
         self._stmt_round_trip('await a + 42;')
