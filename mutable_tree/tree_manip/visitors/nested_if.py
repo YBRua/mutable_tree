@@ -30,6 +30,6 @@ class NestedIfVisitor(TransformingVisitor):
 
         inner_if = node_factory.create_if_stmt(cond_2, node.consequence, node.alternate)
         inner_if_b = node_factory.wrap_block_stmt(inner_if)
-        new_node = node_factory.create_if_stmt(cond_1, inner_if_b, None)
+        new_node = node_factory.create_if_stmt(cond_1, inner_if_b, node.alternate)
 
         return (True, [new_node])

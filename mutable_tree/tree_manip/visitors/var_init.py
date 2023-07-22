@@ -1,15 +1,15 @@
 from .visitor import TransformingVisitor
-from mutable_tree.nodes import (Node, node_factory, LocalVariableDeclaration,
+from mutable_tree.nodes import (Node, NodeType, node_factory, LocalVariableDeclaration,
                                 StatementList, Declarator, InitializingDeclarator,
                                 VariableDeclarator, AssignmentOps, ExpressionStatement,
                                 AssignmentExpression, PointerDeclarator,
-                                ReferenceDeclarator, ArrayDeclarator, Identifier)
-from typing import Optional, List
+                                ReferenceDeclarator, ArrayDeclarator, FunctionDeclarator,
+                                Identifier)
+from typing import Optional, List, Dict, Set
 from .var_same_type import split_DeclaratorList_by_Initializing
 
 
 class SplitVarInitAndDeclVisitor(TransformingVisitor):
-
     def visit_StatementList(self,
                             node: StatementList,
                             parent: Optional[Node] = None,
@@ -21,6 +21,11 @@ class SplitVarInitAndDeclVisitor(TransformingVisitor):
             if child is None:
                 continue
             if isinstance(child, LocalVariableDeclaration):
+                # do not split auto and constants
+                if 'auto' in child.type.to_string() or 'const' in child.type.to_string():
+                    new_children_list.append(child)
+                    continue
+
                 with_init_declarator_list, without_init_declarator_list = \
                     split_DeclaratorList_by_Initializing(child.declarators)
 
@@ -32,6 +37,15 @@ class SplitVarInitAndDeclVisitor(TransformingVisitor):
                 stmts = []
                 if with_init_declarator_list is not None:
                     for initializing_declarator in with_init_declarator_list.node_list:
+                        assert isinstance(initializing_declarator, InitializingDeclarator)
+
+                        # dont split arrays, argument lists or new exprs
+                        if initializing_declarator.value.node_type in {
+                                NodeType.ARRAY_EXPR, NodeType.EXPRESSION_LIST, NodeType.NEW_EXPR
+                        }:
+                            declarators.append(initializing_declarator)
+                            continue
+
                         variable_declarator, stmt = split_initializing_declarator(
                             initializing_declarator)
                         declarators.append(variable_declarator)
@@ -59,7 +73,6 @@ def split_initializing_declarator(node: InitializingDeclarator):
 
 
 class MergeVarInitAndDeclVisitor(TransformingVisitor):
-
     def visit_StatementList(self,
                             node: StatementList,
                             parent: Optional[Node] = None,
@@ -69,6 +82,7 @@ class MergeVarInitAndDeclVisitor(TransformingVisitor):
         # 第二次遍历用assignment给变量赋初值
 
         var_init = {}
+        uninit_vars = set()
 
         # 第一次遍历
         temp_children_list = []
@@ -82,8 +96,9 @@ class MergeVarInitAndDeclVisitor(TransformingVisitor):
                     if not isinstance(declarator, InitializingDeclarator):
                         identifier_name = get_identifier_name_from_declarator(declarator)
                         var_init[identifier_name] = ('un_init', declarator)
+                        uninit_vars.add(identifier_name)
 
-            if is_assignment_used_in_init(child, var_init):
+            if is_assignment_used_in_init(child, var_init, uninit_vars):
                 # remove assignment
                 pass
             else:
@@ -116,8 +131,11 @@ class MergeVarInitAndDeclVisitor(TransformingVisitor):
 
 
 def get_identifier_from_declarator(declarator: Declarator) -> Identifier:
-    assert isinstance(declarator, VariableDeclarator) or isinstance(declarator, PointerDeclarator) \
-           or isinstance(declarator, ReferenceDeclarator) or isinstance(declarator, ArrayDeclarator)
+    assert (isinstance(declarator, VariableDeclarator)
+            or isinstance(declarator, PointerDeclarator)
+            or isinstance(declarator, ReferenceDeclarator)
+            or isinstance(declarator, ArrayDeclarator)
+            or isinstance(declarator, FunctionDeclarator))
     if isinstance(declarator, VariableDeclarator):
         return declarator.decl_id
     else:
@@ -130,16 +148,42 @@ def get_identifier_name_from_declarator(declarator: Declarator) -> str:
     return identifier.name
 
 
-def is_assignment_used_in_init(node: Node, var_init: {}) -> bool:
+def collect_identifiers(node: Node):
+    identifiers = set()
+
+    def _identifier_collector(node: Node):
+        if isinstance(node, Identifier):
+            identifiers.add(node.name)
+        else:
+            for child_attr in node.get_children_names():
+                child = node.get_child_at(child_attr)
+                if child is None:
+                    continue
+                _identifier_collector(child)
+
+    _identifier_collector(node)
+    return identifiers
+
+
+def is_assignment_used_in_init(node: Node, var_init: Dict, uninit_vars: Set) -> bool:
     if isinstance(node, ExpressionStatement) and isinstance(node.expr,
                                                             AssignmentExpression):
         assignment_node = node.expr
         left = assignment_node.left
+        right = assignment_node.right
+
+        # dont do anything if rhs contains uninitialized vars
+        rhs_identifiers = collect_identifiers(right)
+        for ri in rhs_identifiers:
+            if ri in uninit_vars:
+                return False
+
         if isinstance(left, Identifier) and assignment_node.op == AssignmentOps.EQUAL:
             init = var_init.get(left.name, None)
             if init is not None and init[0] == 'un_init':
                 init_declarator = node_factory.create_initializing_declarator(
-                    init[1], assignment_node.right)
+                    init[1], right)
                 var_init[left.name] = ('inited', init_declarator)
                 return True
+
     return False

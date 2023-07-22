@@ -84,7 +84,7 @@ class TestOperandSwap(TransformTestBase):
 
     def test_negated_block_swap(self):
         visitor = NegatedBlockSwapper()
-        verbose = True
+        verbose = False
         code = """
         if (x < 0) {
             doSomething();

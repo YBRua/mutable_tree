@@ -52,14 +52,14 @@ def pprint_mutable_ast(root: Node):
 
 def main():
     # java / cpp
-    LANGUAGE = 'cpp'
+    LANGUAGE = 'java'
     code = """
-    int i = 0, *p = nullptr;
+    int[] a = {1, 2, 3 ,4}
     """
 
     # convert code to tree-sitter AST
     parser = tree_sitter.Parser()
-    LANGUAGES_PATH = '/home/borui/code-watermarking/parser/languages.so'
+    LANGUAGES_PATH = './parser/languages.so'
     parser.set_language(tree_sitter.Language(LANGUAGES_PATH, LANGUAGE))
 
     tree = parser.parse(code.encode())

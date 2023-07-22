@@ -66,7 +66,6 @@ class TransformingVisitor:
             else:
                 raise NotImplementedError('can only insert multiple statement nodes')
 
-
     def _visit(self,
                node: Node,
                parent: Optional[Node] = None,
@@ -77,3 +76,7 @@ class TransformingVisitor:
     def visit(self, node: Node):
         self._visit(node)
         return node
+
+
+class StatefulTransformingVisitor(TransformingVisitor):
+    pass

@@ -22,6 +22,18 @@ class AssignUpdateVisitor(TransformingVisitor):
         literal = node_factory.create_literal('1')
         return node_factory.create_assignment_expr(expr, literal, op)
 
+    def visit_ParenthesizedExpression(self,
+                                      expr: UpdateExpression,
+                                      parent: Optional[Node] = None,
+                                      parent_attr: Optional[str] = None):
+        return (False, None)
+
+    def visit_BinaryExpression(self, expr, parent, parent_attr):
+        return (False, None)
+
+    def visit_CallExpression(self, expr, parent, parent_attr):
+        return (False, None)
+
     def visit_UpdateExpression(self,
                                expr: UpdateExpression,
                                parent: Optional[Node] = None,

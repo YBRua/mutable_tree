@@ -48,7 +48,9 @@ _binary_op_map = {
     '%': BinaryOps.MOD,
     '<<': BinaryOps.LSHIFT,
     '>>': BinaryOps.RSHIFT,
-    '>>>': BinaryOps.LRSHIFT
+    '>>>': BinaryOps.LRSHIFT,
+    'or': BinaryOps.OR,
+    'and': BinaryOps.AND,
 }
 
 
