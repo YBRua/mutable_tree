@@ -1,6 +1,7 @@
 from .visitor import TransformingVisitor
-from mutable_tree.nodes import Node, node_factory, LocalVariableDeclaration, ForStatement, \
-    StatementList, DeclaratorList, InitializingDeclarator, Declarator
+from mutable_tree.nodes import (Node, node_factory, LocalVariableDeclaration,
+                                ForStatement, StatementList, DeclaratorList,
+                                InitializingDeclarator, FunctionDeclarator, Declarator)
 from typing import Optional, List
 
 
@@ -37,6 +38,9 @@ def split_DeclaratorList_by_Initializing(node: DeclaratorList):
     without_init_declarators: List[Declarator] = []
     for declarator in node.node_list:
         if isinstance(declarator, InitializingDeclarator):
+            with_init_declarators.append(declarator)
+        elif isinstance(declarator, FunctionDeclarator):
+            # special case, sometimes tree-sitter recognizes a initializer as function declarator
             with_init_declarators.append(declarator)
         else:
             without_init_declarators.append(declarator)

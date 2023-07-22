@@ -2,7 +2,7 @@ from .visitor import TransformingVisitor
 from mutable_tree.nodes import Node, NodeType, node_factory
 from mutable_tree.nodes import IfStatement
 from mutable_tree.nodes import (Expression, UnaryExpression, BinaryExpression,
-                                ParenthesizedExpression)
+                                ParenthesizedExpression, AssignmentExpression)
 from mutable_tree.nodes import BinaryOps, UnaryOps
 from typing import Optional
 
@@ -100,6 +100,9 @@ class NegatedBlockSwapper(BlockSwapper):
             if op == UnaryOps.NOT:
                 # dont negate twice
                 return False
+        
+        elif isinstance(expr, AssignmentExpression):
+            return False
 
         return True
 

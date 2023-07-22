@@ -1,8 +1,8 @@
-from .keywords import ALL_KEYWORDS_SET
 from .visitor import TransformingVisitor
 from .var_name_utils import (is_underscore_case, sanitize_name_for_styling,
                              remove_preceding_underscores)
-from mutable_tree.nodes import Node, node_factory, VariableDeclarator, Identifier
+from mutable_tree.nodes import Node, NodeType, node_factory
+from mutable_tree.nodes import VariableDeclarator, Identifier, FunctionDeclarator
 from typing import Optional
 import inflection
 
@@ -11,8 +11,14 @@ class VarNamingVisitor(TransformingVisitor):
     def __init__(self):
         self.variable_name_mapping = {}
 
-    def visit_FunctionDeclaration(self, node, parent=None, parent_attr=None):
-        return (False, [])
+    def visit_FunctionDeclarator(self,
+                                 node: FunctionDeclarator,
+                                 parent: Optional[Node] = None,
+                                 parent_attr: Optional[str] = None):
+        if parent.node_type == NodeType.FUNCTION_HEADER:
+            return False, []
+        else:
+            return self.generic_visit(node, parent, parent_attr)
 
     def visit_Identifier(self,
                          node: Identifier,

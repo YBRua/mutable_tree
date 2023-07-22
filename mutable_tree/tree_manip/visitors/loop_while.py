@@ -90,12 +90,13 @@ class ForToWhileVisitor(TransformingVisitor):
                             new_node_list.append(child)
                 cont_parent.node_list = new_node_list
             else:
-                new_stmts = []
+                continue_block_stmts = []
                 for u in update_exprs:
                     assert is_expression(u)
-                    new_stmts.append(node_factory.create_expression_stmt(u))
-                new_stmts.append(cont_node)
-                block_stmt = node_factory.create_block_stmt(new_stmts)
+                    continue_block_stmts.append(node_factory.create_expression_stmt(u))
+                continue_block_stmts.append(cont_node)
+                block_stmt = node_factory.create_block_stmt(
+                    node_factory.create_statement_list(continue_block_stmts))
 
                 for child_attr in cont_parent.get_children_names():
                     child = cont_parent.get_child_at(child_attr)

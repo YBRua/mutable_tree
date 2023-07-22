@@ -1,5 +1,5 @@
 from .visitor import TransformingVisitor
-from mutable_tree.nodes import Node
+from mutable_tree.nodes import Node, is_primary_expression
 from mutable_tree.nodes import Literal, BinaryExpression
 from mutable_tree.nodes import AssignmentOps, BinaryOps, UpdateOps
 from mutable_tree.nodes import node_factory
@@ -39,6 +39,10 @@ class AssignUpdateVisitor(TransformingVisitor):
                                parent: Optional[Node] = None,
                                parent_attr: Optional[str] = None):
         self.generic_visit(expr, parent, parent_attr)
+
+        if not is_primary_expression(expr.operand):
+            return (False, None)
+
         new_node = self._create_new_node(expr.operand,
                                          self.update_op_to_assign_op[expr.op])
         return (True, [new_node])

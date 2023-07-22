@@ -134,30 +134,30 @@ class FormalParameterList(NodeList):
 
 class FunctionDeclarator(Declarator):
 
-    def __init__(self, node_type: NodeType, name: Declarator,
+    def __init__(self, node_type: NodeType, declarator: Declarator,
                  parameters: FormalParameterList):
         super().__init__(node_type)
-        self.name = name
+        self.declarator = declarator
         self.parameters = parameters
         self._check_types()
 
     def _check_types(self):
         if self.node_type != NodeType.FUNCTION_DECLARATOR:
             throw_invalid_type(self.node_type, self)
-        if not is_declarator(self.name):
-            throw_invalid_type(self.name.node_type, self, attr='name')
+        if not is_declarator(self.declarator):
+            throw_invalid_type(self.declarator.node_type, self, attr='name')
         if self.parameters.node_type != NodeType.FORMAL_PARAMETER_LIST:
             throw_invalid_type(self.parameters.node_type, self, attr='parameters')
 
     def to_string(self) -> str:
         params_str = ', '.join([p.to_string() for p in self.parameters.node_list])
-        return f'{self.name.to_string()}({params_str})'
+        return f'{self.declarator.to_string()}({params_str})'
 
     def get_children(self) -> List[Node]:
-        return [self.name, self.parameters]
+        return [self.declarator, self.parameters]
 
     def get_children_names(self) -> List[str]:
-        return ['name', 'parameters']
+        return ['declarator', 'parameters']
 
 
 class FunctionHeader(Node):

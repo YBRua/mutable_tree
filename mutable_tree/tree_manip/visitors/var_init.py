@@ -37,11 +37,16 @@ class SplitVarInitAndDeclVisitor(TransformingVisitor):
                 stmts = []
                 if with_init_declarator_list is not None:
                     for initializing_declarator in with_init_declarator_list.node_list:
+                        if isinstance(initializing_declarator, FunctionDeclarator):
+                            declarators.append(initializing_declarator)
+                            continue
+
                         assert isinstance(initializing_declarator, InitializingDeclarator)
 
                         # dont split arrays, argument lists or new exprs
                         if initializing_declarator.value.node_type in {
-                                NodeType.ARRAY_EXPR, NodeType.EXPRESSION_LIST, NodeType.NEW_EXPR
+                                NodeType.ARRAY_EXPR, NodeType.EXPRESSION_LIST,
+                                NodeType.NEW_EXPR
                         }:
                             declarators.append(initializing_declarator)
                             continue

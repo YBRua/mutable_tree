@@ -7,21 +7,45 @@ from mutable_tree.nodes import Identifier
 from typing import Optional
 
 
-class IdentifierRenamingVisitor(StatefulTransformingVisitor):
-
+class IdentifierAppendingVisitor(StatefulTransformingVisitor):
     def __init__(self, src_var: str, dst_var: str) -> None:
         super().__init__()
         self.src_var = src_var
         self.dst_var = dst_var
 
-        self.norm_src = normalize_name(src_var)
-        self.norm_dst = normalize_name(dst_var)
+        self.norm_src = normalize_name(src_var).lower()
+        self.norm_dst = normalize_name(dst_var).lower()
 
     def visit_Identifier(self,
                          node: Identifier,
                          parent: Optional[Node] = None,
                          parent_attr: Optional[str] = None):
-        normalized_name = normalize_name(node.name)
+        normalized_name = normalize_name(node.name).lower()
+        if normalized_name == self.norm_src:
+            if len(self.dst_var) == 1:
+                new_name = self.src_var + self.dst_var[0].upper()
+            else:
+                new_name = self.src_var + self.dst_var[0].upper() + self.dst_var[1:]
+            new_id = node_factory.create_identifier(new_name)
+            return True, [new_id]
+        else:
+            return False, []
+
+
+class IdentifierRenamingVisitor(StatefulTransformingVisitor):
+    def __init__(self, src_var: str, dst_var: str) -> None:
+        super().__init__()
+        self.src_var = src_var
+        self.dst_var = dst_var
+
+        self.norm_src = normalize_name(src_var).lower()
+        self.norm_dst = normalize_name(dst_var).lower()
+
+    def visit_Identifier(self,
+                         node: Identifier,
+                         parent: Optional[Node] = None,
+                         parent_attr: Optional[str] = None):
+        normalized_name = normalize_name(node.name).lower()
         if normalized_name == self.norm_src:
             new_id = node_factory.create_identifier(self.dst_var)
             return True, [new_id]

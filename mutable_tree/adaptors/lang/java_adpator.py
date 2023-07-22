@@ -72,6 +72,7 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         # NOTE: array_initializer is not an expression, but we treat it as one
         'array_initializer': convert_array_expr,
         'lambda_expression': convert_lambda_expr,
+        'switch_expression': convert_switch_stmt,
     }
 
     return expr_convertors[node.type](node)

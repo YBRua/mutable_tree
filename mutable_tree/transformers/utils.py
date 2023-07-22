@@ -1,5 +1,4 @@
 from .code_transformer import CodeTransformer
-
 from .compound_if_transformer import CompoundIfTransformer
 from .condition_transformer import ConditionTransformer
 from .loop_transformer import LoopTransformer
@@ -10,6 +9,19 @@ from .if_block_swap_transformer import IfBlockSwapTransformer
 from .var_init_transformer import VarInitTransformer
 from .var_decl_pos_transformer import VarDeclLocationTransformer
 from .infinite_loop_transformer import InfiniteLoopTransformer
+from typing import List
 
-from .transformer_pipeline import TransformerPipeline
-from .utils import get_all_transformers
+
+def get_all_transformers() -> List[CodeTransformer]:
+    return [
+        CompoundIfTransformer(),
+        ConditionTransformer(),
+        LoopTransformer(),
+        UpdateTransformer(),
+        SameTypeDeclarationTransformer(),
+        VarNameStyleTransformer(),
+        IfBlockSwapTransformer(),
+        VarInitTransformer(),
+        VarDeclLocationTransformer(),
+        InfiniteLoopTransformer(),
+    ]
