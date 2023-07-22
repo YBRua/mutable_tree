@@ -31,7 +31,7 @@ class TestJavaMethodDeclaration(JavaFunctionTestBase):
         self._function_round_trip('public <T extends Number> T foo() { return null; }')
 
     def test_spread_params(self):
-        self._function_round_trip('void foo(int[]... a) { }', verbose=True)
+        self._function_round_trip('void foo(int[]... a) { }')
 
 
 if __name__ == '__main__':
