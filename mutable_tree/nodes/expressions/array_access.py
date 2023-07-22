@@ -7,10 +7,15 @@ from .expression import is_primary_expression, is_expression
 
 class ArrayAccess(Expression):
 
-    def __init__(self, node_type: NodeType, array: Expression, index: Expression):
+    def __init__(self,
+                 node_type: NodeType,
+                 array: Expression,
+                 index: Expression,
+                 optional: bool = False):
         super().__init__(node_type)
         self.array = array
         self.index = index
+        self.optional = optional
         self._check_types()
 
     def _check_types(self):

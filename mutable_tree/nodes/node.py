@@ -22,6 +22,8 @@ class NodeType(Enum):
     POINTER_EXPR = 'PointerExpression'
     DELETE_EXPR = 'DeleteExpression'
     COMPOUND_LITERAL_EXPR = 'CompoundLiteralExpression'
+    SPREAD_ELEMENT = 'SpreadElement'
+    AWAIT_EXPR = 'AwaitExpression'
 
     # primary expressions
     LITERAL = 'Literal'

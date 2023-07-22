@@ -24,11 +24,13 @@ class FieldAccess(Expression):
                  node_type: NodeType,
                  object: Expression,
                  field: Expression,
-                 op: FieldAccessOps = FieldAccessOps.DOT):
+                 op: FieldAccessOps = FieldAccessOps.DOT,
+                 optional: bool = False):
         super().__init__(node_type)
         self.object = object
         self.field = field
         self.op = op
+        self.optional = optional
         self._check_types()
 
     def _check_types(self):

@@ -11,13 +11,17 @@ class UnaryOps(Enum):
     NEG = '-'
     NOT = '!'
     BITWISE_NOT = '~'
+    VOID = 'void'
+    TYPEOF = 'typeof'
 
 
 _unary_op_map = {
     '+': UnaryOps.PLUS,
     '-': UnaryOps.NEG,
     '!': UnaryOps.NOT,
-    '~': UnaryOps.BITWISE_NOT
+    '~': UnaryOps.BITWISE_NOT,
+    'void': UnaryOps.VOID,
+    'typeof': UnaryOps.TYPEOF,
 }
 
 

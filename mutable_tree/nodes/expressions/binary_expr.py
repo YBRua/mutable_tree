@@ -27,6 +27,12 @@ class BinaryOps(Enum):
     LSHIFT = '<<'
     RSHIFT = '>>'
     LRSHIFT = '>>>'
+    EXP = '**'
+    EQQ = '==='  # javascript
+    NEQQ = '!=='  # javascript
+    NULL_COALESCING = '??'
+    INSTANCEOF = 'instanceof'  # javascript
+    IN = 'in'
 
 
 _binary_op_map = {
@@ -51,6 +57,12 @@ _binary_op_map = {
     '>>>': BinaryOps.LRSHIFT,
     'or': BinaryOps.OR,
     'and': BinaryOps.AND,
+    '**': BinaryOps.EXP,
+    '===': BinaryOps.EQQ,
+    '!==': BinaryOps.NEQQ,
+    '??': BinaryOps.NULL_COALESCING,
+    'instanceof': BinaryOps.INSTANCEOF,
+    'in': BinaryOps.IN,
 }
 
 

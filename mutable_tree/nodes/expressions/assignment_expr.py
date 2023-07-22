@@ -19,6 +19,10 @@ class AssignmentOps(Enum):
     LSHIFT_EQUAL = '<<='
     ARSHIFT_EQUAL = '>>='
     LRSHIFT_EQUAL = '>>>='
+    LOGICAL_OR_EQUAL = '||='
+    LOGICAL_AND_EQUAL = '&&='
+    NULL_COALESCING_EQUAL = '??='
+    EXPONENT_EQUAL = '**='
 
 
 _assignment_op_map = {
@@ -33,7 +37,11 @@ _assignment_op_map = {
     '%=': AssignmentOps.MOD_EQUAL,
     '<<=': AssignmentOps.LSHIFT_EQUAL,
     '>>=': AssignmentOps.ARSHIFT_EQUAL,
-    '>>>=': AssignmentOps.LRSHIFT_EQUAL
+    '>>>=': AssignmentOps.LRSHIFT_EQUAL,
+    '||=': AssignmentOps.LOGICAL_OR_EQUAL,
+    '&&=': AssignmentOps.LOGICAL_AND_EQUAL,
+    '??=': AssignmentOps.NULL_COALESCING_EQUAL,
+    '**=': AssignmentOps.EXPONENT_EQUAL,
 }
 
 

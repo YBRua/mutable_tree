@@ -10,7 +10,8 @@ from .expressions import (ArrayAccess, ArrayExpression, ArrayCreationExpression,
                           UnaryExpression, UpdateExpression, PrimaryExpression,
                           ParenthesizedExpression, ExpressionList, CommaExpression,
                           SizeofExpression, PointerExpression, DeleteExpression,
-                          ScopeResolution, QualifiedIdentifier, CompoundLiteralExpression)
+                          ScopeResolution, QualifiedIdentifier, CompoundLiteralExpression,
+                          SpreadElement, AwaitExpression)
 from .statements import Statement
 from .statements import (
     AssertStatement, BlockStatement, BreakStatement, ContinueStatement, DoStatement,
@@ -106,16 +107,20 @@ def create_update_expr(expr: Union[Identifier, FieldAccess], op: UpdateOps,
     return UpdateExpression(NodeType.UPDATE_EXPR, expr, op, prefix)
 
 
-def create_array_access(array: PrimaryExpression, index: Expression) -> ArrayAccess:
-    return ArrayAccess(NodeType.ARRAY_ACCESS, array, index)
+def create_array_access(array: PrimaryExpression,
+                        index: Expression,
+                        optional: bool = False) -> ArrayAccess:
+    return ArrayAccess(NodeType.ARRAY_ACCESS, array, index, optional)
 
 
 def create_array_expr(elements: ExpressionList) -> ArrayExpression:
     return ArrayExpression(NodeType.ARRAY_EXPR, elements)
 
 
-def create_call_expr(callee: PrimaryExpression, args: ExpressionList) -> CallExpression:
-    return CallExpression(NodeType.CALL_EXPR, callee, args)
+def create_call_expr(callee: PrimaryExpression,
+                     args: ExpressionList,
+                     optional: bool = False) -> CallExpression:
+    return CallExpression(NodeType.CALL_EXPR, callee, args, optional)
 
 
 def create_cast_expr(type_name: TypeIdentifier, expr: Expression) -> CastExpression:
@@ -124,8 +129,9 @@ def create_cast_expr(type_name: TypeIdentifier, expr: Expression) -> CastExpress
 
 def create_field_access(obj: PrimaryExpression,
                         field: Identifier,
-                        op: FieldAccessOps = FieldAccessOps.DOT) -> FieldAccess:
-    return FieldAccess(NodeType.FIELD_ACCESS, obj, field, op)
+                        op: FieldAccessOps = FieldAccessOps.DOT,
+                        optional: bool = False) -> FieldAccess:
+    return FieldAccess(NodeType.FIELD_ACCESS, obj, field, op, optional)
 
 
 def create_instanceof_expr(expr: Expression,
@@ -332,8 +338,9 @@ def create_throw_stmt(expr: Expression) -> ThrowStatement:
     return ThrowStatement(NodeType.THROW_STMT, expr)
 
 
-def create_yield_stmt(expr: Expression) -> YieldStatement:
-    return YieldStatement(NodeType.YIELD_STMT, expr)
+def create_yield_stmt(expr: Optional[Expression] = None,
+                      is_delegate: bool = False) -> YieldStatement:
+    return YieldStatement(NodeType.YIELD_STMT, expr, is_delegate)
 
 
 def create_catch_clause(exception_types: TypeIdentifierList, exception: Identifier,
@@ -483,3 +490,11 @@ def create_modifier(name: str) -> Modifier:
 
 def create_modifier_list(modifiers: List[Modifier]) -> ModifierList:
     return ModifierList(NodeType.MODIFIER_LIST, modifiers)
+
+
+def create_spread_element(expr: Expression) -> SpreadElement:
+    return SpreadElement(NodeType.SPREAD_ELEMENT, expr)
+
+
+def create_await_expr(expr: Expression) -> AwaitExpression:
+    return AwaitExpression(NodeType.AWAIT_EXPR, expr)
