@@ -67,7 +67,7 @@ class MoveVarDeclToBeforeUsedVisitor(TransformingVisitor):
                             [declarator])
                         new_child = node_factory.create_local_variable_declaration(
                             child.type, declarator_list)
-                        identifier = get_identifier_from_declarator(declarator).to_string()
+                        identifier = get_identifier_from_declarator(declarator).name
                         decl_map[identifier] = new_child
             else:
                 new_children_list.append(child)
@@ -95,7 +95,7 @@ def get_all_identifiers(node: Node):
 
     def _get_identifiers(node: Node):
         if isinstance(node, Identifier):
-            identifiers.append(node.to_string())
+            identifiers.append(node.name)
         else:
             for attr in node.get_children_names():
                 child = node.get_child_at(attr)

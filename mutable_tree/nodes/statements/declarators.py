@@ -36,13 +36,6 @@ class InitializingDeclarator(Declarator):
                 and self.value.node_type != NodeType.EXPRESSION_LIST):
             throw_invalid_type(self.value.node_type, self, attr='value')
 
-    def to_string(self) -> str:
-        if is_expression(self.value):
-            return f'{self.declarator.to_string()} = {self.value.to_string()}'
-        else:
-            arg_list = ', '.join(arg.to_string() for arg in self.value.get_children())
-            return f'{self.declarator.to_string()}({arg_list})'
-
     def get_children(self) -> List[Node]:
         return [self.declarator, self.value]
 
@@ -60,9 +53,6 @@ class VariableDeclarator(Declarator):
     def _check_types(self):
         if self.node_type != NodeType.VARIABLE_DECLARATOR:
             throw_invalid_type(self.node_type, self)
-
-    def to_string(self) -> str:
-        return self.decl_id.to_string()
 
     def get_children(self) -> List[Node]:
         return [self.decl_id]
@@ -84,9 +74,6 @@ class PointerDeclarator(Declarator):
         if not is_declarator(self.declarator):
             throw_invalid_type(self.declarator.node_type, self, attr='declarator')
 
-    def to_string(self) -> str:
-        return f'*{self.declarator.to_string()}'
-
     def get_children(self) -> List[Node]:
         return [self.declarator]
 
@@ -107,9 +94,6 @@ class ReferenceDeclarator(Declarator):
             throw_invalid_type(self.node_type, self)
         if not is_declarator(self.declarator):
             throw_invalid_type(self.declarator.node_type, self, attr='declarator')
-
-    def to_string(self) -> str:
-        return f'{"&" if not self.r_ref else "&&"}{self.declarator.to_string()}'
 
     def get_children(self) -> List[Node]:
         return [self.declarator]
@@ -134,9 +118,6 @@ class ArrayDeclarator(Declarator):
             throw_invalid_type(self.declarator.node_type, self, attr='declarator')
         if self.dim.node_type != NodeType.DIMENSION_SPECIFIER:
             throw_invalid_type(self.dim.node_type, self, attr='dim')
-
-    def to_string(self) -> str:
-        return f'{self.declarator.to_string()}{self.dim.to_string()}'
 
     def get_children(self) -> List[Node]:
         return [self.declarator, self.dim]

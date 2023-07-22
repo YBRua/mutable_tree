@@ -2,10 +2,12 @@ from .visitor import TransformingVisitor
 from mutable_tree.nodes import (Node, node_factory, LocalVariableDeclaration,
                                 ForStatement, StatementList, DeclaratorList,
                                 InitializingDeclarator, FunctionDeclarator, Declarator)
+from mutable_tree.stringifiers import BaseStringifier
 from typing import Optional, List
 
 
 class SplitVarWithSameTypeVisitor(TransformingVisitor):
+
     def visit_LocalVariableDeclaration(self,
                                        node: LocalVariableDeclaration,
                                        parent: Optional[Node] = None,
@@ -61,6 +63,7 @@ def split_DeclaratorList_by_Initializing(node: DeclaratorList):
 
 
 class MergeVarWithSameTypeVisitor(TransformingVisitor):
+
     def visit_StatementList(self,
                             node: StatementList,
                             parent: Optional[Node] = None,
@@ -70,6 +73,7 @@ class MergeVarWithSameTypeVisitor(TransformingVisitor):
         types = {}
         type_loc_map = {}
 
+        stringifier = BaseStringifier()
         for child_attr in node.get_children_names():
             child = node.get_child_at(child_attr)
             if child is None:
@@ -83,7 +87,7 @@ class MergeVarWithSameTypeVisitor(TransformingVisitor):
                     new_children_list.append(new_child)
 
                 if without_init_declarator_list is not None:
-                    child_type_str = child.type.type_id.to_string()
+                    child_type_str = stringifier.stringify(child.type.type_id)
                     if types.get(child_type_str, None) is None:
                         types[child_type_str] = (child.type, without_init_declarator_list)
                         # register the location of the first declaration of this type

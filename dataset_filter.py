@@ -7,6 +7,7 @@ from tqdm import tqdm
 from collections import Counter
 from tests.utils import collect_tokens
 from mutable_tree.adaptors import JavaAdaptor, CppAdaptor
+from mutable_tree.stringifiers import CppStringifier, JavaStringifier
 from typing import List
 
 
@@ -68,18 +69,20 @@ def function_round_trip(parser: tree_sitter.Parser, code: str, lang: str):
     assert not tree.root_node.has_error
     if lang == 'java':
         func_root = get_java_function_root(tree.root_node)
+        stringifier = JavaStringifier()
         try:
             mutable_root = JavaAdaptor.convert_function_declaration(func_root)
         except Exception as e:
             return (False, str(e))
     else:
         func_root = get_cpp_function_root(tree.root_node)
+        stringifier = CppStringifier()
         try:
             mutable_root = CppAdaptor.convert_function_definition(func_root)
         except Exception as e:
             return (False, str(e))
 
-    new_code = mutable_root.to_string()
+    new_code = stringifier.stringify(mutable_root)
     if lang == 'java':
         new_code = f'public class A {{ {new_code} }}'
 

@@ -5,6 +5,7 @@ from mutable_tree.nodes import (Node, NodeType, node_factory, LocalVariableDecla
                                 AssignmentExpression, PointerDeclarator,
                                 ReferenceDeclarator, ArrayDeclarator, FunctionDeclarator,
                                 Identifier)
+from mutable_tree.stringifiers import BaseStringifier
 from typing import Optional, List, Dict, Set
 from .var_same_type import split_DeclaratorList_by_Initializing
 
@@ -22,7 +23,9 @@ class SplitVarInitAndDeclVisitor(TransformingVisitor):
                 continue
             if isinstance(child, LocalVariableDeclaration):
                 # do not split auto and constants
-                if 'auto' in child.type.to_string() or 'const' in child.type.to_string():
+                stringifier = BaseStringifier()
+                child_type_str = stringifier.stringify(child.type)
+                if 'auto' in child_type_str or 'const' in child_type_str:
                     new_children_list.append(child)
                     continue
 

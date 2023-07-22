@@ -40,9 +40,6 @@ class FieldAccess(Expression):
         if (f_nt != NodeType.IDENTIFIER and f_nt != NodeType.THIS_EXPR):
             throw_invalid_type(f_nt, self, attr='field')
 
-    def to_string(self) -> str:
-        return f'{self.object.to_string()}{self.op.value}{self.field.to_string()}'
-
     def get_children(self) -> List[Node]:
         return [self.object, self.field]
 

@@ -19,9 +19,6 @@ class YieldStatement(Statement):
         if not is_expression(self.expr):
             throw_invalid_type(self.expr.node_type, self, attr='expr')
 
-    def to_string(self) -> str:
-        return f'yield {self.expr.to_string()};'
-
     def get_children(self) -> List[Node]:
         return [self.expr]
 

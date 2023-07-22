@@ -3,7 +3,7 @@ import treelib
 import tree_sitter
 from mutable_tree.nodes import Node, NodeType
 from mutable_tree.adaptors import JavaAdaptor, CppAdaptor
-from os import path
+from mutable_tree.stringifiers import BaseStringifier, CppStringifier, JavaStringifier
 
 
 def pprint_treesitter(root: tree_sitter.Node):
@@ -29,7 +29,7 @@ def pprint_treesitter(root: tree_sitter.Node):
     tree.show(key=lambda x: True)  # keep order of insertion
 
 
-def pprint_mutable_ast(root: Node):
+def pprint_mutable_ast(root: Node, stringifier: BaseStringifier):
     tree = treelib.Tree()
 
     def _build_treelib_tree(current: Node, parent=None):
@@ -37,7 +37,7 @@ def pprint_mutable_ast(root: Node):
         def _format_node(node: Node):
             if (node.node_type == NodeType.IDENTIFIER
                     or node.node_type == NodeType.LITERAL):
-                node_str = f'{node.node_type.value} ({node.to_string()})'
+                node_str = f'{node.node_type.value} ({stringifier.stringify(node)})'
             else:
                 node_str = node.node_type.value
             return node_str

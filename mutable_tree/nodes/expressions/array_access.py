@@ -21,9 +21,6 @@ class ArrayAccess(Expression):
         if not is_expression(self.index):
             raise TypeError(f'Invalid type: {self.index.node_type} for array index')
 
-    def to_string(self) -> str:
-        return f'{self.array.to_string()}[{self.index.to_string()}]'
-
     def get_children(self) -> List[Node]:
         return [self.array, self.index]
 

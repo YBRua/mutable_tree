@@ -114,9 +114,6 @@ class Node:
     def _check_types(self):
         raise NotImplementedError('Base class Node should never be initialized')
 
-    def to_string(self) -> str:
-        raise NotImplementedError()
-
     def get_children(self) -> List['Node']:
         raise NotImplementedError()
 

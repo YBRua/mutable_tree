@@ -21,10 +21,6 @@ class CallExpression(Expression):
         if self.args.node_type != NodeType.EXPRESSION_LIST:
             throw_invalid_type(self.args.node_type, self, 'args')
 
-    def to_string(self) -> str:
-        arg_list = ", ".join(arg.to_string() for arg in self.args.get_children())
-        return f'{self.callee.to_string()}({arg_list})'
-
     def get_children(self) -> List[Node]:
         return [self.callee, self.args]
 

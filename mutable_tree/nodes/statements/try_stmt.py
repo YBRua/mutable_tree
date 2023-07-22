@@ -36,17 +36,6 @@ class CatchClause(Node):
                 and self.modifiers.node_type != NodeType.MODIFIER_LIST):
             throw_invalid_type(self.modifiers.node_type, self, attr='modifiers')
 
-    def to_string(self) -> str:
-        catch_types_str = ' | '.join(
-            [ty.to_string() for ty in self.catch_types.get_children()])
-        exception_str = self.exception.to_string()
-        body_str = self.body.to_string()
-        if self.modifiers is not None:
-            modifiers_str = self.modifiers.to_string()
-            return f'catch ({modifiers_str} {catch_types_str} {exception_str}) {body_str}'
-        else:
-            return f'catch ({catch_types_str} {exception_str}) {body_str}'
-
     def get_children(self) -> List[Node]:
         if self.modifiers is not None:
             return [self.modifiers, self.catch_types, self.exception, self.body]
@@ -85,10 +74,6 @@ class FinallyClause(Node):
         if self.body.node_type != NodeType.BLOCK_STMT:
             throw_invalid_type(self.body.node_type, self, attr='body')
 
-    def to_string(self) -> str:
-        body_str = self.body.to_string()
-        return f'finally \n{body_str}\n'
-
     def get_children_names(self) -> List[str]:
         return ['body']
 
@@ -116,16 +101,6 @@ class TryStatement(Statement):
             throw_invalid_type(self.finalizer.node_type, self, attr='finalizer')
         if self.handlers.node_type != NodeType.TRY_HANDLERS:
             throw_invalid_type(self.handlers.node_type, self, attr='handlers')
-
-    def to_string(self) -> str:
-        body_str = self.body.to_string()
-        handlers_str = '\n'.join(
-            [handler.to_string() for handler in self.handlers.get_children()])
-        if self.finalizer is not None:
-            finalizer_str = self.finalizer.to_string()
-            return f'try {body_str}\n{handlers_str}\n{finalizer_str}'
-        else:
-            return f'try {body_str}\n{handlers_str}'
 
     def get_children_names(self) -> List[str]:
         return ['body', 'handlers', 'finalizer']

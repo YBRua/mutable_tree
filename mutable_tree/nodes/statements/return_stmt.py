@@ -18,12 +18,6 @@ class ReturnStatement(Statement):
         if self.expr is not None and not is_expression(self.expr):
             throw_invalid_type(self.expr.node_type, self, attr='expr')
 
-    def to_string(self) -> str:
-        if self.expr is not None:
-            return f'return {self.expr.to_string()};'
-        else:
-            return 'return;'
-
     def get_children(self) -> List[Node]:
         if self.expr is not None:
             return [self.expr]

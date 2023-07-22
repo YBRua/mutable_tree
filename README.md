@@ -93,7 +93,9 @@ visitor = ForToWhileVisitor()
 new_root = visitor.visit(mutable_root)
 
 # convert trees back to source code
+stringifier = JavaStringifier()
+
 # NOTE: does not support indentations
-new_code = new_root.to_string()
+new_code = stringifier.stringify(new_root)
 print(new_code)
 ```

@@ -1,6 +1,7 @@
 import unittest
 import tree_sitter
 from mutable_tree.adaptors import JavaAdaptor
+from mutable_tree.stringifiers import JavaStringifier
 from tree_sitter import Language, Parser
 
 from .utils import LANGUAGES_PATH, collect_tokens
@@ -11,6 +12,7 @@ class JavaSnippetTestBase(unittest.TestCase):
     def setUp(self) -> None:
         self.parser = Parser()
         self.parser.set_language(Language(LANGUAGES_PATH, 'java'))
+        self.stringifier = JavaStringifier()
 
     def _stmt_round_trip(self, code: str, verbose: bool = False):
         tree = self.parser.parse(code.encode())
@@ -19,7 +21,7 @@ class JavaSnippetTestBase(unittest.TestCase):
             raise ValueError('original code is invalid')
 
         mutable_root = JavaAdaptor.convert_program(root)
-        new_code = mutable_root.to_string()
+        new_code = self.stringifier.stringify(mutable_root)
 
         if verbose:
             print(new_code)
@@ -38,6 +40,7 @@ class JavaFunctionTestBase(unittest.TestCase):
     def setUp(self) -> None:
         self.parser = Parser()
         self.parser.set_language(Language(LANGUAGES_PATH, 'java'))
+        self.stringifier = JavaStringifier()
 
     def _get_function_root(self, root: tree_sitter.Node):
         assert root.type == 'program'
@@ -60,7 +63,7 @@ class JavaFunctionTestBase(unittest.TestCase):
         func_root_node = self._get_function_root(root)
 
         mutable_root = JavaAdaptor.convert_function_declaration(func_root_node)
-        new_code = mutable_root.to_string()
+        new_code = self.stringifier.stringify(mutable_root)
         wrapped_new = f'public class A {{\n{new_code}\n}}'
 
         if verbose:

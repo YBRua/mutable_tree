@@ -2,6 +2,7 @@ import unittest
 from tree_sitter import Language, Parser
 
 from mutable_tree.adaptors import JavaAdaptor
+from mutable_tree.stringifiers import JavaStringifier
 from mutable_tree.nodes import Node, NodeType
 from mutable_tree.tree_manip.visitors import TransformingVisitor
 
@@ -13,6 +14,7 @@ class TransformTestBase(unittest.TestCase):
     def setUp(self) -> None:
         self.parser = Parser()
         self.parser.set_language(Language(LANGUAGES_PATH, 'java'))
+        self.stringifier = JavaStringifier()
 
     def _check_ast(self, code: str):
         tree = self.parser.parse(code.encode())
@@ -36,7 +38,7 @@ class TransformTestBase(unittest.TestCase):
                         verbose: bool = False) -> Node:
         root = self._statement_to_mutable(code)
         new_root = transform_func.visit(root)
-        new_code = new_root.to_string()
+        new_code = self.stringifier.stringify(new_root)
         self._check_ast(new_code)
 
         if verbose:

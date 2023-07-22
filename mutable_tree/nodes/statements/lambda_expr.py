@@ -27,16 +27,6 @@ class LambdaExpression(Expression):
         if (self.body.node_type != NodeType.BLOCK_STMT and not is_expression(self.body)):
             throw_invalid_type(self.body.node_type, self, 'body')
 
-    def to_string(self) -> str:
-        params_str = ', '.join(
-            [param.to_string() for param in self.params.get_children()])
-
-        body_str = self.body.to_string()
-        if not self.parenthesized:
-            return f'{params_str} -> {body_str}'
-        else:
-            return f'({params_str}) -> {body_str}'
-
     def get_children(self) -> List[Node]:
         return [self.params, self.body]
 

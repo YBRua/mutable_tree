@@ -39,9 +39,6 @@ class UnaryExpression(Expression):
         if not is_expression(self.operand):
             raise TypeError(f'Invalid type: {self.operand.node_type} for unary operand')
 
-    def to_string(self) -> str:
-        return f'{self.op.value}{self.operand.to_string()}'
-
     def get_children(self) -> List[Node]:
         return [self.operand]
 
