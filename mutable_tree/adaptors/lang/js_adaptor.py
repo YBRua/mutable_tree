@@ -98,6 +98,7 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
 
         # patterns
         'array_pattern': convert_array,
+        'object_pattern': convert_object,
     }
     return expr_convertors[node.type](node)
 
@@ -611,7 +612,7 @@ def _convert_default_formal_param(node: tree_sitter.Node) -> UntypedParameter:
     left_node = node.child_by_field_name('left')
     right_node = node.child_by_field_name('right')
 
-    assert left_node.type == 'identifier'
+    assert left_node is not None and left_node.type == 'identifier'
     left_id = convert_identifier(left_node)
     left = node_factory.create_variable_declarator(left_id)
     right = convert_expression(right_node)
@@ -737,6 +738,7 @@ def convert_object_member(node: tree_sitter.Node) -> ObjectMember:
         'spread_element': convert_spread_element,
         'method_definition': convert_function_declaration,
         'shorthand_property_identifier': convert_identifier,
+        'shorthand_property_identifier_pattern': convert_identifier
     }
     return convertors[node.type](node)
 

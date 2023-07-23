@@ -1,10 +1,9 @@
 from mutable_tree.nodes import NodeType, is_expression
-from mutable_tree.nodes import (ArrayAccess, ArrayExpression, BreakStatement,
-                                CallExpression, CatchClause, ContinueStatement,
-                                DoStatement, ExpressionStatement, FieldAccess,
-                                LambdaExpression, FunctionHeader, ReturnStatement,
-                                ThrowStatement, YieldStatement, FunctionDeclaration,
-                                InitializingDeclarator, UnaryExpression, UnaryOps)
+from mutable_tree.nodes import (
+    ArrayAccess, ArrayExpression, BreakStatement, CallExpression, CatchClause,
+    ContinueStatement, DoStatement, ExpressionStatement, FieldAccess, LambdaExpression,
+    FunctionHeader, ReturnStatement, ThrowStatement, YieldStatement, FunctionDeclaration,
+    InitializingDeclarator, UnaryExpression, UnaryOps, TryStatement)
 from mutable_tree.nodes import (SpreadElement, AwaitExpression, WithStatement,
                                 AnonymousDeclarator, KeyValuePair, Object,
                                 DestructuringDeclarator, ComputedPropertyName)
@@ -12,7 +11,6 @@ from .common import BaseStringifier
 
 
 class JavaScriptStringifier(BaseStringifier):
-
     def __init__(self, semicolon: bool = True):
         super().__init__()
         self.semicolon = semicolon
@@ -193,3 +191,21 @@ class JavaScriptStringifier(BaseStringifier):
             return f'{op.value} {self.stringify(node.operand)}'
         else:
             return f'{op.value}{self.stringify(node.operand)}'
+
+    def stringify_TryStatement(self, node: TryStatement) -> str:
+        body_str = self.stringify(node.body)
+
+        if node.handlers is not None:
+            handlers_str = '\n'.join(
+                [self.stringify(handler) for handler in node.handlers.get_children()])
+            if node.finalizer is not None:
+                finalizer_str = self.stringify(node.finalizer)
+                return f'try {body_str}\n{handlers_str}\n{finalizer_str}'
+            else:
+                return f'try {body_str}\n{handlers_str}'
+        else:
+            if node.finalizer is not None:
+                finalizer_str = self.stringify(node.finalizer)
+                return f'try {body_str}\n{finalizer_str}'
+            else:
+                return f'try {body_str}'
