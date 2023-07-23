@@ -179,7 +179,8 @@ class BaseStringifier:
         iter_str = self.stringify(node.declarator)
         iterable_str = self.stringify(node.iterable)
         body_str = self.stringify(node.body)
-        return f'for ({decl_type_str} {iter_str} : {iterable_str})\n{body_str}'
+        op = node.forin_type.value
+        return f'for ({decl_type_str} {iter_str} {op} {iterable_str}) {body_str}'
 
     def stringify_ForStatement(self, node: ForStatement) -> str:
         if node.init is None:
@@ -259,6 +260,9 @@ class BaseStringifier:
         return f'throw {self.stringify(node.expr)};'
 
     def stringify_CatchClause(self, node: CatchClause) -> str:
+        assert node.exception is not None
+        assert node.catch_types is not None
+
         catch_types_str = ' | '.join(
             [self.stringify(t) for t in node.catch_types.get_children()])
         exception_str = self.stringify(node.exception)
@@ -275,6 +279,8 @@ class BaseStringifier:
         return f'finally {body_str}'
 
     def stringify_TryStatement(self, node: TryStatement) -> str:
+        assert node.handlers is not None
+
         body_str = self.stringify(node.body)
         handlers_str = '\n'.join(
             [self.stringify(handler) for handler in node.handlers.get_children()])

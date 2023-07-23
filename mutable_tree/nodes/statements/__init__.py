@@ -6,7 +6,7 @@ from .continue_stmt import ContinueStatement
 from .do_stmt import DoStatement
 from .empty_stmt import EmptyStatement
 from .expression_stmt import ExpressionStatement
-from .for_in_stmt import ForInStatement
+from .for_in_stmt import ForInStatement, ForInType, get_forin_type
 from .for_stmt import ForStatement
 from .if_stmt import IfStatement
 from .labeled_stmt import LabeledStatement
@@ -31,6 +31,8 @@ from .func_declaration import (is_formal_parameter, FormalParameter, InferredPar
 from .template_declaration import (TemplateDeclaration, TemplateParameter,
                                    TemplateParameterList, TypeParameterDeclaration,
                                    TypenameOpts, get_typename_opts)
+
+from .with_statement import WithStatement
 
 # NOTE: have to put an expression in the statements folder due to circular imports
 from .lambda_expr import LambdaExpression

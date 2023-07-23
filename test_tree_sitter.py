@@ -35,10 +35,14 @@ if __name__ == '__main__':
     parser.set_language(LANGUAGE)
 
     code = """
-    myArray[1];
-    myThing.myArray[idx];
-    myThing.myArray[idx].myOtherThing;
-    myThing.myMaybeArray?.[idx];
+        switch (value) {
+            case 1:
+                doSomething();
+                break;
+            case 2:
+                doSomethingElse();
+                break;
+        }
     """
 
     if lang == 'java':

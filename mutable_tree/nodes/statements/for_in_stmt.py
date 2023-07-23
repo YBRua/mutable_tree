@@ -1,3 +1,4 @@
+from enum import Enum
 from ..node import Node, NodeType
 from .statement import Statement
 from .statement import is_statement
@@ -9,15 +10,40 @@ from ..utils import throw_invalid_type
 from typing import List
 
 
+class ForInType(Enum):
+    COLON = ':'
+    IN = 'in'
+    OF = 'of'
+
+
+_forin_type_map = {
+    ':': ForInType.COLON,
+    'in': ForInType.IN,
+    'of': ForInType.OF,
+}
+
+
+def get_forin_type(op: str) -> ForInType:
+    return _forin_type_map[op]
+
+
 class ForInStatement(Statement):
 
-    def __init__(self, node_type: NodeType, decl_type: DeclaratorType,
-                 declarator: Declarator, iterable: Expression, body: Statement):
+    def __init__(self,
+                 node_type: NodeType,
+                 decl_type: DeclaratorType,
+                 declarator: Declarator,
+                 iterable: Expression,
+                 body: Statement,
+                 forin_type: ForInType,
+                 is_async: bool = False):
         super().__init__(node_type)
         self.decl_type = decl_type
         self.declarator = declarator
         self.iterable = iterable
         self.body = body
+        self.forin_type = forin_type
+        self.is_async = is_async
         self._check_types()
 
     def _check_types(self):

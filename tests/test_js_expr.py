@@ -207,6 +207,13 @@ class TestJavaScriptAwaitExpr(JavaScriptSnippetTestBase):
         self._stmt_round_trip('await thingy();')
 
 
+class TestJavaScriptSequenceExpr(JavaScriptSnippetTestBase):
+    def test_sequence_expr(self):
+        self._stmt_round_trip('a, b;')
+        self._stmt_round_trip('(a = 1, b = 2), c = 3;')
+        self._stmt_round_trip('a = b, c, d();')
+
+
 # class TestJavaLambdaExpr(JavaScriptSnippetTestBase):
 
 #     def test_identifier_lambda(self):

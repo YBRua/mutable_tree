@@ -13,13 +13,16 @@ from .expressions import (ArrayAccess, ArrayExpression, ArrayCreationExpression,
                           ScopeResolution, QualifiedIdentifier, CompoundLiteralExpression,
                           SpreadElement, AwaitExpression)
 from .statements import Statement
-from .statements import (
-    AssertStatement, BlockStatement, BreakStatement, ContinueStatement, DoStatement,
-    EmptyStatement, ExpressionStatement, ForInStatement, ForStatement, IfStatement,
-    LabeledStatement, ReturnStatement, SwitchCase, SwitchCaseList, SwitchStatement,
-    ThrowStatement, TryStatement, TryHandlers, CatchClause, FinallyClause, WhileStatement,
-    YieldStatement, StatementList, TryResource, TryResourceList,
-    TryWithResourcesStatement, SynchronizedStatement, LambdaExpression, GotoStatement)
+from .statements import (AssertStatement, BlockStatement, BreakStatement,
+                         ContinueStatement, DoStatement, EmptyStatement,
+                         ExpressionStatement, ForInStatement, ForStatement, IfStatement,
+                         LabeledStatement, ReturnStatement, SwitchCase, SwitchCaseList,
+                         SwitchStatement, ThrowStatement, TryStatement, TryHandlers,
+                         CatchClause, FinallyClause, WhileStatement, YieldStatement,
+                         StatementList, TryResource, TryResourceList,
+                         TryWithResourcesStatement, SynchronizedStatement,
+                         LambdaExpression, GotoStatement, WithStatement)
+from .statements import ForInType
 from .statements import (Declarator, VariableDeclarator, ArrayDeclarator,
                          PointerDeclarator, ReferenceDeclarator, InitializingDeclarator,
                          DeclaratorList, DeclaratorType, LocalVariableDeclaration)
@@ -296,8 +299,11 @@ def create_for_in_stmt(
     decl: Declarator,
     iterable: Expression,
     body: Statement,
+    forin_type: ForInType = ForInType.COLON,
+    is_async: bool = False,
 ) -> ForInStatement:
-    return ForInStatement(NodeType.FOR_IN_STMT, decl_type, decl, iterable, body)
+    return ForInStatement(NodeType.FOR_IN_STMT, decl_type, decl, iterable, body,
+                          forin_type, is_async)
 
 
 def create_if_stmt(
@@ -343,10 +349,11 @@ def create_yield_stmt(expr: Optional[Expression] = None,
     return YieldStatement(NodeType.YIELD_STMT, expr, is_delegate)
 
 
-def create_catch_clause(exception_types: TypeIdentifierList, exception: Identifier,
-                        body: BlockStatement,
-                        modifiers: Optional[ModifierList]) -> CatchClause:
-    return CatchClause(NodeType.CATCH_CLAUSE, exception_types, exception, body, modifiers)
+def create_catch_clause(body: BlockStatement,
+                        exception_types: Optional[TypeIdentifierList] = None,
+                        exception: Optional[Identifier] = None,
+                        modifiers: Optional[ModifierList] = None) -> CatchClause:
+    return CatchClause(NodeType.CATCH_CLAUSE, body, exception_types, exception, modifiers)
 
 
 def create_finally_clause(body: BlockStatement) -> FinallyClause:
@@ -359,7 +366,7 @@ def create_try_handlers(catch_clauses: List[CatchClause]) -> TryHandlers:
 
 def create_try_stmt(
     try_block: BlockStatement,
-    handlers: TryHandlers,
+    handlers: Optional[TryHandlers] = None,
     finally_clause: Optional[FinallyClause] = None,
 ) -> TryStatement:
     return TryStatement(NodeType.TRY_STMT, try_block, handlers, finally_clause)
@@ -397,6 +404,10 @@ def wrap_block_stmt(stmt: Statement) -> BlockStatement:
 
 def create_goto_stmt(label: Identifier) -> GotoStatement:
     return GotoStatement(NodeType.GOTO_STMT, label)
+
+
+def create_with_stmt(object: Expression, body: Statement) -> WithStatement:
+    return WithStatement(NodeType.WITH_STMT, object, body)
 
 
 # DECLARATIONS & DEFINITIONS

@@ -640,7 +640,7 @@ def convert_catch_handler(node: tree_sitter.Node) -> CatchClause:
     # NOTE: should be variable declarator according to grammar specification
     decl = convert_identifier(decl_node)
 
-    return node_factory.create_catch_clause(param_types, decl, body, modifiers)
+    return node_factory.create_catch_clause(body, param_types, decl, modifiers)
 
 
 def convert_try_finalizer(node: tree_sitter.Node) -> FinallyClause:

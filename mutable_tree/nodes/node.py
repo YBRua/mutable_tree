@@ -60,6 +60,7 @@ class NodeType(Enum):
     WHILE_STMT = 'WhileStatement'
     YIELD_STMT = 'YieldStatement'
     GOTO_STMT = 'GotoStatement'
+    WITH_STMT = 'WithStatement'
 
     # declarations & definitions (are also statements)
     FUNCTION_DECLARATOR = 'FunctionDeclarator'
