@@ -35,7 +35,12 @@ if __name__ == '__main__':
     parser.set_language(LANGUAGE)
 
     code = """
-        function foo(a, b=1) { }
+  for (let [key, value] of map.entries()) {
+    if (value > max) {
+      max = value;
+      maxKey = key;
+    }
+  }
     """
 
     if lang == 'java':

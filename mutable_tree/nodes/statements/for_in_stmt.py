@@ -51,7 +51,7 @@ class ForInStatement(Statement):
             throw_invalid_type(self.node_type, self)
         if self.decl_type.node_type != NodeType.DECLARATOR_TYPE:
             throw_invalid_type(self.decl_type.node_type, self, attr='decl_type')
-        if not is_declarator(self.declarator):
+        if not is_declarator(self.declarator) and not is_expression(self.declarator):
             throw_invalid_type(self.declarator.node_type, self, attr='declarator')
         if not is_expression(self.iterable):
             throw_invalid_type(self.iterable.node_type, self, attr='iterable')

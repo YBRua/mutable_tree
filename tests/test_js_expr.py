@@ -208,25 +208,40 @@ class TestJavaScriptAwaitExpr(JavaScriptSnippetTestBase):
 
 
 class TestJavaScriptSequenceExpr(JavaScriptSnippetTestBase):
+
     def test_sequence_expr(self):
         self._stmt_round_trip('a, b;')
         self._stmt_round_trip('(a = 1, b = 2), c = 3;')
         self._stmt_round_trip('a = b, c, d();')
 
 
-# class TestJavaLambdaExpr(JavaScriptSnippetTestBase):
+class TestJavaScriptLambdaExpr(JavaScriptSnippetTestBase):
 
-#     def test_identifier_lambda(self):
-#         self._stmt_round_trip('a -> a + 42;')
-#         self._stmt_round_trip('a -> { int b = a + 42; return b; };')
+    def test_identifier_lambda(self):
+        # self._stmt_round_trip('a => a + 42;', verbose=True)
+        self._stmt_round_trip('a => { let b = a + 42; return b; };')
 
-#     def test_typed_lambda(self):
-#         self._stmt_round_trip('(int a) -> a + 42;')
-#         self._stmt_round_trip('(int a, int b) -> { int c = a + b; return c; };')
+    def test_parenthesized_lambda(self):
+        self._stmt_round_trip('(a) => a + 42;')
+        self._stmt_round_trip('(a, b) => { let c = a + b; return c; };')
 
-#     def test_inferred_lambda(self):
-#         self._stmt_round_trip('(a) -> a + 42;')
-#         self._stmt_round_trip('(a, b) -> { int c = a + b; return c; };')
+
+class TestJavaScriptObject(JavaScriptSnippetTestBase):
+
+    def test_simple_object(self):
+        self._stmt_round_trip('{ };')
+        self._stmt_round_trip('{ a: 1 };')
+        self._stmt_round_trip('{ a: 1, b: 2 };')
+
+    def test_literal_key(self):
+        self._stmt_round_trip('{ "a": 1 };')
+        self._stmt_round_trip('{ 1: 2, 3: 4 };')
+
+    def test_computed_key(self):
+        self._stmt_round_trip('{ [a]: 1 };')
+        # self._stmt_round_trip('{ [a + b]: 1 };')
+        # self._stmt_round_trip('let a = { [a + b]: 1 };')
+
 
 if __name__ == '__main__':
     unittest.main()

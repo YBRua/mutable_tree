@@ -5,7 +5,7 @@ import subprocess
 from tqdm import tqdm
 from collections import defaultdict, Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import tree_sitter
 from dataset_filter import remove_comments
@@ -42,7 +42,7 @@ class MBXPRunner:
         if not os.path.exists(self.bin_dir):
             os.makedirs(self.bin_dir)
 
-    def _exec(self, cmd: List[str]):
+    def _exec(self, cmd: List[str], cwd: Optional[str] = None):
         try:
             exec_result = subprocess.run(
                 cmd,
@@ -50,9 +50,11 @@ class MBXPRunner:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
+                cwd=cwd,
             )
             return exec_result.returncode == 0
-        except Exception:
+        except Exception as e:
+            print(e)
             return False
 
     def _compile(self, src_path: str, bin_path: str):
@@ -61,33 +63,41 @@ class MBXPRunner:
     def _run_ut(self, bin_path: str):
         raise NotImplementedError()
 
-    def _compile_and_check_impl(self, code: str, src_path: str, bin_path: str):
+    def _compile_and_check_impl(self, id: str, code: str, src_path: str, bin_path: str):
         compiled = self._compile(src_path, bin_path)
         if not compiled:
-            return False, self.msg_err_compile + ': ' + src_path
+            return id, False, self.msg_err_compile + ': ' + src_path
 
         # run compiled program
         passed = self._run_ut(bin_path)
         if not passed:
-            return False, self.msg_err_exec + ': ' + src_path
+            return id, False, self.msg_err_exec + ': ' + src_path
 
-        return True, self.msg_good
+        return id, True, self.msg_good
 
-    def compile_and_check_solution(self, task_id: int, code: str):
+    def compile_and_check_solution(self, task_id: str, code: str):
         task_name = f'{self.task_prefix}_{task_id}'
         src_path = os.path.join(self.source_dir, f'{task_name}.{self.lang}')
         bin_path = os.path.join(self.bin_dir, f'{task_name}')
 
-        with open(src_path, 'w', encoding='utf-8') as f:
-            f.write(code)
-
-        return self._compile_and_check_impl(code, src_path, bin_path)
+        return self._compile_and_check_impl(task_id, code, src_path, bin_path)
 
     def check_solution_wrapper(self, args):
         return self.compile_and_check_solution(*args)
 
+    def write_code_to_fs(self, instances: List):
+        for task_id, code in instances:
+            task_name = f'{self.task_prefix}_{task_id}'
+            src_path = os.path.join(self.source_dir, f'{task_name}.{self.lang}')
+            with open(src_path, 'w', encoding='utf-8') as f:
+                f.write(code)
+
     def check_solutions(self, instances: List, n_processes: int = 1):
         results = []
+
+        self.write_code_to_fs(instances)
+        input('NOTE: please manually npm install lodash in the source dir! ')
+
         with ThreadPoolExecutor(max_workers=n_processes) as executor:
             futures = []
             completion_ids = Counter()
@@ -108,11 +118,10 @@ class MBXPRunner:
 
         res_dict = defaultdict(int)
         failures = set()
-        for i, (is_good, msg) in enumerate(results):
-            instance = instances[i]
-            res_dict[msg] += 1
+        for (id, is_good, msg) in results:
+            res_dict[msg.split(':')[0]] += 1
             if not is_good:
-                failures.add((instance[0], msg))
+                failures.add((id, msg))
 
         return res_dict, failures
 
@@ -151,7 +160,7 @@ class MBJPRunner(MBXPRunner):
         passed = self._exec([java_path, '-cp', bin_path, 'Main'])
         return passed
 
-    def compile_and_check_solution(self, task_id: int, code: str):
+    def compile_and_check_solution(self, task_id: str, code: str):
         task_name = f'{self.task_prefix}_{task_id}'
         src_path = os.path.join(self.source_dir, task_name, f'main.{self.lang}')
         bin_path = os.path.dirname(src_path)
@@ -159,10 +168,7 @@ class MBJPRunner(MBXPRunner):
         if not os.path.exists(bin_path):
             os.makedirs(bin_path)
 
-        with open(src_path, 'w', encoding='utf-8') as f:
-            f.write(code)
-
-        return self._compile_and_check_impl(code, src_path, bin_path)
+        return self._compile_and_check_impl(task_id, code, src_path, bin_path)
 
 
 class MBJSPRunner(MBXPRunner):
@@ -172,6 +178,9 @@ class MBJSPRunner(MBXPRunner):
     def __init__(self, source_dir: str, bin_dir: str):
         super().__init__(source_dir, bin_dir)
 
+    def check_cleanup(self):
+        super().check_cleanup()
+
     def _compile(self, src_path: str, bin_path: str):
         return True
 
@@ -179,14 +188,11 @@ class MBJSPRunner(MBXPRunner):
         passed = self._exec(['node', bin_path])
         return passed
 
-    def compile_and_check_solution(self, task_id: int, code: str):
+    def compile_and_check_solution(self, task_id: str, code: str):
         task_name = f'{self.task_prefix}_{task_id}'
         src_path = os.path.join(self.source_dir, f'{task_name}.{self.lang}')
 
-        with open(src_path, 'w', encoding='utf-8') as f:
-            f.write(code)
-
-        return self._compile_and_check_impl(code, src_path, src_path)
+        return self._compile_and_check_impl(task_id, code, src_path, src_path)
 
 
 def load_samples_with_sol(dataset_path: str):
@@ -294,9 +300,9 @@ def round_trip(code: str, parser: tree_sitter.Parser, lang: str):
 def main():
     LANG = 'javascript'
     MBXP_NAME = {'java': 'mbjp', 'cpp': 'mbcpp', 'javascript': 'mbjsp'}[LANG]
-    FILE_STORE = './mbxp/original/source/'
-    BIN_STORE = './mbxp/original/bin/'
-    MBXP_DATASET_PATH = f'./datasets/{MBXP_NAME}_release_v1.2.jsonl'
+    FILE_STORE = 'mbxp/original/source/'
+    BIN_STORE = 'mbxp/original/bin/'
+    MBXP_DATASET_PATH = f'datasets/{MBXP_NAME}_release_v1.2_filtered.jsonl'
 
     if LANG == 'cpp':
         prefix = "#include <bits/stdc++.h>\nusing namespace std;\n"
@@ -333,7 +339,32 @@ def main():
     else:
         raise ValueError(f'Unknown language: {LANG}')
 
-    for sample in valid_samples:
+    # original_instances = []
+    # for sample in valid_samples:
+    #     program = compose_program(sample)
+    #     original_instances.append((sample['task_id'].split('/')[-1], program))
+    # res, failures = runner.check_solutions(original_instances, n_processes=16)
+    # print(res)
+    # print(failures)
+    # print()
+
+    # sample_dict = {}
+    # for sample in valid_samples:
+    #     sample_id = int(sample['task_id'].split('/')[-1])
+    #     sample_dict[sample_id] = sample
+
+    # for id, _ in failures:
+    #     id = int(id)
+    #     sample_dict.pop(id)
+
+    # with open(f'datasets/{MBXP_NAME}_release_v1.2_filtered.jsonl', 'w') as f:
+    #     for i in sorted(sample_dict.keys()):
+    #         f.write(json.dumps(sample_dict[i]) + '\n')
+
+    # return
+
+    mutableast_instances = []
+    for sample in tqdm(valid_samples):
         if LANG == 'cpp':
             function = compose_function_cpp(sample)
         elif LANG == 'java':
@@ -342,13 +373,13 @@ def main():
             function = compose_function_javascript(sample)
         else:
             raise ValueError(f'Unknown language: {LANG}')
-        # try:
-        #     t_function = round_trip(function, parser, LANG)
-        # except Exception as e:
-        #     print(e)
-        #     continue
-        print(function)
-        t_function = round_trip(function, parser, LANG)
+        try:
+            t_function = round_trip(function, parser, LANG)
+        except Exception as e:
+            print(e)
+            continue
+        # print(function)
+        # t_function = round_trip(function, parser, LANG)
 
         if LANG == 'java':
             # extract class header
@@ -357,11 +388,11 @@ def main():
 
         t_program = prefix + t_function + sample["test"]
         task_id = sample['task_id'].split('/')[-1]
-        mutableast_instances = [(task_id, t_program)]
+        mutableast_instances.append((task_id, t_program))
 
-        res, failures = runner.check_solutions(mutableast_instances, n_processes=16)
-        print(res, failures)
-        print()
+    res, failures = runner.check_solutions(mutableast_instances, n_processes=16)
+    print(res, failures)
+    print()
 
 
 if __name__ == '__main__':

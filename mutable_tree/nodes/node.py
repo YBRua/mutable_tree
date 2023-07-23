@@ -75,6 +75,7 @@ class NodeType(Enum):
     ARRAY_DECLARATOR = 'ArrayDeclarator'
     INITIALIZING_DECLARATOR = 'InitializingDeclarator'
     ANONYMOUS_DECLARATOR = 'AnonymousDeclarator'
+    DESTRUCTURING_DECLARATOR = 'DestructuringDeclarator'
 
     DECLARATOR_LIST = 'DeclaratorList'
 
@@ -107,6 +108,12 @@ class NodeType(Enum):
     FORMAL_PARAMETER_LIST = 'FormalParameterList'
     SPREAD_PARAMETER = 'SpreadParameter'
     VARIADIC_PARAMETER = 'VariadicParameter'
+
+    # object
+    OBJECT = 'Object'
+    KEYVALUE_PAIR = 'KeyValuePair'
+    OBJECT_MEMBERS = 'ObjectMembers'
+    COMPUTED_PROPERTY_NAME = 'ComputedPropertyName'
 
 
 class Node:

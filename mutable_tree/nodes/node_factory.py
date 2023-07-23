@@ -26,12 +26,14 @@ from .statements import ForInType
 from .statements import (Declarator, VariableDeclarator, ArrayDeclarator,
                          PointerDeclarator, ReferenceDeclarator, InitializingDeclarator,
                          AnonymousDeclarator, DeclaratorList, DeclaratorType,
-                         LocalVariableDeclaration)
+                         LocalVariableDeclaration, DestructuringDeclarator)
 from .statements import (FormalParameter, UntypedParameter, TypedFormalParameter,
                          SpreadParameter, VariadicParameter, FormalParameterList,
                          FunctionDeclarator, FunctionHeader, FunctionDeclaration)
 from .statements import (TemplateDeclaration, TemplateParameter, TemplateParameterList,
                          TypeParameterDeclaration, TypenameOpts)
+from .classes import (KeyValuePair, ObjectMembers, ObjectMember, Object,
+                      ComputedPropertyName)
 from .miscs import Modifier, ModifierList
 from .statements.for_stmt import ForInit
 from .types import (TypeIdentifier, TypeIdentifierList, DimensionSpecifier, Dimensions,
@@ -169,12 +171,11 @@ def create_parenthesized_expr(expr: Expression) -> Expression:
     return ParenthesizedExpression(NodeType.PARENTHESIZED_EXPR, expr)
 
 
-def create_lambda_expr(
-    params: FormalParameterList,
-    body: Union[Expression, BlockStatement],
-    parenthesized: bool = False,
-) -> LambdaExpression:
-    return LambdaExpression(NodeType.LAMBDA_EXPR, params, body, parenthesized)
+def create_lambda_expr(params: FormalParameterList,
+                       body: Union[Expression, BlockStatement],
+                       parenthesized: bool = False,
+                       modifiers: Optional[ModifierList] = None) -> LambdaExpression:
+    return LambdaExpression(NodeType.LAMBDA_EXPR, params, body, parenthesized, modifiers)
 
 
 def create_comma_expr(left: Expression, right: Expression) -> CommaExpression:
@@ -254,6 +255,10 @@ def create_anonymous_declarator() -> AnonymousDeclarator:
     return AnonymousDeclarator(NodeType.ANONYMOUS_DECLARATOR)
 
 
+def create_destructuring_declarator(pattern: Expression) -> DestructuringDeclarator:
+    return DestructuringDeclarator(NodeType.DESTRUCTURING_DECLARATOR, pattern)
+
+
 # STATEMENTS
 
 
@@ -301,7 +306,7 @@ def create_do_stmt(condition: Expression, body: Statement) -> DoStatement:
 
 def create_for_in_stmt(
     decl_type: DeclaratorType,
-    decl: Declarator,
+    decl: Union[Declarator, Expression],
     iterable: Expression,
     body: Statement,
     forin_type: ForInType = ForInType.COLON,
@@ -479,6 +484,25 @@ def create_template_parameter_list(
 def create_template_declaration(params: TemplateParameterList,
                                 func: FunctionDeclaration) -> TemplateDeclaration:
     return TemplateDeclaration(NodeType.TEMPLATE_DECLARATION, params, func)
+
+
+# OBJECTS & CLASSES
+
+
+def create_computed_property_name(expr: Expression) -> ComputedPropertyName:
+    return ComputedPropertyName(NodeType.COMPUTED_PROPERTY_NAME, expr)
+
+
+def create_key_value_pair(key: Identifier, value: Expression) -> KeyValuePair:
+    return KeyValuePair(NodeType.KEYVALUE_PAIR, key, value)
+
+
+def create_object_members(members: List[ObjectMember]) -> ObjectMembers:
+    return ObjectMembers(NodeType.OBJECT_MEMBERS, members)
+
+
+def create_object(members: ObjectMembers) -> Object:
+    return Object(NodeType.OBJECT, members)
 
 
 # MISCS

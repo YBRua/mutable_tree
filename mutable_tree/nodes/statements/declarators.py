@@ -33,7 +33,9 @@ class InitializingDeclarator(Declarator):
         if not is_declarator(self.declarator):
             throw_invalid_type(self.declarator.node_type, self, attr='declarator')
         if (not is_expression(self.value)
-                and self.value.node_type != NodeType.EXPRESSION_LIST):
+                and self.value.node_type != NodeType.EXPRESSION_LIST
+                and self.value.node_type != NodeType.FUNCTION_DEFINITION):
+            # FIXME: function definition is not an expression
             throw_invalid_type(self.value.node_type, self, attr='value')
 
     def get_children(self) -> List[Node]:
@@ -41,6 +43,26 @@ class InitializingDeclarator(Declarator):
 
     def get_children_names(self) -> List[str]:
         return ['declarator', 'value']
+
+
+class DestructuringDeclarator(Declarator):
+
+    def __init__(self, node_type: NodeType, pattern: Expression):
+        super().__init__(node_type)
+        self.pattern = pattern
+        self._check_types()
+
+    def _check_types(self):
+        if self.node_type != NodeType.DESTRUCTURING_DECLARATOR:
+            throw_invalid_type(self.node_type, self)
+        if not is_expression(self.pattern):
+            throw_invalid_type(self.pattern.node_type, self, attr='pattern')
+
+    def get_children(self) -> List[Node]:
+        return [self.pattern]
+
+    def get_children_names(self) -> List[str]:
+        return ['pattern']
 
 
 class VariableDeclarator(Declarator):

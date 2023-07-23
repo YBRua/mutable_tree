@@ -13,6 +13,7 @@ class UnaryOps(Enum):
     BITWISE_NOT = '~'
     VOID = 'void'
     TYPEOF = 'typeof'
+    DELETE = 'delete'  # js
 
 
 _unary_op_map = {
@@ -22,6 +23,7 @@ _unary_op_map = {
     '~': UnaryOps.BITWISE_NOT,
     'void': UnaryOps.VOID,
     'typeof': UnaryOps.TYPEOF,
+    'delete': UnaryOps.DELETE
 }
 
 

@@ -17,6 +17,7 @@ from ...nodes import (Declarator, VariableDeclarator, ArrayDeclarator,
 from ...nodes import (FormalParameter, UntypedParameter, TypedFormalParameter,
                       SpreadParameter, FormalParameterList, FunctionHeader,
                       FunctionDeclaration)
+from ...nodes import Object, KeyValuePair, ObjectMember, ObjectMembers
 from ...nodes import (Modifier, ModifierList)
 from ...nodes import Program
 from ...nodes import TypeIdentifier, Dimensions, TypeParameter, TypeParameterList
@@ -91,6 +92,12 @@ def convert_expression(node: tree_sitter.Node) -> Expression:
         'yield_expression': convert_yield_expr,
         'this': convert_this_expr,
         'sequence_expression': convert_sequence_expr,
+        'arrow_function': convert_arrow_function,
+        'function': convert_function_declaration,
+        'object': convert_object,
+
+        # patterns
+        'array_pattern': convert_array,
     }
     return expr_convertors[node.type](node)
 
@@ -420,11 +427,14 @@ def convert_variable_declarator(node: tree_sitter.Node) -> Declarator:
     name_node = node.child_by_field_name('name')
     value_node = node.child_by_field_name('value')
 
-    assert name_node.type == 'identifier'
-    name = convert_identifier(name_node)
-    value = convert_expression(value_node) if value_node is not None else None
+    if name_node.type == 'identifier':
+        name = convert_identifier(name_node)
+        decl = node_factory.create_variable_declarator(name)
+    else:
+        pattern = convert_expression(name_node)
+        decl = node_factory.create_destructuring_declarator(pattern)
 
-    decl = node_factory.create_variable_declarator(name)
+    value = convert_expression(value_node) if value_node is not None else None
     if value is not None:
         decl = node_factory.create_initializing_declarator(decl, value)
 
@@ -523,16 +533,17 @@ def convert_for_in_stmt(node: tree_sitter.Node) -> ForInStatement:
     body_node = node.child_by_field_name('body')
 
     if kind_node is None:
-        raise NotImplementedError('for_in_stmt without kind')
-
-    kind_id = node_factory.create_type_identifier(kind_node.text.decode())
+        # FIXME: temporary workaround
+        kind_id = node_factory.create_type_identifier('let')
+    else:
+        kind_id = node_factory.create_type_identifier(kind_node.text.decode())
     decl_ty = node_factory.create_declarator_type(kind_id)
 
     if left_node.type != 'identifier':
-        raise NotImplementedError('for_in_stmt with non-identifier left')
-
-    left = convert_identifier(left_node)
-    left = node_factory.create_variable_declarator(left)
+        left = convert_expression(left_node)
+    else:
+        left = convert_identifier(left_node)
+        left = node_factory.create_variable_declarator(left)
     forin_type = get_forin_type(operator)
     right = convert_expression(right_node)
     body = convert_statement(body_node)
@@ -629,16 +640,27 @@ def convert_formal_parameters(node: tree_sitter.Node) -> FormalParameterList:
 
 
 def convert_function_header(node: tree_sitter.Node) -> FunctionHeader:
-    idx = 0
-    if node.children[idx].type == 'async':
-        modifiers = node_factory.create_modifier_list(
-            [node_factory.create_modifier('async')])
-        idx += 1
-    else:
-        modifiers = None
+    # modifiers
+    modifiers = []
 
-    assert node.children[idx].type == 'function'
-    idx += 1
+    # decorators
+    decorator_nodes = node.children_by_field_name('decorator')
+    for decorator_node in decorator_nodes:
+        modifiers.append(node_factory.create_modifier(decorator_node.text.decode()))
+
+    # static, async, get, set
+    idx = 0
+    while node.children[idx].type in {'static', 'async', 'get', 'set'}:
+        modifiers.append(node_factory.create_modifier(node.children[idx].text.decode()))
+        idx += 1
+
+    if len(modifiers) == 0:
+        modifiers = None
+    else:
+        modifiers = node_factory.create_modifier_list(modifiers)
+
+    if node.children[idx].type == 'function':
+        idx += 1
 
     if node.children[idx].type == '*':
         raise NotImplementedError('generator function')
@@ -665,3 +687,66 @@ def convert_function_declaration(node: tree_sitter.Node) -> FunctionDeclaration:
     body = convert_statement(node.child_by_field_name('body'))
 
     return node_factory.create_func_declaration(header, body)
+
+
+def convert_arrow_function(node: tree_sitter.Node) -> LambdaExpression:
+    if node.children[0].type == 'async':
+        modifiers = node_factory.create_modifier_list(
+            [node_factory.create_modifier('async')])
+    else:
+        modifiers = None
+
+    param_node = node.child_by_field_name('parameter')
+    if param_node is not None:
+        parenthesized = False
+        params = []
+        params.append(convert_formal_param(param_node))
+        params = node_factory.create_formal_parameter_list(params)
+    else:
+        param_node = node.child_by_field_name('parameters')
+        assert param_node is not None
+        parenthesized = True
+        params = convert_formal_parameters(param_node)
+
+    body_node = node.child_by_field_name('body')
+    if body_node.type == 'statement_block':
+        body = convert_statement(body_node)
+    else:
+        body = convert_expression(body_node)
+
+    return node_factory.create_lambda_expr(params, body, parenthesized, modifiers)
+
+
+def convert_key_value_pair(node: tree_sitter.Node) -> KeyValuePair:
+    key_node = node.child_by_field_name('key')
+    value_node = node.child_by_field_name('value')
+
+    if key_node.type == 'computed_property_name':
+        key = convert_expression(key_node.children[1])
+        key = node_factory.create_computed_property_name(key)
+    else:
+        key = convert_expression(key_node)
+
+    value = convert_expression(value_node)
+    return node_factory.create_key_value_pair(key, value)
+
+
+def convert_object_member(node: tree_sitter.Node) -> ObjectMember:
+    convertors = {
+        'pair': convert_key_value_pair,
+        'spread_element': convert_spread_element,
+        'method_definition': convert_function_declaration,
+        'shorthand_property_identifier': convert_identifier,
+    }
+    return convertors[node.type](node)
+
+
+def convert_object(node: tree_sitter.Node) -> Object:
+    members = []
+    for child in node.children[1:-1]:
+        if child.type == ',':
+            continue
+        members.append(convert_object_member(child))
+
+    members = node_factory.create_object_members(members)
+    return node_factory.create_object(members)

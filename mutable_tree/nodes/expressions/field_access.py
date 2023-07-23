@@ -36,7 +36,8 @@ class FieldAccess(Expression):
     def _check_types(self):
         if self.node_type != NodeType.FIELD_ACCESS:
             throw_invalid_type(self.node_type, self)
-        if not is_primary_expression(self.object):
+        if not is_primary_expression(
+                self.object) and self.object.node_type != NodeType.ARRAY_EXPR:
             throw_invalid_type(self.object.node_type, self, attr='object')
         f_nt = self.field.node_type
         if (f_nt != NodeType.IDENTIFIER and f_nt != NodeType.THIS_EXPR):
