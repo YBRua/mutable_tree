@@ -44,18 +44,12 @@ class JavaScriptFunctionTestBase(unittest.TestCase):
 
     def _get_function_root(self, root: tree_sitter.Node):
         assert root.type == 'program'
-        class_decl_node = root.children[0]
-        assert class_decl_node.type == 'class_declaration'
-        class_body_node = class_decl_node.children[3]
-        assert class_body_node.type == 'class_body'
-        func_root_node = class_body_node.children[1]
-        assert func_root_node.type == 'method_declaration'
+        func_root_node = root.children[0]
+        assert func_root_node.type == 'function_declaration'
         return func_root_node
 
     def _function_round_trip(self, code: str, verbose: bool = False):
-        wrapped = f'public class A {{\n{code}\n}}'
-
-        tree = self.parser.parse(wrapped.encode())
+        tree = self.parser.parse(code.encode())
         root = tree.root_node
         if root.has_error:
             raise ValueError('original code is invalid')
@@ -64,12 +58,11 @@ class JavaScriptFunctionTestBase(unittest.TestCase):
 
         mutable_root = JavaScriptAdaptor.convert_function_declaration(func_root_node)
         new_code = self.stringifier.stringify(mutable_root)
-        wrapped_new = f'public class A {{\n{new_code}\n}}'
 
         if verbose:
             print(new_code)
 
-        new_tree = self.parser.parse(wrapped_new.encode())
+        new_tree = self.parser.parse(new_code.encode())
         new_root = new_tree.root_node
         self.assertFalse(new_root.has_error)
 

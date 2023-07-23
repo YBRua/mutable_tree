@@ -1,3 +1,4 @@
+from mutable_tree.nodes.node import NodeType
 from ..node import Node, NodeType, NodeList
 from ..miscs import ModifierList
 from ..types import Dimensions, TypeIdentifierList, TypeParameterList
@@ -29,7 +30,7 @@ class VariadicParameter(FormalParameter):
             throw_invalid_type(self.node_type, self)
 
 
-class InferredParameter(FormalParameter):
+class UntypedParameter(FormalParameter):
 
     def __init__(self, node_type: NodeType, decl: Declarator):
         super().__init__(node_type)
@@ -37,7 +38,7 @@ class InferredParameter(FormalParameter):
         self._check_types()
 
     def _check_types(self):
-        if self.node_type != NodeType.INFERRED_PARAMETER:
+        if self.node_type != NodeType.UNTYPED_PARAMETER:
             throw_invalid_type(self.node_type, self)
         if not is_declarator(self.declarator):
             throw_invalid_type(self.declarator.node_type, self, attr='declarator')
@@ -145,8 +146,8 @@ class FunctionHeader(Node):
 
     def __init__(self,
                  node_type: NodeType,
-                 return_type: DeclaratorType,
                  func_decl: FunctionDeclarator,
+                 return_type: Optional[DeclaratorType] = None,
                  dimensions: Optional[Dimensions] = None,
                  throws: Optional[TypeIdentifierList] = None,
                  modifiers: Optional[ModifierList] = None,
@@ -166,7 +167,8 @@ class FunctionHeader(Node):
     def _check_types(self):
         if self.node_type != NodeType.FUNCTION_HEADER:
             throw_invalid_type(self.node_type, self)
-        if self.return_type.node_type != NodeType.DECLARATOR_TYPE:
+        if (self.return_type is not None
+                and self.return_type.node_type != NodeType.DECLARATOR_TYPE):
             throw_invalid_type(self.return_type.node_type, self, attr='return_type')
         if not is_declarator(self.func_decl):
             throw_invalid_type(self.func_decl.node_type, self, attr='name')

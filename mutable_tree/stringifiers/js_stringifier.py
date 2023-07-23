@@ -1,9 +1,10 @@
 from mutable_tree.nodes import (ArrayAccess, ArrayExpression, BreakStatement,
                                 CallExpression, CatchClause, ContinueStatement,
                                 DoStatement, ExpressionStatement, FieldAccess,
-                                ReturnStatement, ThrowStatement, YieldStatement,
-                                WithStatement)
-from mutable_tree.nodes import SpreadElement, AwaitExpression
+                                FunctionDeclaration, FunctionHeader, ReturnStatement,
+                                ThrowStatement, YieldStatement)
+from mutable_tree.nodes import (SpreadElement, AwaitExpression, WithStatement,
+                                AnonymousDeclarator)
 from .common import BaseStringifier
 
 
@@ -107,3 +108,15 @@ class JavaScriptStringifier(BaseStringifier):
         obj_str = self.stringify(node.object)
         body_str = self.stringify(node.body)
         return f'with ({obj_str}) {body_str}'
+
+    def stringify_AnonymousDeclarator(self, node: AnonymousDeclarator) -> str:
+        return ''
+
+    def stringify_FunctionHeader(self, node: FunctionHeader) -> str:
+        decl_str = self.stringify(node.func_decl)
+
+        if node.modifiers is not None:
+            modifier_str = self.stringify(node.modifiers)
+            return f'{modifier_str} function {decl_str}'
+        else:
+            return f'function {decl_str}'

@@ -11,7 +11,8 @@ from .for_stmt import ForStatement
 from .if_stmt import IfStatement
 from .labeled_stmt import LabeledStatement
 from .declarators import (Declarator, VariableDeclarator, ArrayDeclarator,
-                          PointerDeclarator, ReferenceDeclarator, InitializingDeclarator)
+                          PointerDeclarator, ReferenceDeclarator, InitializingDeclarator,
+                          AnonymousDeclarator)
 from .local_var_decl import (LocalVariableDeclaration, DeclaratorList, DeclaratorType)
 from .return_stmt import ReturnStatement
 from .switch_stmt import SwitchStatement, SwitchCase, SwitchCaseList
@@ -24,7 +25,7 @@ from .statement_list import StatementList
 from .try_with_resources_stmt import (TryResource, TryResourceList,
                                       TryWithResourcesStatement)
 
-from .func_declaration import (is_formal_parameter, FormalParameter, InferredParameter,
+from .func_declaration import (is_formal_parameter, FormalParameter, UntypedParameter,
                                TypedFormalParameter, SpreadParameter, VariadicParameter,
                                FormalParameterList, FunctionDeclarator, FunctionHeader,
                                FunctionDeclaration)

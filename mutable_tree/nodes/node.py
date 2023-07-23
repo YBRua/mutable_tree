@@ -74,6 +74,7 @@ class NodeType(Enum):
     REFERENCE_DECLARATOR = 'ReferenceDeclarator'
     ARRAY_DECLARATOR = 'ArrayDeclarator'
     INITIALIZING_DECLARATOR = 'InitializingDeclarator'
+    ANONYMOUS_DECLARATOR = 'AnonymousDeclarator'
 
     DECLARATOR_LIST = 'DeclaratorList'
 
@@ -101,7 +102,7 @@ class NodeType(Enum):
 
     MODIFIER = 'Modifier'
     MODIFIER_LIST = 'ModifierList'
-    INFERRED_PARAMETER = 'UntypedParameter'
+    UNTYPED_PARAMETER = 'UntypedParameter'
     FORMAL_PARAMETER = 'FormalParameter'
     FORMAL_PARAMETER_LIST = 'FormalParameterList'
     SPREAD_PARAMETER = 'SpreadParameter'

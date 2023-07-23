@@ -14,7 +14,7 @@ from ...nodes import (BlockStatement, BreakStatement, ContinueStatement, DoState
                       WithStatement)
 from ...nodes import (Declarator, VariableDeclarator, ArrayDeclarator,
                       InitializingDeclarator, DeclaratorType, LocalVariableDeclaration)
-from ...nodes import (FormalParameter, InferredParameter, TypedFormalParameter,
+from ...nodes import (FormalParameter, UntypedParameter, TypedFormalParameter,
                       SpreadParameter, FormalParameterList, FunctionHeader,
                       FunctionDeclaration)
 from ...nodes import (Modifier, ModifierList)
@@ -55,6 +55,8 @@ def convert_statement(node: tree_sitter.Node) -> Statement:
         'with_statement': convert_with_stmt,
         'variable_declaration': convert_local_variable_declaration,
         'lexical_declaration': convert_local_variable_declaration,
+        'function_declaration': convert_function_declaration,
+        'generator_function_declaration': convert_function_declaration,
     }
     return stmt_convertors[node.type](node)
 
@@ -585,3 +587,81 @@ def convert_with_stmt(node: tree_sitter.Node) -> WithStatement:
     body = convert_statement(body_node)
 
     return node_factory.create_with_stmt(object, body)
+
+
+def _convert_formal_param(node: tree_sitter.Node) -> UntypedParameter:
+    assert node.type == 'identifier'
+    decl_id = convert_identifier(node)
+    param_decl = node_factory.create_variable_declarator(decl_id)
+    return node_factory.create_untyped_param(param_decl)
+
+
+def _convert_default_formal_param(node: tree_sitter.Node) -> UntypedParameter:
+    left_node = node.child_by_field_name('left')
+    right_node = node.child_by_field_name('right')
+
+    assert left_node.type == 'identifier'
+    left_id = convert_identifier(left_node)
+    left = node_factory.create_variable_declarator(left_id)
+    right = convert_expression(right_node)
+
+    param_decl = node_factory.create_initializing_declarator(left, right)
+    return node_factory.create_untyped_param(param_decl)
+
+
+def convert_formal_param(node: tree_sitter.Node) -> FormalParameter:
+    if node.child_count == 0:
+        return _convert_formal_param(node)
+    elif node.child_count == 3:
+        return _convert_default_formal_param(node)
+    else:
+        raise AssertionError(f'formal_param with {node.child_count} children')
+
+
+def convert_formal_parameters(node: tree_sitter.Node) -> FormalParameterList:
+    params = []
+    for child in node.children[1:-1]:
+        if child.type == ',':
+            continue
+        else:
+            params.append(convert_formal_param(child))
+    return node_factory.create_formal_parameter_list(params)
+
+
+def convert_function_header(node: tree_sitter.Node) -> FunctionHeader:
+    idx = 0
+    if node.children[idx].type == 'async':
+        modifiers = node_factory.create_modifier_list(
+            [node_factory.create_modifier('async')])
+        idx += 1
+    else:
+        modifiers = None
+
+    assert node.children[idx].type == 'function'
+    idx += 1
+
+    if node.children[idx].type == '*':
+        raise NotImplementedError('generator function')
+
+    # function name
+    name_node = node.child_by_field_name('name')
+    if name_node is None:
+        name = node_factory.create_anonymous_declarator()
+    else:
+        assert name_node.type == 'identifier'
+        name_identifier = convert_identifier(name_node)
+        name = node_factory.create_variable_declarator(name_identifier)
+
+    # parameters
+    params_node = node.child_by_field_name('parameters')
+    params = convert_formal_parameters(params_node)
+    func_decl = node_factory.create_func_declarator(name, params)
+
+    return node_factory.create_func_header(func_decl, modifiers=modifiers)
+
+
+def convert_function_declaration(node: tree_sitter.Node) -> FunctionDeclaration:
+    header = convert_function_header(node)
+    body = convert_statement(node.child_by_field_name('body'))
+
+    return node_factory.create_func_declaration(header, body)

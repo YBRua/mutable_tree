@@ -35,14 +35,7 @@ if __name__ == '__main__':
     parser.set_language(LANGUAGE)
 
     code = """
-        switch (value) {
-            case 1:
-                doSomething();
-                break;
-            case 2:
-                doSomethingElse();
-                break;
-        }
+        function foo(a, b=1) { }
     """
 
     if lang == 'java':

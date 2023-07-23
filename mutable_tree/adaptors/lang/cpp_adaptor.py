@@ -489,7 +489,7 @@ def convert_formal_param(node: tree_sitter.Node) -> TypedFormalParameter:
     else:
         decl = None
 
-    return node_factory.create_formal_param(decl_type, decl)
+    return node_factory.create_typed_formal_param(decl_type, decl)
 
 
 def convert_variadic_parameter(node: tree_sitter.Node) -> VariadicParameter:
@@ -729,7 +729,7 @@ def convert_function_definition(node: tree_sitter.Node) -> FunctionDeclaration:
     decl = convert_declarator(node.child_by_field_name('declarator'))
     body = convert_block_stmt(node.child_by_field_name('body'))
 
-    header = node_factory.create_func_header(decl_type, decl)
+    header = node_factory.create_func_header(decl, decl_type)
     return node_factory.create_func_declaration(header, body)
 
 

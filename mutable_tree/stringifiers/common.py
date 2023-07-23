@@ -16,7 +16,7 @@ from ..nodes import (DimensionSpecifier, Dimensions, TypeIdentifier, TypeParamet
                      TypeParameter)
 from ..nodes import (InitializingDeclarator, VariableDeclarator, PointerDeclarator,
                      ReferenceDeclarator, ArrayDeclarator, VariadicParameter,
-                     InferredParameter, TypedFormalParameter, SpreadParameter,
+                     UntypedParameter, TypedFormalParameter, SpreadParameter,
                      FunctionDeclarator, FunctionHeader, FunctionDeclaration,
                      DeclaratorType, LocalVariableDeclaration, TypeParameterDeclaration,
                      TemplateParameterList, TemplateDeclaration)
@@ -375,7 +375,7 @@ class BaseStringifier:
     def stringify_VariadicParameter(self, node: VariadicParameter) -> str:
         return '...'
 
-    def stringify_InferredParameter(self, node: InferredParameter) -> str:
+    def stringify_UntypedParameter(self, node: UntypedParameter) -> str:
         return self.stringify(node.declarator)
 
     def stringify_TypedFormalParameter(self, node: TypedFormalParameter) -> str:
@@ -393,6 +393,8 @@ class BaseStringifier:
         return f'{self.stringify(node.declarator)}({params_str})'
 
     def stringify_FunctionHeader(self, node: FunctionHeader) -> str:
+        assert node.return_type is not None
+
         ret_type_str = self.stringify(node.return_type)
         decl_str = self.stringify(node.func_decl)
         res = f'{ret_type_str} {decl_str}'

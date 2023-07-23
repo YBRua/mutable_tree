@@ -25,8 +25,9 @@ from .statements import (AssertStatement, BlockStatement, BreakStatement,
 from .statements import ForInType
 from .statements import (Declarator, VariableDeclarator, ArrayDeclarator,
                          PointerDeclarator, ReferenceDeclarator, InitializingDeclarator,
-                         DeclaratorList, DeclaratorType, LocalVariableDeclaration)
-from .statements import (FormalParameter, InferredParameter, TypedFormalParameter,
+                         AnonymousDeclarator, DeclaratorList, DeclaratorType,
+                         LocalVariableDeclaration)
+from .statements import (FormalParameter, UntypedParameter, TypedFormalParameter,
                          SpreadParameter, VariadicParameter, FormalParameterList,
                          FunctionDeclarator, FunctionHeader, FunctionDeclaration)
 from .statements import (TemplateDeclaration, TemplateParameter, TemplateParameterList,
@@ -249,6 +250,10 @@ def create_local_variable_declaration(
                                     declarators)
 
 
+def create_anonymous_declarator() -> AnonymousDeclarator:
+    return AnonymousDeclarator(NodeType.ANONYMOUS_DECLARATOR)
+
+
 # STATEMENTS
 
 
@@ -413,12 +418,12 @@ def create_with_stmt(object: Expression, body: Statement) -> WithStatement:
 # DECLARATIONS & DEFINITIONS
 
 
-def create_inferred_parameter(decl: Declarator) -> InferredParameter:
-    return InferredParameter(NodeType.INFERRED_PARAMETER, decl)
+def create_untyped_param(decl: Declarator) -> UntypedParameter:
+    return UntypedParameter(NodeType.UNTYPED_PARAMETER, decl)
 
 
-def create_formal_param(decl_type: DeclaratorType,
-                        decl: Optional[Declarator] = None) -> TypedFormalParameter:
+def create_typed_formal_param(decl_type: DeclaratorType,
+                              decl: Optional[Declarator] = None) -> TypedFormalParameter:
     return TypedFormalParameter(NodeType.FORMAL_PARAMETER, decl_type, decl)
 
 
@@ -440,14 +445,14 @@ def create_func_declarator(decl: Declarator,
 
 
 def create_func_header(
-    return_type: DeclaratorType,
     func_decl: FunctionDeclarator,
+    return_type: Optional[DeclaratorType] = None,
     dimensions: Optional[Dimensions] = None,
     throws: Optional[TypeIdentifierList] = None,
     modifiers: Optional[ModifierList] = None,
     type_params: Optional[TypeParameterList] = None,
 ) -> FunctionHeader:
-    return FunctionHeader(NodeType.FUNCTION_HEADER, return_type, func_decl, dimensions,
+    return FunctionHeader(NodeType.FUNCTION_HEADER, func_decl, return_type, dimensions,
                           throws, modifiers, type_params)
 
 
