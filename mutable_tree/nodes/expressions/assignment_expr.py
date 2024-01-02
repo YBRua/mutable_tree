@@ -50,7 +50,6 @@ def get_assignment_op(op: str) -> AssignmentOps:
 
 
 class AssignmentExpression(Expression):
-
     def __init__(self, node_type: NodeType, left: Node, right: Expression,
                  op: AssignmentOps):
         super().__init__(node_type)
@@ -72,7 +71,8 @@ class AssignmentExpression(Expression):
                 NodeType.PARENTHESIZED_EXPR,
         }:
             raise TypeError(f'Invalid type: {lt} for Assignment LHS')
-        if not is_expression(self.right):
+        if (not is_expression(self.right)
+                and self.right.node_type != NodeType.FUNCTION_DEFINITION):
             raise TypeError(f'Invalid type: {self.right.node_type} for Assignment RHS')
 
     def get_children(self) -> List[Node]:

@@ -6,7 +6,6 @@ from typing import List, Optional
 
 
 class ReturnStatement(Statement):
-
     def __init__(self, node_type: NodeType, expr: Optional[Expression] = None):
         super().__init__(node_type)
         self.expr = expr
@@ -15,7 +14,8 @@ class ReturnStatement(Statement):
     def _check_types(self):
         if self.node_type != NodeType.RETURN_STMT:
             throw_invalid_type(self.node_type, self)
-        if self.expr is not None and not is_expression(self.expr):
+        if (self.expr is not None and not is_expression(self.expr)
+                and self.expr.node_type != NodeType.FUNCTION_DEFINITION):
             throw_invalid_type(self.expr.node_type, self, attr='expr')
 
     def get_children(self) -> List[Node]:

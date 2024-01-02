@@ -19,7 +19,7 @@ class WithStatement(Statement):
         if self.node_type != NodeType.WITH_STMT:
             throw_invalid_type(self.node_type, self)
         if not is_expression(self.object):
-            throw_invalid_type(self.object.node_type, self, attr='condition')
+            throw_invalid_type(self.object.node_type, self, attr='object')
         if not is_statement(self.body):
             throw_invalid_type(self.body.node_type, self, attr='body')
 
@@ -27,4 +27,4 @@ class WithStatement(Statement):
         return [self.object, self.body]
 
     def get_children_names(self) -> List[str]:
-        return ['condition', 'body']
+        return ['object', 'body']

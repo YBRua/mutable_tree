@@ -7,7 +7,6 @@ from typing import List, Union
 
 
 class ComputedPropertyName(Node):
-
     def __init__(self, node_type: NodeType, expr: Expression):
         super().__init__(node_type)
         self.expr = expr
@@ -26,7 +25,6 @@ class ComputedPropertyName(Node):
 
 
 class KeyValuePair(Node):
-
     def __init__(self, node_type: NodeType, key: Union[Identifier, Literal,
                                                        ComputedPropertyName],
                  value: Expression):
@@ -44,7 +42,8 @@ class KeyValuePair(Node):
                 NodeType.IDENTIFIER, NodeType.LITERAL, NodeType.COMPUTED_PROPERTY_NAME
         }:
             throw_invalid_type(self.key.node_type, self, 'key')
-        if not is_expression(self.value):
+        if (not is_expression(self.value)
+                and self.value.node_type != NodeType.FUNCTION_DEFINITION):
             throw_invalid_type(self.value.node_type, self, 'value')
 
     def get_children(self) -> List[Node]:
@@ -58,7 +57,6 @@ ObjectMember = Union[KeyValuePair, SpreadElement, FunctionDeclaration]
 
 
 class ObjectMembers(NodeList):
-
     def __init__(self, node_type: NodeType, members: List[ObjectMember]):
         super().__init__(node_type)
         self.node_list = members
@@ -69,12 +67,14 @@ class ObjectMembers(NodeList):
             throw_invalid_type(self.node_type, self)
 
         for i, member in enumerate(self.node_list):
-            if not isinstance(member, ObjectMember):
+            if member.node_type not in {
+                    NodeType.KEYVALUE_PAIR, NodeType.SPREAD_ELEMENT,
+                    NodeType.FUNCTION_DEFINITION, NodeType.IDENTIFIER
+            }:
                 throw_invalid_type(member.node_type, self, f'member#{i}')
 
 
 class Object(Expression):
-
     def __init__(self, node_type: NodeType, members: ObjectMembers):
         super().__init__(node_type)
         self.members = members

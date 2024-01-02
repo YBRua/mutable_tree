@@ -24,9 +24,11 @@ from ..nodes import Modifier, ModifierList
 from ..nodes import (ScopeResolution, SwitchCase, TryResource, CatchClause, FinallyClause)
 from ..nodes import Program
 
+from ..nodes import (SpreadElement, AwaitExpression, WithStatement, AnonymousDeclarator,
+                     KeyValuePair, Object, DestructuringDeclarator, ComputedPropertyName)
+
 
 class BaseStringifier:
-
     def stringify(self, node: Node) -> str:
         stringifier = getattr(self, f'stringify_{type(node).__name__}', None)
         if stringifier is None:
@@ -110,7 +112,7 @@ class BaseStringifier:
         return f'{self.stringify(node.scope)}::'
 
     def stringify_QualifiedIdentifier(self, node: QualifiedIdentifier) -> str:
-        return f'{self.stringify(node.scope)}.{self.stringify(node.name)}'
+        return f'{self.stringify(node.scope)}{self.stringify(node.name)}'
 
     def stringify_SizeofExpression(self, node: SizeofExpression) -> str:
         if is_expression(node.operand):
@@ -393,9 +395,10 @@ class BaseStringifier:
         return f'{self.stringify(node.declarator)}({params_str})'
 
     def stringify_FunctionHeader(self, node: FunctionHeader) -> str:
-        assert node.return_type is not None
-
-        ret_type_str = self.stringify(node.return_type)
+        if node.return_type is None:
+            ret_type_str = ''
+        else:
+            ret_type_str = self.stringify(node.return_type)
         decl_str = self.stringify(node.func_decl)
         res = f'{ret_type_str} {decl_str}'
 
@@ -449,3 +452,49 @@ class BaseStringifier:
         params_str = self.stringify(node.params)
         func_decl_str = self.stringify(node.func_decl)
         return f'template {params_str}\n{func_decl_str}'
+
+    def stringify_AnonymousDeclarator(self, node: AnonymousDeclarator) -> str:
+        return ''
+
+    def stringify_SpreadElement(self, node: SpreadElement) -> str:
+        expr_str = self.stringify(node.expr)
+        return f'...{expr_str}'
+
+    def stringify_AwaitExpression(self, node: AwaitExpression) -> str:
+        expr_str = self.stringify(node.expr)
+        return f'await {expr_str}'
+
+    def stringify_WithStatement(self, node: WithStatement) -> str:
+        obj_str = self.stringify(node.object)
+        body_str = self.stringify(node.body)
+        return f'with ({obj_str}) {body_str}'
+
+    def stringify_KeyValuePair(self, node: KeyValuePair) -> str:
+        key_str = self.stringify(node.key)
+        value_str = self.stringify(node.value)
+
+        return f'{key_str}: {value_str}'
+
+    def _stringify_ObjectMethod(self, node: FunctionDeclaration) -> str:
+        header_str = self.stringify(node.header)
+        body_str = self.stringify(node.body)
+        return f'{header_str} {body_str}'
+
+    def stringify_Object(self, node: Object) -> str:
+        member_strs = []
+        for member in node.members.get_children():
+            if isinstance(member, FunctionDeclaration):
+                member_strs.append(self._stringify_ObjectMethod(member))
+            else:
+                member_strs.append(self.stringify(member))
+
+        member_str = ',\n'.join(member_strs)
+        return f'{{\n{member_str}\n}}'
+
+    def stringify_DestructuringDeclarator(self, node: DestructuringDeclarator) -> str:
+        pattern_str = self.stringify(node.pattern)
+        return pattern_str
+
+    def stringify_ComputedPropertyName(self, node: ComputedPropertyName) -> str:
+        expr_str = self.stringify(node.expr)
+        return f'[{expr_str}]'

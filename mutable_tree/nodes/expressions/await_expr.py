@@ -22,4 +22,4 @@ class AwaitExpression(Expression):
         return [self.expr]
 
     def get_children_names(self) -> List[str]:
-        return ['operand']
+        return ['expr']
