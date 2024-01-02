@@ -4,7 +4,7 @@ from mutable_tree.nodes import (Node, NodeType, node_factory, LocalVariableDecla
                                 VariableDeclarator, AssignmentOps, ExpressionStatement,
                                 AssignmentExpression, PointerDeclarator,
                                 ReferenceDeclarator, ArrayDeclarator, FunctionDeclarator,
-                                Identifier)
+                                Identifier, DestructuringDeclarator)
 from mutable_tree.stringifiers import BaseStringifier
 from typing import Optional, List, Dict, Set
 from .var_same_type import split_DeclaratorList_by_Initializing
@@ -45,6 +45,12 @@ class SplitVarInitAndDeclVisitor(TransformingVisitor):
                             continue
 
                         assert isinstance(initializing_declarator, InitializingDeclarator)
+
+                        # dont split destructuring declarators
+                        if isinstance(initializing_declarator.declarator,
+                                      DestructuringDeclarator):
+                            declarators.append(initializing_declarator)
+                            continue
 
                         # dont split arrays, argument lists or new exprs
                         if initializing_declarator.value.node_type in {
@@ -102,6 +108,10 @@ class MergeVarInitAndDeclVisitor(TransformingVisitor):
             if isinstance(child, LocalVariableDeclaration):
                 for declarator in child.declarators.node_list:
                     if not isinstance(declarator, InitializingDeclarator):
+
+                        if isinstance(declarator, DestructuringDeclarator):
+                            continue
+
                         identifier_name = get_identifier_name_from_declarator(declarator)
                         var_init[identifier_name] = ('un_init', declarator)
                         uninit_vars.add(identifier_name)
@@ -120,6 +130,10 @@ class MergeVarInitAndDeclVisitor(TransformingVisitor):
                 for declarator in child.declarators.node_list:
                     if not isinstance(declarator, InitializingDeclarator):
                         identifier_name = get_identifier_name_from_declarator(declarator)
+
+                        if isinstance(declarator, DestructuringDeclarator):
+                            continue
+
                         init = var_init.get(identifier_name, None)
                         if init is not None and init[0] == 'inited':
                             declarator_list.append(init[1])
@@ -143,9 +157,11 @@ def get_identifier_from_declarator(declarator: Declarator) -> Identifier:
             or isinstance(declarator, PointerDeclarator)
             or isinstance(declarator, ReferenceDeclarator)
             or isinstance(declarator, ArrayDeclarator)
-            or isinstance(declarator, FunctionDeclarator))
+            or isinstance(declarator, FunctionDeclarator)), declarator.node_type.value
     if isinstance(declarator, VariableDeclarator):
         return declarator.decl_id
+    elif isinstance(declarator, DestructuringDeclarator):
+        pass
     else:
         declarator = declarator.declarator
         return get_identifier_from_declarator(declarator)

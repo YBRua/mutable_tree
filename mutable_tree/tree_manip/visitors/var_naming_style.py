@@ -16,6 +16,7 @@ class VarNamingVisitor(TransformingVisitor):
                                  parent: Optional[Node] = None,
                                  parent_attr: Optional[str] = None):
         if parent.node_type == NodeType.FUNCTION_HEADER:
+            self.generic_visit(node.parameters, node, 'parameters')
             return False, []
         else:
             return self.generic_visit(node, parent, parent_attr)
@@ -24,6 +25,12 @@ class VarNamingVisitor(TransformingVisitor):
                          node: Identifier,
                          parent: Optional[Node] = None,
                          parent_attr: Optional[str] = None):
+        if parent.node_type == NodeType.FIELD_ACCESS and parent_attr == 'field':
+            return False, []
+
+        if parent.node_type == NodeType.CALL_EXPR and parent_attr == 'callee':
+            return False, []
+
         name = node.name
         new_name = self.variable_name_mapping.get(name, None)
 
@@ -119,6 +126,12 @@ class ToUnderscoreCaseVisitor(VarNamingVisitor):
                          node: Identifier,
                          parent: Optional[Node] = None,
                          parent_attr: Optional[str] = None):
+        if parent.node_type == NodeType.FIELD_ACCESS and parent_attr == 'field':
+            return False, []
+
+        if parent.node_type == NodeType.CALL_EXPR and parent_attr == 'callee':
+            return False, []
+
         name = node.name
         if not is_underscore_case(name):
             name = '_' + name
