@@ -1,15 +1,17 @@
 import unittest
 from .transform_test_base import TransformTestBase
-from mutable_tree.tree_manip.visitors import MoveVarDeclToHeadVisitor, MoveVarDeclToBeforeUsedVisitor
+from mutable_tree.tree_manip.visitors import (
+    MoveVarDeclToHeadVisitor,
+    MoveVarDeclToBeforeUsedVisitor,
+)
 
 
 class TestVarDeclToHeadTransform(TransformTestBase):
-
     def test_var_decl_to_head(self):
         visitor = MoveVarDeclToHeadVisitor()
         verbose = False
 
-        code = '''
+        code = """
         doSomething();
         int a, b=1, i; 
         doSomething();
@@ -21,14 +23,14 @@ class TestVarDeclToHeadTransform(TransformTestBase):
         int c;
         for (i = 0; i < 10; i++) {}
         c = b + a;
-        '''
+        """
         self.check_transform(code, visitor, verbose=verbose)
 
     def test_var_decl_to_before_use(self):
         visitor = MoveVarDeclToBeforeUsedVisitor()
         verbose = False
 
-        code = '''
+        code = """
         int a, b = 1, i;
         doSomething();
         int c;
@@ -39,9 +41,9 @@ class TestVarDeclToHeadTransform(TransformTestBase):
         }
         for (i = 0; i < 10; i++) {}
         c = b + a;
-        '''
+        """
         self.check_transform(code, visitor, verbose=verbose)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

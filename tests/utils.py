@@ -2,7 +2,7 @@ import tree_sitter
 from typing import List
 from os import path
 
-LANGUAGES_PATH = './parser/languages.so'
+LANGUAGES_PATH = "./parser/languages.so"
 
 
 def collect_tokens(root: tree_sitter.Node) -> List[str]:

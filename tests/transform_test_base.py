@@ -10,10 +10,9 @@ from .utils import LANGUAGES_PATH
 
 
 class TransformTestBase(unittest.TestCase):
-
     def setUp(self) -> None:
         self.parser = Parser()
-        self.parser.set_language(Language(LANGUAGES_PATH, 'java'))
+        self.parser.set_language(Language(LANGUAGES_PATH, "java"))
         self.stringifier = JavaStringifier()
 
     def _check_ast(self, code: str):
@@ -25,26 +24,25 @@ class TransformTestBase(unittest.TestCase):
         tree = self.parser.parse(code.encode())
         root = tree.root_node
         if root.has_error:
-            raise ValueError('original code is invalid')
+            raise ValueError("original code is invalid")
         mutable_root = JavaAdaptor.convert_program(root)
         return mutable_root
 
     def check_contains_statement(self, root: Node, node_type: NodeType, count: int):
         pass
 
-    def check_transform(self,
-                        code: str,
-                        transform_func: TransformingVisitor,
-                        verbose: bool = False) -> Node:
+    def check_transform(
+        self, code: str, transform_func: TransformingVisitor, verbose: bool = False
+    ) -> Node:
         root = self._statement_to_mutable(code)
         new_root = transform_func.visit(root)
         new_code = self.stringifier.stringify(new_root)
         self._check_ast(new_code)
 
         if verbose:
-            print('##### before #####')
+            print("##### before #####")
             print(code)
-            print('##### after #####')
+            print("##### after #####")
             print(new_code)
             print()
 

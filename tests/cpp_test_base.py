@@ -8,17 +8,16 @@ from .utils import LANGUAGES_PATH, collect_tokens
 
 
 class CppSnippetTestBase(unittest.TestCase):
-
     def setUp(self) -> None:
         self.parser = Parser()
-        self.parser.set_language(Language(LANGUAGES_PATH, 'cpp'))
+        self.parser.set_language(Language(LANGUAGES_PATH, "cpp"))
         self.stringifier = CppStringifier()
 
     def _stmt_round_trip(self, code: str, verbose: bool = False):
         tree = self.parser.parse(code.encode())
         root = tree.root_node
         if root.has_error:
-            raise ValueError('original code is invalid')
+            raise ValueError("original code is invalid")
 
         mutable_root = CppAdaptor.convert_program(root)
         new_code = self.stringifier.stringify(mutable_root)
@@ -36,23 +35,22 @@ class CppSnippetTestBase(unittest.TestCase):
 
 
 class CppFunctionTestBase(unittest.TestCase):
-
     def setUp(self) -> None:
         self.parser = Parser()
-        self.parser.set_language(Language(LANGUAGES_PATH, 'cpp'))
+        self.parser.set_language(Language(LANGUAGES_PATH, "cpp"))
         self.stringifier = CppStringifier()
 
     def _get_function_root(self, root: tree_sitter.Node):
-        assert root.type == 'translation_unit'
+        assert root.type == "translation_unit"
         func_root_node = root.children[0]
-        assert func_root_node.type == 'function_definition', func_root_node.type
+        assert func_root_node.type == "function_definition", func_root_node.type
         return func_root_node
 
     def _function_round_trip(self, code: str, verbose: bool = False):
         tree = self.parser.parse(code.encode())
         root = tree.root_node
         if root.has_error:
-            raise ValueError('original code is invalid')
+            raise ValueError("original code is invalid")
 
         func_root_node = self._get_function_root(root)
 

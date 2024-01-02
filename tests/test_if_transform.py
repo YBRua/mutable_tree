@@ -4,7 +4,6 @@ from mutable_tree.tree_manip.visitors import CompoundIfVisitor, NestedIfVisitor
 
 
 class TestIfTransform(TransformTestBase):
-
     def test_compound_if(self):
         visitor = CompoundIfVisitor()
         verbose = False
@@ -120,5 +119,5 @@ class TestIfTransform(TransformTestBase):
         self.check_transform(code, visitor, verbose=verbose)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

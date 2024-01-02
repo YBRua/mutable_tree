@@ -1,11 +1,11 @@
 import setuptools
 
 long_description = """A mutable AST for source code manipulation with Python."""
-__version__ = '0.0.1'
+__version__ = "0.0.1"
 
 
 def packages():
-    return setuptools.find_packages(exclude=['tests'])
+    return setuptools.find_packages(exclude=["tests"])
 
 
 setuptools.setup(
@@ -23,6 +23,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=['tree_sitter', 'inflection'],
-    python_requires='~=3.8',
+    install_requires=["tree_sitter", "inflection"],
+    python_requires="~=3.8",
 )
